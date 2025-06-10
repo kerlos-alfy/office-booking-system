@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">🏢 Select an Office</h1>
+
+<div class="row">
+    <% offices.forEach(office => { 
+        const isBooked = bookedOfficeIds.includes(office._id.toString());
+        // نجيب الـ booking بتاع المكتب لو محجوز
+        let booking = null;
+        bookings.forEach(b => {
+            if (b.office_id.toString() === office._id.toString()) {
+                booking = b;
+            }
+        });
+    %>
+        <div class="col-md-3 mb-4">
+            <div 
+                class="card text-center p-4 shadow-sm 
+                <% if (isBooked) { %> bg-danger text-white <% } else { %> bg-success text-white <% } %>"
+                <% if (isBooked && booking && booking.client_id) { %>
+                    title="Booked by: <%= booking.client_id.name %>"
+                <% } %>
+            >
+                <h5 class="card-title mb-2">Office <%= office.office_number %></h5>
+                <p class="mb-2">$<%= office.monthly_price %> / month</p>
+
+                <% if (isBooked) { %>
+                    <span class="badge bg-dark">Booked</span>
+                <% } else { %>
+                    <a href="/bookings/branch/<%= branchId %>/office/<%= office._id %>" class="btn btn-light">Book Now</a>
+                <% } %>
+            </div>
+        </div>
+    <% }) %>
+</div>
+
+<%- include('partials/footer') %>

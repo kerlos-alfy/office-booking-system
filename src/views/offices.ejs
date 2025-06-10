@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+    <div class="container py-5">
+        <h1 class="mb-4 text-primary">🏢 Offices List</h1>
+
+        <a href="/offices/new" class="btn btn-success mb-4">+ Add New Office</a>
+
+        <% if (offices.length === 0) { %>
+            <div class="alert alert-info">No offices found.</div>
+        <% } else { %>
+            <table class="table table-bordered table-hover bg-white">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Office Number</th>
+                        <th>Branch</th>
+                        <th>Monthly Price</th>
+                        <th>Yearly Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% offices.forEach((office, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= office.office_number %></td>
+                            <td><%= office.branch_id ? office.branch_id.name : 'N/A' %></td>
+                            <td>$<%= office.monthly_price %></td>
+                            <td>$<%= office.yearly_price %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+
+    </div>
+
+<%- include('partials/footer') %>
+

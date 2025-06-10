@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">📈 Revenue Timeline (Last 6 Months)</h1>
+
+<canvas id="timelineChart" width="600" height="300"></canvas>
+
+<script>
+    const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+    const timelineChart = new Chart(timelineCtx, {
+        type: 'line',
+        data: {
+            labels: <%- JSON.stringify(dataPoints.map(p => p.label)) %>,
+            datasets: [
+                {
+                    label: 'Expected Revenue',
+                    data: <%- JSON.stringify(dataPoints.map(p => p.expected)) %>,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    fill: false
+                },
+                {
+                    label: 'Paid',
+                    data: <%- JSON.stringify(dataPoints.map(p => p.paid)) %>,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+<%- include('partials/footer') %>

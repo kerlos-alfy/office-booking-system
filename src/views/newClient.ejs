@@ -1,0 +1,30 @@
+<%- include('partials/header') %>
+
+
+    <div class="container py-5">
+        <h1 class="mb-4 text-success">➕ Add New Client</h1>
+
+        <form method="POST" action="/clients/new" class="bg-white p-4 rounded shadow-sm">
+
+            <div class="mb-3">
+                <label class="form-label">Name:</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone:</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <input type="email" name="email" class="form-control">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Client</button>
+            <a href="/clients" class="btn btn-secondary ms-2">Back to Clients</a>
+
+        </form>
+    </div>
+<%- include('partials/footer') %>
+

@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+
+    <div class="container py-5">
+        <h1 class="mb-4 text-primary">👤 Clients List</h1>
+
+        <a href="/clients/new" class="btn btn-success mb-4">+ Add New Client</a>
+
+        <% if (clients.length === 0) { %>
+            <div class="alert alert-info">No clients found.</div>
+        <% } else { %>
+            <table class="table table-bordered table-hover bg-white">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% clients.forEach((client, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= client.name %></td>
+                            <td><%= client.phone %></td>
+                            <td><%= client.email %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+
+    </div>
+
+<%- include('partials/footer') %>
+

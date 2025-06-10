@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+    <div class="container py-5">
+        <h1 class="mb-4 text-success">➕ Add New Office</h1>
+
+        <form method="POST" action="/offices/new" class="bg-white p-4 rounded shadow-sm">
+
+            <div class="mb-3">
+                <label class="form-label">Branch:</label>
+                <select name="branch_id" class="form-control" required>
+                    <% branches.forEach(branch => { %>
+                        <option value="<%= branch._id %>"><%= branch.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Office Number:</label>
+                <input type="text" name="office_number" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Monthly Price:</label>
+                <input type="number" name="monthly_price" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Yearly Price:</label>
+                <input type="number" name="yearly_price" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Office</button>
+            <a href="/offices" class="btn btn-secondary ms-2">Back to Offices</a>
+
+        </form>
+    </div>
+<%- include('partials/footer') %>
+

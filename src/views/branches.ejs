@@ -1,0 +1,30 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">🏢 Branches List</h1>
+
+<a href="/branches/new" class="btn btn-success mb-4">+ Add New Branch</a>
+
+<% if (branches.length === 0) { %>
+    <div class="alert alert-info">No branches found.</div>
+<% } else { %>
+    <table class="table table-bordered table-hover bg-white">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% branches.forEach((branch, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= branch.name %></td>
+                    <td><%= branch.location %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } %>
+
+<%- include('partials/footer') %>

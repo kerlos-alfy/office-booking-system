@@ -1,0 +1,133 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">📊 Revenue Report</h1>
+
+<!-- Form لاختيار الشهر -->
+<form method="GET" action="/reports/revenue" class="mb-4">
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">Select Month:</label>
+        </div>
+        <div class="col-auto">
+            <input type="month" name="month" class="form-control" value="<%= selectedMonth %>" required>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </div>
+    </div>
+</form>
+
+<!-- Summary Table + Pie Chart -->
+<% if (selectedMonth && reportData.length > 0) { %>
+    <div class="row align-items-start mb-4">
+        <!-- Col 1: Summary Table -->
+        <div class="col-md-6 mb-3">
+<table class="table table-bordered text-center align-middle shadow table-summary" style="max-width: 100%;">
+
+                <thead class="table-primary">
+                    <tr>
+                        <th colspan="2" class="fs-5">📊 Revenue Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>📅 Month</td>
+                        <td><%= selectedMonth %></td>
+                    </tr>
+                    <tr>
+                        <td>💰 Total Expected Revenue</td>
+                        <td class="text-success fw-bold">$<%= totalExpectedRevenue %></td>
+                    </tr>
+                    <tr>
+                        <td>💵 Total Paid</td>
+                        <td class="text-info fw-bold">$<%= totalPaid %></td>
+                    </tr>
+                    <tr>
+                        <td>📈 Collection Rate</td>
+                        <td class="fw-bold <% if (collectionRate >= 80) { %> text-success <% } else if (collectionRate >= 50) { %> text-warning <% } else { %> text-danger <% } %>">
+                            <%= collectionRate.toFixed(2) %> %
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Col 2: Pie Chart in Card -->
+        <div class="col-md-6 mb-3">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white fw-bold text-center">
+                    📊 Collection Rate Pie
+                </div>
+                <div class="card-body d-flex justify-content-center">
+                    <div style="max-width: 220px;">
+                        <canvas id="collectionPie"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Script -->
+    <script>
+        const pieCtx = document.getElementById('collectionPie').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Paid', 'Remaining'],
+                datasets: [{
+                    data: [
+                        <%= totalPaid %>,
+                        <%= totalExpectedRevenue - totalPaid %>
+                    ],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.8)', // Paid
+                        'rgba(255, 99, 132, 0.8)'  // Remaining
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+<% } %>
+
+<!-- Table -->
+<% if (reportData.length === 0 && selectedMonth) { %>
+    <div class="alert alert-warning">No data found for this month.</div>
+<% } else if (reportData.length > 0) { %>
+    <table class="table table-bordered table-hover bg-white shadow">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Office</th>
+                <th>Client</th>
+                <th>Contract Type</th>
+                <th>Expected Revenue</th>
+                <th>Paid So Far</th>
+                <th>Remaining</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% reportData.forEach((row, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= row.office %></td>
+                    <td><%= row.client %></td>
+                    <td><%= row.contract_type %></td>
+                    <td>$<%= row.expected_revenue %></td>
+                    <td>$<%= row.paid_so_far %></td>
+                    <td>$<%= row.remaining %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } %>
+
+<%- include('partials/footer') %>

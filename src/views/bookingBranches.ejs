@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">🗂️ Select a Branch</h1>
+
+<div class="row">
+    <% branches.forEach(branch => { %>
+        <div class="col-md-3 mb-4">
+            <a href="/bookings/branch/<%= branch._id %>" class="text-decoration-none">
+                <div class="card text-center p-4 shadow-sm">
+                    <h5 class="card-title mb-0"><%= branch.name %></h5>
+                    <p class="text-muted"><%= branch.location %></p>
+                </div>
+            </a>
+        </div>
+    <% }) %>
+</div>
+
+<%- include('partials/footer') %>
