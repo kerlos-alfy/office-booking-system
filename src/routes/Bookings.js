@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
+
 const Booking = require('../models/Booking');
 const Branch = require('../models/Branch');
 const Office = require('../models/Office');
 const Client = require('../models/Client');
 
-// ✅ الصفحة الرئيسية — عرض الفروع (4 بلوك)
+// ✅ الصفحة الرئيسية — عرض الفروع
 router.get('/', async (req, res) => {
     try {
         const branches = await Branch.find();
@@ -19,66 +20,160 @@ router.get('/', async (req, res) => {
 router.get('/branch/:branchId', async (req, res) => {
     try {
         const branchId = req.params.branchId;
-
         const offices = await Office.find({ branch_id: branchId });
 
         const bookings = await Booking.find({
             office_id: { $in: offices.map(o => o._id) }
-        }).populate('client_id'); // لازم نعمل populate للعميل عشان نجيب اسمه
+        }).populate('client_id');
 
-        const bookedOfficeIds = bookings.map(b => b.office_id.toString());
+        const today = new Date();
+
+        const activeBookings = bookings.filter(b => b.status === 'active' && new Date(b.end_date) >= today);
+
+        const bookedOfficeIds = activeBookings.map(b => b.office_id.toString());
 
         res.render('bookingOffices', {
             offices,
             branchId,
             bookedOfficeIds,
-            bookings // ✅ دي لازم تكون موجودة
+            bookings: activeBookings,
+            filter: req.query.filter || 'all'
         });
+
     } catch (err) {
         res.status(500).send('Error loading offices');
     }
 });
 
-
-// ✅ صفحة تفاصيل الحجز لمكتب معين
-router.get('/branch/:branchId/office/:officeId', async (req, res) => {
+// ✅ Form New Booking
+router.get('/new/:officeId', async (req, res) => {
     try {
-        const officeId = req.params.officeId;
-
-        const clients = await Client.find();
-        const office = await Office.findById(officeId).populate('branch_id');
-
-        res.render('bookingForm', { office, clients });
+        const office = await Office.findById(req.params.officeId).populate('branch_id');
+        res.render('bookingNew', { office });
     } catch (err) {
-        res.status(500).send('Error loading booking form');
+        res.status(500).send('Error loading new booking form');
     }
 });
 
-// ✅ حفظ الحجز
-router.post('/branch/:branchId/office/:officeId', async (req, res) => {
+// ✅ POST — New Booking
+router.post('/', async (req, res) => {
     try {
+        console.log('✅ req.body:', req.body);
+
+        const {
+            office_id,
+            page_no,
+            start_date,
+            end_date,
+            down_payment,
+            cheques_count,
+            cheques,
+            total_price,
+            vat,
+            sec_deposit,
+            admin_fee,
+            commission,
+            ejari
+        } = req.body;
+
+        const chequesArray = cheques ? Object.values(cheques) : [];
+
         const booking = new Booking({
-            office_id: req.params.officeId,
-            client_id: req.body.client_id,
-            start_date: req.body.start_date,
-            end_date: req.body.end_date,
-            contract_type: req.body.contract_type,
-            initial_payment: req.body.initial_payment,
-            total_price: req.body.total_price,
+            office_id,
+            page_no,
+            start_date,
+            end_date,
+            initial_payment: down_payment,
+            total_price,
+            vat,
+            sec_deposit,
+            admin_fee,
+            commission,
+            ejari_no: ejari,
             payments: [
                 {
-                    amount: req.body.initial_payment,
+                    amount: down_payment,
                     payment_date: new Date(),
                     payment_type: 'initial'
                 }
-            ]
+            ],
+            cheques: chequesArray
         });
 
         await booking.save();
-        res.redirect('/bookings');
+
+        console.log('✅ Booking created:', booking);
+
+        res.redirect('/bookings/success');
     } catch (err) {
-        res.status(500).send('Error saving booking');
+        console.error('❌ Error creating booking:', err);
+        res.status(500).send('Error creating booking');
     }
 });
+
+// ✅ View Booking Details
+router.get('/view/:bookingId', async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.bookingId)
+            .populate('office_id')
+            .populate('client_id');
+
+        if (!booking) {
+            return res.status(404).send('Booking not found');
+        }
+
+        res.render('bookingView', { booking });
+    } catch (err) {
+        res.status(500).send('Error loading booking view');
+    }
+});
+
+// ✅ Archive Page → Show archived bookings
+router.get('/archive', async (req, res) => {
+    try {
+        const clientFilter = req.query.client;
+
+let query = { status: 'archived' };
+
+if (clientFilter) {
+    query = {
+        ...query,
+        client_id: {
+            $in: await Client.find({
+                name: { $regex: clientFilter, $options: 'i' }
+            }).distinct('_id')
+        }
+    };
+}
+
+const archivedBookings = await Booking.find(query)
+    .populate('office_id')
+    .populate('client_id');
+
+res.render('bookingArchive', { archivedBookings, client: clientFilter });
+
+    } catch (err) {
+        res.status(500).send('Error loading archive');
+    }
+});
+
+// ✅ Release Office → Archive Booking
+router.post('/:bookingId/archive', async (req, res) => {
+    try {
+        await Booking.findByIdAndUpdate(req.params.bookingId, { status: 'archived' });
+        console.log(`✅ Booking ${req.params.bookingId} archived.`);
+        res.redirect('/bookings/success');
+    } catch (err) {
+        res.status(500).send('Error archiving booking');
+    }
+});
+
+// ✅ Success Page
+router.get('/success', (req, res) => {
+    res.render('bookingSuccess');
+});
+
+
+
 
 module.exports = router;

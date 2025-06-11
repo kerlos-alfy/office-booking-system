@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">📝 New Booking — Office <%= office.office_number %> (Floor: <%= office.floor || 'N/A' %>)</h1>
+
+<form method="POST" action="/bookings">
+    <input type="hidden" name="office_id" value="<%= office._id %>">
+
+    <!-- Page No -->
+    <div class="mb-3">
+        <label class="form-label">Page Number</label>
+        <input type="text" name="page_no" class="form-control" required>
+    </div>
+
+    <!-- Start & End Date -->
+    <div class="row mb-3">
+        <div class="col">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" class="form-control" required>
+        </div>
+        <div class="col">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" class="form-control" required>
+        </div>
+    </div>
+
+    <!-- Down Payment -->
+    <div class="mb-3">
+        <label class="form-label">Down Payment</label>
+        <input type="number" name="down_payment" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- Number of Cheques -->
+    <div class="mb-3">
+        <label class="form-label">Number of Cheques</label>
+        <input type="number" id="cheques_count" name="cheques_count" class="form-control" min="0" value="0" oninput="generateChequeFields()">
+    </div>
+
+    <!-- Dynamic Cheques Fields -->
+    <div id="cheques_fields"></div>
+
+    <!-- Total Price -->
+    <div class="mb-3">
+        <label class="form-label">Total Price</label>
+        <input type="number" name="total_price" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- VAT -->
+    <div class="mb-3">
+        <label class="form-label">VAT</label>
+        <input type="number" name="vat" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- Security Deposit -->
+    <div class="mb-3">
+        <label class="form-label">Security Deposit</label>
+        <input type="number" name="sec_deposit" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- Admin Fee -->
+    <div class="mb-3">
+        <label class="form-label">Admin Fee</label>
+        <input type="number" name="admin_fee" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- Commission -->
+    <div class="mb-3">
+        <label class="form-label">Commission</label>
+        <input type="number" name="commission" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- Ejari Number -->
+    <div class="mb-3">
+        <label class="form-label">Ejari Number</label>
+        <input type="text" name="ejari" class="form-control" required>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-success">Submit Booking</button>
+</form>
+
+<!-- JS for Dynamic Cheques -->
+<script>
+function generateChequeFields() {
+    const count = parseInt(document.getElementById('cheques_count').value) || 0;
+    const container = document.getElementById('cheques_fields');
+    container.innerHTML = '';
+
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+            <div class="border p-3 mb-3 rounded">
+                <h6>Cheque ${i}</h6>
+                <div class="mb-2">
+                    <label class="form-label">Amount</label>
+                    <input type="number" name="cheques[${i-1}][amount]" step="0.01" class="form-control" required>
+                </div>
+                <div>
+                    <label class="form-label">Due Date</label>
+                    <input type="date" name="cheques[${i-1}][due_date]" class="form-control" required>
+                </div>
+            </div>
+        `;
+    }
+}
+</script>
+
+<%- include('partials/footer') %>

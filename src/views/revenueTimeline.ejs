@@ -1,8 +1,67 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📈 Revenue Timeline (Last 6 Months)</h1>
+<h1 class="mb-4 text-primary">📈 Revenue Timeline</h1>
 
-<canvas id="timelineChart" width="600" height="300"></canvas>
+<!-- Form لاختيار الفترة -->
+<form method="GET" action="/reports/timeline" class="mb-4">
+    <div class="row g-3 align-items-center mb-2">
+        <div class="col-auto">
+            <label class="col-form-label">Select Range:</label>
+        </div>
+        <div class="col-auto">
+            <select name="range" class="form-select" id="rangeSelector" onchange="toggleCustomRange()">
+                <option value="3months" <%= range === '3months' ? 'selected' : '' %>>Last 3 Months</option>
+                <option value="6months" <%= range === '6months' ? 'selected' : '' %>>Last 6 Months</option>
+                <option value="12months" <%= range === '12months' ? 'selected' : '' %>>Last 12 Months</option>
+                <option value="custom" <%= range === 'custom' ? 'selected' : '' %>>Custom Range</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Custom Range -->
+    <div class="row g-3 align-items-center mb-3" id="customRangeSection" style="<%= range === 'custom' ? '' : 'display:none;' %>">
+        <div class="col-auto">
+            <label class="col-form-label">From:</label>
+        </div>
+        <div class="col-auto">
+            <input type="month" name="startMonth" class="form-control" value="<%= startMonth %>">
+        </div>
+        <div class="col-auto">
+            <label class="col-form-label">To:</label>
+        </div>
+        <div class="col-auto">
+            <input type="month" name="endMonth" class="form-control" value="<%= endMonth %>">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Generate Timeline</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function toggleCustomRange() {
+        const rangeSelector = document.getElementById('rangeSelector');
+        const customRangeSection = document.getElementById('customRangeSection');
+        if (rangeSelector.value === 'custom') {
+            customRangeSection.style.display = '';
+        } else {
+            customRangeSection.style.display = 'none';
+        }
+    }
+</script>
+
+<!-- Timeline Chart -->
+<div class="card shadow mb-5">
+    <div class="card-header bg-primary text-white fw-bold text-center">
+        Revenue Timeline Chart
+    </div>
+    <div class="card-body">
+        <canvas id="timelineChart" height="100"></canvas>
+    </div>
+</div>
 
 <script>
     const timelineCtx = document.getElementById('timelineChart').getContext('2d');
@@ -15,20 +74,26 @@
                     label: 'Expected Revenue',
                     data: <%- JSON.stringify(dataPoints.map(p => p.expected)) %>,
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    fill: false
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3
                 },
                 {
                     label: 'Paid',
                     data: <%- JSON.stringify(dataPoints.map(p => p.paid)) %>,
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    fill: false
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.3
                 }
             ]
         },
         options: {
             responsive: true,
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });

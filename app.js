@@ -7,6 +7,7 @@ const path = require('path');
 const branchesRoutes = require('./src/routes/Branch');
 const officesRoutes = require('./src/routes/Offices');
 const clientsRoutes = require('./src/routes/Clients');
+const bookingsRoutes = require('./src/routes/Bookings');
 
 require('dotenv').config();
 
@@ -34,7 +35,6 @@ app.get('/', (req, res) => {
 app.use('/branches', branchesRoutes);
 app.use('/offices', officesRoutes);
 app.use('/clients', clientsRoutes);
-const bookingsRoutes = require('./src/routes/Bookings');
 app.use('/bookings', bookingsRoutes);
 const paymentsRoutes = require('./src/routes/Payments');
 app.use('/payments', paymentsRoutes);

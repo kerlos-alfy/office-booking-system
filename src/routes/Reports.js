@@ -64,18 +64,42 @@ router.get('/revenue', async (req, res) => {
 
 router.get('/timeline', async (req, res) => {
     try {
-        const monthsToShow = 6;
-        const now = new Date();
-        const dataPoints = [];
+        const range = req.query.range || '3months';
+        const startMonth = req.query.startMonth;
+        const endMonth = req.query.endMonth;
 
-        for (let i = monthsToShow - 1; i >= 0; i--) {
-            const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
-            const monthLabel = start.toLocaleString('default', { month: 'short', year: 'numeric' });
+        const now = new Date();
+        let startDate, endDate;
+
+        if (range === 'custom' && startMonth && endMonth) {
+            const [startY, startM] = startMonth.split('-').map(Number);
+            const [endY, endM] = endMonth.split('-').map(Number);
+
+            startDate = new Date(startY, startM - 1, 1);
+            endDate = new Date(endY, endM, 0, 23, 59, 59);
+        } else {
+            let monthsBack = 3;
+            if (range === '6months') monthsBack = 6;
+            if (range === '12months') monthsBack = 12;
+
+            startDate = new Date(now.getFullYear(), now.getMonth() - (monthsBack - 1), 1);
+            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        }
+
+        const dataPoints = [];
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        let current = new Date(start.getFullYear(), start.getMonth(), 1);
+
+        while (current <= end) {
+            const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
+            const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0, 23, 59, 59);
+            const monthLabel = monthStart.toLocaleString('default', { month: 'short', year: 'numeric' });
 
             const bookings = await Booking.find({
-                start_date: { $lte: end },
-                end_date: { $gte: start }
+                start_date: { $lte: monthEnd },
+                end_date: { $gte: monthStart }
             });
 
             const total = bookings.reduce((sum, b) => sum + b.total_price, 0);
@@ -88,12 +112,20 @@ router.get('/timeline', async (req, res) => {
                 expected: total,
                 paid
             });
+
+            current.setMonth(current.getMonth() + 1);
         }
 
-        res.render('revenueTimeline', { dataPoints });
+        res.render('revenueTimeline', {
+            dataPoints,
+            range,
+            startMonth,
+            endMonth
+        });
     } catch (err) {
         res.status(500).send('Error loading timeline report');
     }
 });
+
     
 module.exports = router;

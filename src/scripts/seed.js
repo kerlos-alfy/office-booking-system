@@ -34,12 +34,13 @@ mongoose.connect(process.env.MONGO_URI, {
     for (const branch of branches) {
         let officesData = [];
         for (let i = 1; i <= 10; i++) {
-            officesData.push({
-                branch_id: branch._id,
-                office_number: `#${i}`,
-                monthly_price: 500 + i * 10,
-                yearly_price: 5000 + i * 100
-            });
+           officesData.push({
+        branch_id: branch._id,
+        office_number: `#${i}`,
+        floor: Math.ceil(i / 3), // مثال: كل 3 Offices في Floor
+        monthly_price: 500 + i * 10,
+        yearly_price: 5000 + i * 100
+    });
         }
         const offices = await Office.insertMany(officesData);
         console.log(`✅ Inserted ${offices.length} offices for branch ${branch.name}`);

@@ -1,37 +1,114 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">🏢 Select an Office</h1>
+<h1 class="mb-4 text-primary">🗂️ Offices in Branch</h1>
 
-<div class="row">
-    <% offices.forEach(office => { 
-        const isBooked = bookedOfficeIds.includes(office._id.toString());
-        // نجيب الـ booking بتاع المكتب لو محجوز
-        let booking = null;
-        bookings.forEach(b => {
-            if (b.office_id.toString() === office._id.toString()) {
-                booking = b;
-            }
-        });
-    %>
-        <div class="col-md-3 mb-4">
-            <div 
-                class="card text-center p-4 shadow-sm 
-                <% if (isBooked) { %> bg-danger text-white <% } else { %> bg-success text-white <% } %>"
-                <% if (isBooked && booking && booking.client_id) { %>
-                    title="Booked by: <%= booking.client_id.name %>"
-                <% } %>
-            >
-                <h5 class="card-title mb-2">Office <%= office.office_number %></h5>
-                <p class="mb-2">$<%= office.monthly_price %> / month</p>
-
-                <% if (isBooked) { %>
-                    <span class="badge bg-dark">Booked</span>
-                <% } else { %>
-                    <a href="/bookings/branch/<%= branchId %>/office/<%= office._id %>" class="btn btn-light">Book Now</a>
-                <% } %>
-            </div>
+<form method="GET" action="/bookings/branch/<%= branchId %>" class="mb-4">
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">Filter:</label>
         </div>
-    <% }) %>
+        <div class="col-auto">
+            <select name="filter" class="form-select" onchange="this.form.submit()">
+                <option value="all" <%= filter === 'all' ? 'selected' : '' %>>Show All</option>
+                <option value="available" <%= filter === 'available' ? 'selected' : '' %>>Show Only Available</option>
+                <option value="booked" <%= filter === 'booked' ? 'selected' : '' %>>Show Only Booked</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<%
+    const today = new Date();
+%>
+
+<div class="row g-3">
+    <% offices.forEach(office => { %>
+        <% const isBooked = bookedOfficeIds.includes(office._id.toString()); %>
+        <% const booking = bookings.find(b => b.office_id.toString() === office._id.toString()); %>
+        <% const isExpiringSoon = isBooked && (new Date(booking.end_date) - today) / (1000 * 60 * 60 * 24) <= 7; %>
+
+        <% if (filter === 'all' || (filter === 'available' && !isBooked) || (filter === 'booked' && isBooked)) { %>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <a href="<%= isBooked ? `/bookings/view/${booking._id}` : `/bookings/new/${office._id}` %>" class="text-decoration-none text-dark">
+                    <div class="office-box p-3 shadow-sm rounded <%= isBooked ? 'office-booked' : 'office-available' %>">
+
+                        <div class="d-flex justify-content-end mb-2">
+                            <span class="badge <%= isBooked ? 'bg-danger' : 'bg-success' %>">
+                                <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
+                            </span>
+                        </div>
+
+                        <h5 class="fw-bold mb-2">Office <%= office.office_number %></h5>
+                        <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
+
+                        <% if (isBooked) { %>
+                            <p class="mb-1 text-muted">🔒 Booked by: <strong><%= booking?.client_id?.name || 'Unknown' %></strong></p>
+                            <p class="mb-1">📅 From: <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
+                            <p class="mb-1">📅 To: <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
+
+                            <% if (isExpiringSoon) { %>
+                                <p class="text-danger fw-bold mt-2">⚠️ Booking expiring soon!</p>
+                            <% } %>
+                        <% } else { %>
+                            <div class="d-flex align-items-center justify-content-center" style="height: 100px;">
+                                <p class="text-success fw-bold fs-5 mb-0">✅ Available</p>
+                            </div>
+                        <% } %>
+
+                    </div>
+                </a>
+            </div>
+        <% } %>
+    <% }); %>
 </div>
+
+<style>
+    .office-box {
+        border: 2px solid #e0e0e0;
+        border-radius: 16px;
+        background-color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 250px;
+    }
+
+    .office-available {
+        background-color: #e8f5e9;
+        border-color: #81c784;
+    }
+
+    .office-booked {
+        background-color: #fff3f3;
+        border-color: #e57373;
+    }
+
+    .office-box:hover {
+        border-color: #0d6efd;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+    }
+
+    .office-box h5 {
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .office-box p {
+        font-size: 0.9rem;
+        color: #555;
+    }
+</style>
+
+<!-- Page Fade In -->
+<style>
+    body {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+</style>
 
 <%- include('partials/footer') %>

@@ -31,5 +31,19 @@ router.post('/new', async (req, res) => {
         res.status(500).send('Error saving branch');
     }
 });
+// ✅ View Branch Details
+router.get('/view/:branchId', async (req, res) => {
+    try {
+        const branch = await Branch.findById(req.params.branchId);
+
+        if (!branch) {
+            return res.status(404).send('Branch not found');
+        }
+
+        res.render('branchView', { branch });
+    } catch (err) {
+        res.status(500).send('Error loading branch');
+    }
+});
 
 module.exports = router;
