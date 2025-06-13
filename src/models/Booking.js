@@ -8,7 +8,8 @@ const paymentSchema = new mongoose.Schema({
 
 const chequeSchema = new mongoose.Schema({
     amount: { type: Number, required: true },
-    due_date: { type: Date, required: true }
+    due_date: { type: Date, required: true },
+    collected: { type: Boolean, default: false } // ✅ Added
 });
 
 const bookingSchema = new mongoose.Schema({
@@ -24,7 +25,7 @@ const bookingSchema = new mongoose.Schema({
     admin_fee: { type: Number, required: true },
     commission: { type: Number, required: true },
     ejari_no: { type: String, required: true },
-status: { type: String, enum: ['active', 'archived'], default: 'active' },
+    status: { type: String, enum: ['active', 'archived'], default: 'active' },
 
     payments: [paymentSchema],
     cheques: [chequeSchema]

@@ -1,30 +1,86 @@
 <%- include('partials/header') %>
 
+<h1 class="mb-4 text-primary">➕ Add New Client</h1>
 
-    <div class="container py-5">
-        <h1 class="mb-4 text-success">➕ Add New Client</h1>
+<form method="POST" action="/clients/new" class="card shadow p-4 mb-5">
 
-        <form method="POST" action="/clients/new" class="bg-white p-4 rounded shadow-sm">
-
-            <div class="mb-3">
-                <label class="form-label">Name:</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Phone:</label>
-                <input type="text" name="phone" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Email:</label>
-                <input type="email" name="email" class="form-control">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Save Client</button>
-            <a href="/clients" class="btn btn-secondary ms-2">Back to Clients</a>
-
-        </form>
+    <!-- Mobile -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">📱 Mobile Number</label>
+        <input type="text" name="mobile" class="form-control" required>
     </div>
-<%- include('partials/footer') %>
 
+    <!-- Company -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">🏢 Company Name</label>
+        <input type="text" name="company" class="form-control" required>
+    </div>
+
+    <!-- Registered Owner Name -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">👤 Registered Owner Name</label>
+        <input type="text" name="registered_owner_name" class="form-control" required>
+    </div>
+
+    <!-- Nationality -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">🌍 Nationality</label>
+        <input type="text" name="nationality" class="form-control" required>
+    </div>
+
+    <!-- Emirates ID Status -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">🆔 Emirates ID Status</label>
+        <select name="emirates_id_status" class="form-select" required>
+            <option value="OK">OK</option>
+            <option value="NOT NEED">NOT NEED</option>
+            <option value="Unavailable">Unavailable</option>
+        </select>
+    </div>
+
+    <!-- Contract Status -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">📄 Contract Status</label>
+        <select name="contract_status" class="form-select" required>
+            <option value="OK">OK</option>
+            <option value="Not OK">Not OK</option>
+        </select>
+    </div>
+
+    <!-- License Status -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">🏷️ License Status</label>
+        <select name="license_status" class="form-select" required>
+            <option value="OK">OK</option>
+            <option value="Not OK">Not OK</option>
+        </select>
+    </div>
+
+    <!-- Ejari No -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">📄 Ejari No (Optional)</label>
+        <input type="text" name="ejari_no" class="form-control">
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-primary mt-3 fw-bold">✅ Save Client</button>
+
+</form>
+
+<!-- Fade In -->
+<style>
+    body {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+</style>
+
+<%- include('partials/footer') %>

@@ -2,13 +2,12 @@
   "name": "office-booking-system",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
+  "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
     "seed": "node src/scripts/seed.js",
     "clear": "node src/scripts/clear.js"
-}
-,
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -19,6 +18,7 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mongoose": "^8.15.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^2.0.1"
   }
 }

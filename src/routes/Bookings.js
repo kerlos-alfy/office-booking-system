@@ -27,23 +27,38 @@ router.get('/branch/:branchId', async (req, res) => {
         }).populate('client_id');
 
         const today = new Date();
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
         const activeBookings = bookings.filter(b => b.status === 'active' && new Date(b.end_date) >= today);
 
         const bookedOfficeIds = activeBookings.map(b => b.office_id.toString());
+
+        // Stats:
+        const totalOffices = offices.length;
+        const totalBooked = activeBookings.length;
+        const totalAvailable = totalOffices - totalBooked;
+
+        const expiringThisMonth = activeBookings.filter(b =>
+            new Date(b.end_date) >= today && new Date(b.end_date) <= endOfMonth
+        ).length;
 
         res.render('bookingOffices', {
             offices,
             branchId,
             bookedOfficeIds,
             bookings: activeBookings,
-            filter: req.query.filter || 'all'
+            filter: req.query.filter || 'all',
+            totalOffices,
+            totalBooked,
+            totalAvailable,
+            expiringThisMonth
         });
 
     } catch (err) {
         res.status(500).send('Error loading offices');
     }
 });
+
 
 // ✅ Form New Booking
 router.get('/new/:officeId', async (req, res) => {
@@ -133,24 +148,24 @@ router.get('/archive', async (req, res) => {
     try {
         const clientFilter = req.query.client;
 
-let query = { status: 'archived' };
+        let query = { status: 'archived' };
 
-if (clientFilter) {
-    query = {
-        ...query,
-        client_id: {
-            $in: await Client.find({
-                name: { $regex: clientFilter, $options: 'i' }
-            }).distinct('_id')
+        if (clientFilter) {
+            query = {
+                ...query,
+                client_id: {
+                    $in: await Client.find({
+                        name: { $regex: clientFilter, $options: 'i' }
+                    }).distinct('_id')
+                }
+            };
         }
-    };
-}
 
-const archivedBookings = await Booking.find(query)
-    .populate('office_id')
-    .populate('client_id');
+        const archivedBookings = await Booking.find(query)
+            .populate('office_id')
+            .populate('client_id');
 
-res.render('bookingArchive', { archivedBookings, client: clientFilter });
+        res.render('bookingArchive', { archivedBookings, client: clientFilter });
 
     } catch (err) {
         res.status(500).send('Error loading archive');
@@ -168,12 +183,33 @@ router.post('/:bookingId/archive', async (req, res) => {
     }
 });
 
+// ✅ Toggle Collected Status for Cheque
+router.post('/:bookingId/cheques/:chequeIndex/toggle-collected', async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.bookingId);
+        const chequeIndex = parseInt(req.params.chequeIndex);
+
+        if (!booking || !booking.cheques[chequeIndex]) {
+            return res.status(404).send('Cheque not found');
+        }
+
+        // Toggle collected
+        booking.cheques[chequeIndex].collected = !booking.cheques[chequeIndex].collected;
+
+        await booking.save();
+
+        console.log(`✅ Cheque #${chequeIndex + 1} in booking ${booking._id} marked as ${booking.cheques[chequeIndex].collected ? 'Collected' : 'Uncollected'}`);
+
+        res.redirect(`/bookings/view/${booking._id}`);
+    } catch (err) {
+        console.error('❌ Error toggling cheque collected:', err);
+        res.status(500).send('Error toggling cheque collected');
+    }
+});
+
 // ✅ Success Page
 router.get('/success', (req, res) => {
     res.render('bookingSuccess');
 });
-
-
-
 
 module.exports = router;

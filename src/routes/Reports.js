@@ -1,131 +1,95 @@
 const express = require('express');
 const router = express.Router();
-const Booking = require('../models/Booking');
-const Office = require('../models/Office');
-const Client = require('../models/Client');
 
-// Revenue Report
+const Booking = require('../models/Booking');
+const Branch = require('../models/Branch');
+const Office = require('../models/Office');
+
+// ✅ Revenue Report
 router.get('/revenue', async (req, res) => {
     try {
-        const monthParam = req.query.month; // Format: YYYY-MM
+        const selectedMonth = req.query.month;
+        const selectedBranchIds = req.query.branch_ids
+            ? Array.isArray(req.query.branch_ids)
+                ? req.query.branch_ids
+                : [req.query.branch_ids]
+            : [];
+
+        const branches = await Branch.find();
+
+        // لو مفيش Month → رجع الفيو بس
+        if (!selectedMonth) {
+            return res.render('revenueReport', {
+                selectedMonth: '',
+                selectedBranchIds,
+                branches,
+                reportData: [],
+                totalExpectedRevenue: 0,
+                totalPaid: 0,
+                collectionRate: 0
+            });
+        }
+
+        // Filter bookings by Month
+        const startDate = new Date(selectedMonth + '-01');
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+
+        // Filter branch if selected
+        let officeFilter = {};
+        if (selectedBranchIds.length > 0) {
+            const officesInBranches = await Office.find({
+                branch_id: { $in: selectedBranchIds }
+            }).distinct('_id');
+
+            officeFilter = {
+                office_id: { $in: officesInBranches }
+            };
+        }
+
+        // Get relevant bookings
+        const bookings = await Booking.find({
+            ...officeFilter,
+            start_date: { $lt: endDate },
+            end_date: { $gte: startDate }
+        }).populate('office_id').populate('client_id');
+
+        // Build report
         let reportData = [];
         let totalExpectedRevenue = 0;
         let totalPaid = 0;
-        let collectionRate = 0;
 
-        if (monthParam) {
-            const [year, month] = monthParam.split('-').map(Number);
+        bookings.forEach(booking => {
+            const paidSoFar = booking.payments.reduce((sum, p) => sum + p.amount, 0);
 
-            const startDate = new Date(year, month - 1, 1);
-            const endDate = new Date(year, month, 0, 23, 59, 59);
-
-            const bookings = await Booking.find({
-                start_date: { $lte: endDate },
-                end_date: { $gte: startDate }
-            })
-            .populate('office_id')
-            .populate('client_id');
-
-            reportData = bookings.map(booking => {
-                const totalPaidForBooking = booking.payments.reduce((sum, p) => sum + p.amount, 0);
-                const remaining = booking.total_price - totalPaidForBooking;
-
-                // اجمع للقيم الإجمالية
-                totalExpectedRevenue += booking.total_price;
-                totalPaid += totalPaidForBooking;
-
-                return {
-                    office: booking.office_id ? booking.office_id.office_number : 'N/A',
-                    client: booking.client_id ? booking.client_id.name : 'N/A',
-                    contract_type: booking.contract_type,
-                    expected_revenue: booking.total_price,
-                    paid_so_far: totalPaidForBooking,
-                    remaining
-                };
+            reportData.push({
+                office: booking.office_id?.office_number || 'N/A',
+                client: booking.client_id?.name || 'N/A',
+                contract_type: booking.contract_type || '-',
+                expected_revenue: booking.total_price,
+                paid_so_far: paidSoFar,
+                remaining: booking.total_price - paidSoFar
             });
 
-            // حساب نسبة التحصيل
-            if (totalExpectedRevenue > 0) {
-                collectionRate = (totalPaid / totalExpectedRevenue) * 100;
-            }
-        }
+            totalExpectedRevenue += booking.total_price;
+            totalPaid += paidSoFar;
+        });
+
+        const collectionRate = totalExpectedRevenue === 0 ? 0 : (totalPaid / totalExpectedRevenue) * 100;
 
         res.render('revenueReport', {
+            selectedMonth,
+            selectedBranchIds,
+            branches,
             reportData,
-            selectedMonth: monthParam || '',
             totalExpectedRevenue,
             totalPaid,
             collectionRate
         });
+
     } catch (err) {
         res.status(500).send('Error loading revenue report');
     }
 });
 
-router.get('/timeline', async (req, res) => {
-    try {
-        const range = req.query.range || '3months';
-        const startMonth = req.query.startMonth;
-        const endMonth = req.query.endMonth;
-
-        const now = new Date();
-        let startDate, endDate;
-
-        if (range === 'custom' && startMonth && endMonth) {
-            const [startY, startM] = startMonth.split('-').map(Number);
-            const [endY, endM] = endMonth.split('-').map(Number);
-
-            startDate = new Date(startY, startM - 1, 1);
-            endDate = new Date(endY, endM, 0, 23, 59, 59);
-        } else {
-            let monthsBack = 3;
-            if (range === '6months') monthsBack = 6;
-            if (range === '12months') monthsBack = 12;
-
-            startDate = new Date(now.getFullYear(), now.getMonth() - (monthsBack - 1), 1);
-            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-        }
-
-        const dataPoints = [];
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-
-        let current = new Date(start.getFullYear(), start.getMonth(), 1);
-
-        while (current <= end) {
-            const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
-            const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0, 23, 59, 59);
-            const monthLabel = monthStart.toLocaleString('default', { month: 'short', year: 'numeric' });
-
-            const bookings = await Booking.find({
-                start_date: { $lte: monthEnd },
-                end_date: { $gte: monthStart }
-            });
-
-            const total = bookings.reduce((sum, b) => sum + b.total_price, 0);
-            const paid = bookings.reduce((sum, b) => {
-                return sum + b.payments.reduce((s, p) => s + p.amount, 0);
-            }, 0);
-
-            dataPoints.push({
-                label: monthLabel,
-                expected: total,
-                paid
-            });
-
-            current.setMonth(current.getMonth() + 1);
-        }
-
-        res.render('revenueTimeline', {
-            dataPoints,
-            range,
-            startMonth,
-            endMonth
-        });
-    } catch (err) {
-        res.status(500).send('Error loading timeline report');
-    }
-});
-
-    
 module.exports = router;

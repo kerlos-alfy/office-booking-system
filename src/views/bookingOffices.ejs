@@ -2,6 +2,7 @@
 
 <h1 class="mb-4 text-primary">🗂️ Offices in Branch</h1>
 
+<!-- Filter -->
 <form method="GET" action="/bookings/branch/<%= branchId %>" class="mb-4">
     <div class="row g-3 align-items-center">
         <div class="col-auto">
@@ -17,51 +18,151 @@
     </div>
 </form>
 
+<!-- Dashboard Stats -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center bg-primary text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Offices</h5>
+                <h2><%= totalOffices %></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title">Available Offices</h5>
+                <h2><%= totalAvailable %></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-danger text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title">Booked Offices</h5>
+                <h2><%= totalBooked %></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-dark shadow">
+            <div class="card-body">
+                <h5 class="card-title">Expiring This Month</h5>
+                <h2><%= expiringThisMonth %></h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pie Chart -->
+<div class="text-center mb-4">
+    <h5>📊 Office Occupancy</h5>
+    <div style="max-width: 300px; margin: 0 auto;">
+        <canvas id="occupancyChart"></canvas>
+    </div>
+</div>
+
+<!-- Pie Chart Script -->
+<script>
+    const occupancyCtx = document.getElementById('occupancyChart').getContext('2d');
+    const occupancyChart = new Chart(occupancyCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Booked', 'Available'],
+            datasets: [{
+                data: [<%= totalBooked %>, <%= totalAvailable %>],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+
 <%
     const today = new Date();
 %>
 
+<!-- Offices Grid -->
 <div class="row g-3">
     <% offices.forEach(office => { %>
-        <% const isBooked = bookedOfficeIds.includes(office._id.toString()); %>
-        <% const booking = bookings.find(b => b.office_id.toString() === office._id.toString()); %>
-        <% const isExpiringSoon = isBooked && (new Date(booking.end_date) - today) / (1000 * 60 * 60 * 24) <= 7; %>
+        <% 
+            const booking = bookings.find(b => b.office_id.toString() === office._id.toString());
+            const isBooked = booking !== undefined;
+            const isExpiringSoon = isBooked && (new Date(booking.end_date) - today) / (1000 * 60 * 60 * 24) <= 7;
+        %>
 
         <% if (filter === 'all' || (filter === 'available' && !isBooked) || (filter === 'booked' && isBooked)) { %>
+            
             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="<%= isBooked ? `/bookings/view/${booking._id}` : `/bookings/new/${office._id}` %>" class="text-decoration-none text-dark">
-                    <div class="office-box p-3 shadow-sm rounded <%= isBooked ? 'office-booked' : 'office-available' %>">
+                <div class="office-box p-3 shadow-sm rounded d-flex flex-column justify-content-between <%= isBooked ? 'office-booked' : 'office-available' %>">
 
-                        <div class="d-flex justify-content-end mb-2">
-                            <span class="badge <%= isBooked ? 'bg-danger' : 'bg-success' %>">
-                                <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
-                            </span>
-                        </div>
+                    <% if (isBooked) { %>
+                        <a href="/bookings/view/<%= booking._id %>" class="text-decoration-none text-dark d-block flex-grow-1">
+                    <% } %>
 
-                        <h5 class="fw-bold mb-2">Office <%= office.office_number %></h5>
-                        <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
-
-                        <% if (isBooked) { %>
-                            <p class="mb-1 text-muted">🔒 Booked by: <strong><%= booking?.client_id?.name || 'Unknown' %></strong></p>
-                            <p class="mb-1">📅 From: <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
-                            <p class="mb-1">📅 To: <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
-
-                            <% if (isExpiringSoon) { %>
-                                <p class="text-danger fw-bold mt-2">⚠️ Booking expiring soon!</p>
-                            <% } %>
-                        <% } else { %>
-                            <div class="d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <p class="text-success fw-bold fs-5 mb-0">✅ Available</p>
-                            </div>
-                        <% } %>
-
+                    <!-- Badge -->
+                    <div class="d-flex justify-content-end mb-2">
+                        <span class="badge <%= isBooked ? 'bg-danger' : 'bg-success' %>">
+                            <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
+                        </span>
                     </div>
-                </a>
+
+                    <!-- Office Info -->
+                    <h5 class="fw-bold mb-2">Office <%= office.office_number %></h5>
+                    <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
+
+                    <% if (isBooked) { %>
+                        <p class="mb-1">
+                            <i class="fas fa-lock text-warning me-2"></i>
+                            <strong>Booked by:</strong>
+                            <span title="<%= booking.client_id?.name %>" 
+                                  style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 180px;">
+                                <%= booking.client_id?.name %>
+                            </span>
+                        </p>
+
+                        <p class="mb-1">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <strong>From:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %>
+                        </p>
+                        <p class="mb-1">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <strong>To:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %>
+                        </p>
+                    <% } %>
+
+                    <% if (isBooked) { %>
+                        </a> <!-- Close link -->
+                    <% } %>
+
+                    <% if (!isBooked) { %>
+                        <!-- Available → Book Now Button -->
+                        <div class="d-grid mt-3">
+                            <a href="/bookings/new/<%= office._id %>" class="btn btn-sm btn-outline-primary fw-bold">
+                                🚀 Book Now
+                            </a>
+                        </div>
+                    <% } %>
+
+                </div>
             </div>
+
         <% } %>
     <% }); %>
 </div>
 
+<!-- Styling -->
 <style>
     .office-box {
         border: 2px solid #e0e0e0;
@@ -70,6 +171,10 @@
         cursor: pointer;
         transition: all 0.3s ease;
         height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 16px;
     }
 
     .office-available {
@@ -96,6 +201,10 @@
     .office-box p {
         font-size: 0.9rem;
         color: #555;
+    }
+
+    .d-grid .btn {
+        font-size: 0.95rem;
     }
 </style>
 

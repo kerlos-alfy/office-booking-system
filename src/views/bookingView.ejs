@@ -1,96 +1,179 @@
 <%- include('partials/header') %>
 
 <h1 class="mb-4 text-primary">📄 Booking Details</h1>
-<!-- Release Office Button -->
-<form method="POST" action="/bookings/<%= booking._id %>/archive" onsubmit="return confirm('Are you sure you want to release this office? This booking will be archived.')">
-    <button type="submit" class="btn btn-warning mt-3">📦 Release Office (Archive Booking)</button>
-</form>
 
-<!-- Basic Booking Info -->
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Office: <%= booking.office_id?.office_number %> (Floor: <%= booking.office_id?.floor || 'N/A' %>)</h5>
-        <p class="card-text">Client: <%= booking.client_id?.name || 'N/A' %></p>
-        <p class="card-text">Page Number: <%= booking.page_no %></p>
-        <p class="card-text">Start Date: <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
-        <p class="card-text">End Date: <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
-    </div>
+<!-- UX Actions -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/bookings" class="btn btn-outline-secondary">
+        🔙 Back to Bookings
+    </a>
+    <button class="btn btn-outline-primary" onclick="window.print()">
+        🖨️ Print Page
+    </button>
 </div>
 
-<!-- Financial Info -->
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">💰 Financial Details</h5>
-        <p class="card-text">Total Price: $<%= booking.total_price %></p>
-        <p class="card-text">Down Payment: $<%= booking.initial_payment %></p>
-        <p class="card-text">VAT: $<%= booking.vat %></p>
-        <p class="card-text">Security Deposit: $<%= booking.sec_deposit %></p>
-        <p class="card-text">Admin Fee: $<%= booking.admin_fee %></p>
-        <p class="card-text">Commission: $<%= booking.commission %></p>
-        <p class="card-text">Ejari Number: <%= booking.ejari_no %></p>
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white fw-bold">
+        Booking Info
     </div>
-</div>
-
-<!-- Payments Table -->
-<div class="card mb-4">
     <div class="card-body">
-        <h5 class="card-title">💵 Payments</h5>
 
-        <% if (booking.payments.length === 0) { %>
-            <div class="alert alert-info">No payments recorded.</div>
+        <!-- Office & Client Info -->
+        <p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
+        <p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
+        <p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.name %></p>
+
+        <!-- Dates -->
+        <p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
+        <p class="mb-2"><strong>End Date:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
+
+        <!-- Contract Info -->
+        <p class="mb-2"><strong>Contract Page No:</strong> <%= booking.page_no %></p>
+        <p class="mb-2"><strong>Status:</strong>
+            <% if (booking.status === 'archived') { %>
+                <span class="badge bg-secondary">Archived</span>
+            <% } else { %>
+                <span class="badge bg-success">Active</span>
+            <% } %>
+        </p>
+
+        <!-- Financial Info -->
+        <hr>
+        <h5 class="text-primary fw-bold mb-3">💰 Financial Details</h5>
+        <p class="mb-2"><strong>Total Price:</strong> $<%= booking.total_price %></p>
+        <p class="mb-2"><strong>Down Payment:</strong> $<%= booking.initial_payment %></p>
+        <p class="mb-2"><strong>VAT:</strong> $<%= booking.vat %></p>
+        <p class="mb-2"><strong>Security Deposit:</strong> $<%= booking.sec_deposit %></p>
+        <p class="mb-2"><strong>Admin Fee:</strong> $<%= booking.admin_fee %></p>
+        <p class="mb-2"><strong>Commission:</strong> $<%= booking.commission %></p>
+        <p class="mb-2"><strong>Ejari No:</strong> <%= booking.ejari_no %></p>
+
+        <!-- Cheques -->
+        <hr>
+        <h5 class="text-primary fw-bold mb-3">📝 Cheques</h5>
+
+        <%
+            const today = new Date();
+        %>
+
+        <% if (booking.cheques && booking.cheques.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover bg-white">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% booking.cheques.forEach((cheque, index) => {
+                            const dueDate = new Date(cheque.due_date);
+                            let statusText = '';
+                            let rowClass = '';
+
+                            if (cheque.collected) {
+                                statusText = '✅ Collected';
+                                rowClass = 'table-success';
+                            } else if (dueDate < today) {
+                                statusText = '❌ Overdue';
+                                rowClass = 'table-danger';
+                            } else {
+                                statusText = '⏳ Upcoming';
+                                rowClass = 'table-warning';
+                            }
+                        %>
+                            <tr class="<%= rowClass %>">
+                                <td><%= index + 1 %></td>
+                                <td>$<%= cheque.amount %></td>
+                                <td><%= dueDate.toISOString().split('T')[0] %></td>
+                                <td><%= statusText %></td>
+                                <td>
+                                    <% if (!cheque.collected) { %>
+                                        <!-- لو الشيك مش متحصل → أظهر الزر -->
+                                        <form method="POST" action="/bookings/<%= booking._id %>/cheques/<%= index %>/toggle-collected" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                Mark as Collected
+                                            </button>
+                                        </form>
+                                    <% } else { %>
+                                        <!-- لو متحصل → مايظهرش زر → يظهر Text ✅ -->
+                                        <span class="text-success fw-bold">✅ Collected</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
         <% } else { %>
+            <p>No cheques.</p>
+        <% } %>
+
+        <!-- Payments -->
+        <hr>
+        <h5 class="text-primary fw-bold mb-3">💳 Payments</h5>
+        <% if (booking.payments && booking.payments.length > 0) { %>
             <table class="table table-bordered table-hover bg-white">
-                <thead class="table-dark">
+                <thead class="table-light">
                     <tr>
                         <th>#</th>
                         <th>Amount</th>
                         <th>Payment Date</th>
-                        <th>Payment Type</th>
+                        <th>Type</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% booking.payments.forEach((p, index) => { %>
+                    <% booking.payments.forEach((payment, index) => { %>
                         <tr>
                             <td><%= index + 1 %></td>
-                            <td>$<%= p.amount %></td>
-                            <td><%= new Date(p.payment_date).toISOString().split('T')[0] %></td>
-                            <td><%= p.payment_type %></td>
+                            <td>$<%= payment.amount %></td>
+                            <td><%= new Date(payment.payment_date).toISOString().split('T')[0] %></td>
+                            <td><%= payment.payment_type %></td>
                         </tr>
                     <% }); %>
                 </tbody>
             </table>
-        <% } %>
-    </div>
-</div>
-
-<!-- Cheques Table -->
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">📝 Cheques</h5>
-
-        <% if (booking.cheques.length === 0) { %>
-            <div class="alert alert-info">No cheques recorded.</div>
         <% } else { %>
-            <table class="table table-bordered table-hover bg-white">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Amount</th>
-                        <th>Due Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% booking.cheques.forEach((c, index) => { %>
-                        <tr>
-                            <td><%= index + 1 %></td>
-                            <td>$<%= c.amount %></td>
-                            <td><%= new Date(c.due_date).toISOString().split('T')[0] %></td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
+            <p>No payments recorded.</p>
         <% } %>
+
     </div>
 </div>
+
+<!-- Page Fade In + Card Styling -->
+<style>
+    body {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+        font-size: 1.1rem;
+    }
+
+    .table {
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-primary {
+        font-weight: 600;
+    }
+
+    .btn-outline-secondary {
+        font-weight: 600;
+    }
+</style>
 
 <%- include('partials/footer') %>

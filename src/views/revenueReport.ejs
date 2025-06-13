@@ -2,66 +2,68 @@
 
 <h1 class="mb-4 text-primary">📊 Revenue Report</h1>
 
-<!-- Form لاختيار الشهر -->
+<!-- Form لاختيار الشهر والفروع -->
 <form method="GET" action="/reports/revenue" class="mb-4">
     <div class="row g-3 align-items-center">
+
+        <!-- Month -->
         <div class="col-auto">
             <label class="col-form-label">Select Month:</label>
         </div>
         <div class="col-auto">
             <input type="month" name="month" class="form-control" value="<%= selectedMonth %>" required>
         </div>
+
+        <!-- Branches -->
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Generate Report</button>
+            <label class="col-form-label">Select Branches:</label>
         </div>
+        <div class="col-auto">
+            <select id="branchSelect" name="branch_ids" class="form-select select2" multiple style="min-width: 250px;">
+                <% branches.forEach(branch => { %>
+                    <option value="<%= branch._id %>" <%= selectedBranchIds.includes(branch._id.toString()) ? 'selected' : '' %>>
+                        <%= branch.name %>
+                    </option>
+                <% }) %>
+            </select>
+            <% if (selectedBranchIds.length > 0) { %>
+                <div class="mt-2">
+                    <span class="badge bg-info text-dark">
+                        Selected Branches: <%= selectedBranchIds.length %>
+                    </span>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-auto d-flex flex-column gap-2">
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+
+            <!-- Clear Selection button -->
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearBranchSelection()">
+                Clear Selection
+            </button>
+        </div>
+
     </div>
 </form>
 
-<!-- Summary Table + Pie Chart -->
+<!-- إجماليات + Pie Chart جنب بعض -->
 <% if (selectedMonth && reportData.length > 0) { %>
     <div class="row align-items-start mb-4">
-        <!-- Col 1: Summary Table -->
+        <!-- Col 1: الإحصائيات -->
         <div class="col-md-6 mb-3">
-            <table class="table table-bordered text-center align-middle shadow table-summary" style="max-width: 100%;">
-                <thead class="table-primary">
-                    <tr>
-                        <th colspan="2" class="fs-5">📊 Revenue Summary</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>📅 Month</td>
-                        <td><%= selectedMonth %></td>
-                    </tr>
-                    <tr>
-                        <td>💰 Total Expected Revenue</td>
-                        <td class="text-success fw-bold">$<%= totalExpectedRevenue %></td>
-                    </tr>
-                    <tr>
-                        <td>💵 Total Paid</td>
-                        <td class="text-info fw-bold">$<%= totalPaid %></td>
-                    </tr>
-                    <tr>
-                        <td>📈 Collection Rate</td>
-                        <td class="fw-bold <% if (collectionRate >= 80) { %> text-success <% } else if (collectionRate >= 50) { %> text-warning <% } else { %> text-danger <% } %>">
-                            <%= collectionRate.toFixed(2) %> %
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <h5>📅 Month: <%= selectedMonth %></h5>
+            <h5>💰 Total Expected Revenue: $<%= totalExpectedRevenue %></h5>
+            <h5>💵 Total Paid: $<%= totalPaid %></h5>
+            <h5>📈 Collection Rate: <%= collectionRate.toFixed(2) %> %</h5>
         </div>
 
-        <!-- Col 2: Pie Chart in Card -->
-        <div class="col-md-6 mb-3">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white fw-bold text-center">
-                    📊 Collection Rate Pie
-                </div>
-                <div class="card-body d-flex justify-content-center">
-                    <div style="max-width: 220px;">
-                        <canvas id="collectionPie"></canvas>
-                    </div>
-                </div>
+        <!-- Col 2: Pie Chart -->
+        <div class="col-md-6 text-center">
+            <h5>📊 Collection Rate Pie</h5>
+            <div style="max-width: 200px; margin: 0 auto;">
+                <canvas id="collectionPie"></canvas>
             </div>
         </div>
     </div>
@@ -79,8 +81,8 @@
                         <%= totalExpectedRevenue - totalPaid %>
                     ],
                     backgroundColor: [
-                        'rgba(75, 192, 192, 0.8)', // Paid
-                        'rgba(255, 99, 132, 0.8)'  // Remaining
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 99, 132, 0.8)'
                     ],
                     borderColor: [
                         'rgba(75, 192, 192, 1)',
@@ -101,7 +103,7 @@
 <% if (reportData.length === 0 && selectedMonth) { %>
     <div class="alert alert-warning">No data found for this month.</div>
 <% } else if (reportData.length > 0) { %>
-    <table class="table table-bordered table-hover bg-white shadow">
+    <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
             <tr>
                 <th>#</th>
@@ -128,5 +130,25 @@
         </tbody>
     </table>
 <% } %>
+
+<!-- Select2 Plugin -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#branchSelect').select2({
+            placeholder: "Select one or more branches",
+            allowClear: true,
+            width: 'resolve'
+        });
+    });
+
+    function clearBranchSelection() {
+        $('#branchSelect').val(null).trigger('change');
+        // ✅ يعمل Submit تلقائي
+        $('#branchSelect').closest('form')[0].submit();
+    }
+</script>
 
 <%- include('partials/footer') %>
