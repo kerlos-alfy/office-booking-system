@@ -5,7 +5,10 @@ const Booking = require('../models/Booking');
 const Branch = require('../models/Branch');
 const Office = require('../models/Office');
 const Client = require('../models/Client');
-
+const path = require('path');
+const fs = require('fs');
+const ejs = require('ejs');
+const puppeteer = require('puppeteer');
 // ✅ الصفحة الرئيسية — عرض الفروع
 router.get('/', async (req, res) => {
     try {
@@ -59,12 +62,12 @@ router.get('/branch/:branchId', async (req, res) => {
     }
 });
 
-
 // ✅ Form New Booking
 router.get('/new/:officeId', async (req, res) => {
     try {
         const office = await Office.findById(req.params.officeId).populate('branch_id');
-        res.render('bookingNew', { office });
+        const clients = await Client.find();
+        res.render('bookingNew', { office, clients });
     } catch (err) {
         res.status(500).send('Error loading new booking form');
     }
@@ -77,6 +80,7 @@ router.post('/', async (req, res) => {
 
         const {
             office_id,
+            client_id,
             page_no,
             start_date,
             end_date,
@@ -95,6 +99,7 @@ router.post('/', async (req, res) => {
 
         const booking = new Booking({
             office_id,
+            client_id,
             page_no,
             start_date,
             end_date,
@@ -116,8 +121,38 @@ router.post('/', async (req, res) => {
         });
 
         await booking.save();
-
         console.log('✅ Booking created:', booking);
+
+        // ✅ Generate contract automatically
+        const fullBooking = await Booking.findById(booking._id)
+            .populate('office_id')
+            .populate('client_id');
+
+        const templatePath = path.join(__dirname, '../templates/Office_Contract_Template.docx');
+        const content = fs.readFileSync(templatePath, 'binary');
+        const zip = new PizZip(content);
+        const doc = new Docxtemplater(zip);
+
+        doc.setData({
+            client_name: fullBooking.client_id?.registered_owner_name || '',
+            company_name: fullBooking.client_id?.company || '',
+            office_number: fullBooking.office_id?.office_number || '',
+            branch_name: fullBooking.office_id?.branch_id?.name || '',
+            start_date: fullBooking.start_date.toISOString().split('T')[0],
+            end_date: fullBooking.end_date.toISOString().split('T')[0],
+            total_price: fullBooking.total_price,
+            ejari_no: fullBooking.ejari_no,
+            page_no: fullBooking.page_no
+        });
+
+        doc.render();
+        const buf = doc.getZip().generate({ type: 'nodebuffer' });
+        const contractsDir = path.join(__dirname, '../contracts');
+        if (!fs.existsSync(contractsDir)) fs.mkdirSync(contractsDir);
+        const filename = `Contract_${booking._id}.docx`;
+        const filepath = path.join(contractsDir, filename);
+        fs.writeFileSync(filepath, buf);
+        console.log(`✅ Contract generated: ${filename}`);
 
         res.redirect('/bookings/success');
     } catch (err) {
@@ -211,5 +246,65 @@ router.post('/:bookingId/cheques/:chequeIndex/toggle-collected', async (req, res
 router.get('/success', (req, res) => {
     res.render('bookingSuccess');
 });
+
+
+router.get('/:bookingId/generate-contract', async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.bookingId)
+      .populate('office_id')
+      .populate({ path: 'office_id', populate: { path: 'branch_id' } })
+      .populate('client_id');
+
+    if (!booking) return res.status(404).send('Booking not found');
+
+ const data = {
+  tenant_name: booking.client_id?.registered_owner_name || '',
+  company_name: booking.client_id?.company || '',
+  phone: booking.client_id?.phone || '',
+  unit_number: booking.office_id?.office_number || '',
+  branch_name: booking.office_id?.branch_id?.name || '',
+  start_date: booking.start_date.toISOString().split('T')[0],
+  end_date: booking.end_date.toISOString().split('T')[0],
+  total_price: booking.total_price,
+  office_rent: booking.total_price || 0,  // ✅ أضف دا هنا
+  ejari: booking.ejari_no || '',
+  page_no: booking.page_no || '',
+  cheques: booking.cheques || [],
+  license_no: booking.client_id?.license_no || '',
+  email: booking.client_id?.email || '',
+  license_expiry: booking.client_id?.license_expiry
+    ? new Date(booking.client_id.license_expiry).toISOString().split('T')[0]
+    : '',
+  vat: booking.vat || 0,
+  commission: booking.commission || 0,
+  admin_fee: booking.admin_fee || 0,
+  sec_deposit: booking.sec_deposit || 0
+};
+
+
+    const html = await ejs.renderFile(
+      path.join(__dirname, '../templates/contractTemplate.ejs'),
+      data
+    );
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="Contract_${booking._id}.pdf"`
+    });
+
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error('❌ Error generating PDF contract:', err.message);
+    res.status(500).send('Error generating contract');
+  }
+});
+
 
 module.exports = router;

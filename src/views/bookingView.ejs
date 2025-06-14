@@ -22,6 +22,10 @@
         <p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
         <p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
         <p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.name %></p>
+<!-- Contract Download Button -->
+<a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success fw-bold mb-3">
+    📄 تحميل العقد
+</a>
 
         <!-- Dates -->
         <p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
@@ -141,6 +145,7 @@
         <% } %>
 
     </div>
+    
 </div>
 
 <!-- Page Fade In + Card Styling -->

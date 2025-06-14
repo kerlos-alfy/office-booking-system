@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tenancy Contract</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      direction: rtl;
+    }
+    .center {
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: center;
+    }
+    .highlight {
+      background-color: #d0f0d0;
+      font-weight: bold;
+    }
+    .notes {
+      font-size: 10px;
+      margin-top: 10px;
+      direction: rtl;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <img src="https://yourownbc.com/wp-content/uploads/2023/08/header-logo1.png" alt="Logo" height="60"><br>
+    TENANCY CONTRACT / عقد إيجار
+  </div>
+
+  <table>
+    <tr class="highlight"><td colspan="4">Lessor / المؤجر</td></tr>
+    <tr><td colspan="4">Lessor Name: YOUR OWN REAL ESTATE L.L.C</td></tr>
+    <tr><td colspan="4">LAND AREA: ASWAAQ COMMUNITY MALL – AL MIZHAR</td></tr>
+    <tr class="highlight"><td colspan="4">Tenant / المستأجر</td></tr>
+    <tr><td colspan="4">Tenant Name: <%= tenant_name %></td></tr>
+    <tr>
+      <td>License No: <%= license_no %></td>
+      <td>Email: <%= email %></td>
+      <td>CONTACT NO: <%= phone %></td>
+      <td>License Expiry: <%= license_expiry %></td>
+    </tr>
+  </table>
+
+  <table>
+    <tr class="highlight"><td colspan="6">Details / بيان الدفعات</td></tr>
+    <tr>
+      <th>#</th><th>Cheque Date</th><th>Amount AED</th><th>#</th><th>Cheque Date</th><th>Amount AED</th>
+    </tr>
+    <% cheques.forEach(function(c, i) { %>
+      <% if (i % 2 === 0) { %><tr><% } %>
+      <td><%= i + 1 %></td>
+      <td><%= c.date %></td>
+      <td><%= c.amount %> AED</td>
+      <% if (i % 2 === 1 || i === cheques.length - 1) { %></tr><% } %>
+    <% }); %>
+    <tr><td colspan="6" style="text-align: right; font-weight: bold;">TOTAL: <%= total_price %> AED</td></tr>
+  </table>
+
+  <table>
+    <tr class="highlight"><td colspan="4">Details / تفاصيل العقد</td></tr>
+    <tr>
+      <td>Unit number: <%= unit_number %></td>
+      <td>Ejari inscription: <%= ejari %> AED</td>
+      <td>VAT: <%= vat %> AED</td>
+      <td>Commission: <%= commission %> AED</td>
+    </tr>
+    <tr>
+      <td colspan="2">Office Rent: <%= office_rent %> AED</td>
+      <td colspan="2">TOTAL: <%= total_price %> AED</td>
+    </tr>
+    <tr>
+      <td colspan="2">Start Date: <%= start_date %></td>
+      <td colspan="2">End Date: <%= end_date %></td>
+    </tr>
+  </table>
+
+  <div class="notes">
+    <p>• يقرّ المستأجر بوجود موقف مجاني له و موقف آخر لأحد موظفيه أو عملائه فقط. وما دون ذلك يكون مدفوع.</p>
+    <p>• يلتزم المستأجر بدفع تأمين 5% للمحتويات إضافة لرسوم تسجيل العقد (إيجاري).</p>
+    <p>• يلتزم المستأجر بدفع 100 درهم شهرياً مقابل استخدام قاعة الاجتماعات وجميع الخدمات.</p>
+    <p>• يتعهد المستأجر بعدم تأخير أي دفعة، وفي حالة التأخير يقر بالموافقة على فسخ العقد، ويحق للمؤجر فتح المكتب ونقل العهدة دون دفع الإيجار.</p>
+    <p>• أقر المستأجر بالاطلاع على كافة الأنظمة والتعليمات الرسمية والعطل، وساعات العمل من 8 صباحاً حتى 6 مساءً.</p>
+  </div>
+
+  <div class="center">
+    <p>YOUR OWN REAL ESTATE - ASWAAQ COMMUNITY MALL – AL MIZHAR</p>
+    <p>PHONE: +971 58 900 0915</p>
+  </div>
+</body>
+</html>

@@ -1,97 +1,84 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 
 const Branch = require('../models/Branch');
 const Office = require('../models/Office');
 const Client = require('../models/Client');
 const Booking = require('../models/Booking');
 
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(async () => {
-    console.log('✅ MongoDB connected — Seeding...');
+const branchesPath = path.join(__dirname, 'seed-data', 'branches.json');
+const officesPath = path.join(__dirname, 'seed-data', 'offices.json');
+const clientsPath = path.join(__dirname, 'seed-data', 'clients.json');
+const paymentsPath = path.join(__dirname, 'seed-data', 'payments.json');
 
-    // مسح القديم (لو حابب تبدأ من الصفر)
-    await Branch.deleteMany();
-    await Office.deleteMany();
-    await Client.deleteMany();
-    await Booking.deleteMany();
+mongoose.connect(process.env.MONGO_URI).then(async () => {
+  console.log('✅ Connected to MongoDB – Starting Seeding');
 
-    // اضافة 4 فروع
-    const branchesData = [
-        { name: 'Branch A', location: 'Location A' },
-        { name: 'Branch B', location: 'Location B' },
-        { name: 'Branch C', location: 'Location C' },
-        { name: 'Branch D', location: 'Location D' },
-    ];
+  // Clear existing data
+  await Branch.deleteMany();
+  await Office.deleteMany();
+  await Client.deleteMany();
+  await Booking.deleteMany();
 
-    const branches = await Branch.insertMany(branchesData);
-    console.log(`✅ Inserted ${branches.length} branches`);
+  // Read data
+  const branchesData = JSON.parse(fs.readFileSync(branchesPath, 'utf-8'));
+  const officesDataRaw = JSON.parse(fs.readFileSync(officesPath, 'utf-8'));
+  const clientsData = JSON.parse(fs.readFileSync(clientsPath, 'utf-8'));
+  const paymentsData = JSON.parse(fs.readFileSync(paymentsPath, 'utf-8'));
 
-    // اضافة مكاتب لكل فرع
-    let allOffices = [];
-    for (const branch of branches) {
-        let officesData = [];
-        for (let i = 1; i <= 10; i++) {
-           officesData.push({
-        branch_id: branch._id,
-        office_number: `#${i}`,
-        floor: Math.ceil(i / 3), // مثال: كل 3 Offices في Floor
-        monthly_price: 500 + i * 10,
-        yearly_price: 5000 + i * 100
-    });
-        }
-        const offices = await Office.insertMany(officesData);
-        console.log(`✅ Inserted ${offices.length} offices for branch ${branch.name}`);
-        allOffices = allOffices.concat(offices); // نجمعهم علشان نستخدمهم في Bookings
+  // Insert branches
+  const branches = await Branch.insertMany(branchesData);
+  console.log(`✅ Created ${branches.length} branches`);
+
+  // Insert offices
+  const officesData = officesDataRaw.map(o => ({
+    branch_id: branches[o.branchIndex]._id,
+    office_number: o.office_number,
+    floor: o.floor,
+    monthly_price: o.monthly_price,
+    yearly_price: o.yearly_price
+  }));
+
+  const allOffices = await Office.insertMany(officesData);
+  console.log(`✅ Created ${allOffices.length} offices`);
+
+  // Insert clients
+  const clients = await Client.insertMany(clientsData);
+  console.log(`✅ Inserted ${clients.length} clients`);
+
+  // Insert bookings
+  const today = new Date();
+  const bookingsData = [];
+
+  for (let i = 0; i < allOffices.length; i++) {
+    if (i % 2 === 0) {
+      const randomClient = clients[Math.floor(Math.random() * clients.length)];
+      const randomPayments = [paymentsData[Math.floor(Math.random() * paymentsData.length)]];
+
+      bookingsData.push({
+        office_id: allOffices[i]._id,
+        client_id: randomClient._id,
+        start_date: today,
+        end_date: new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()),
+        contract_type: 'monthly',
+        initial_payment: randomPayments[0].amount,
+        total_price: 3000,
+        ejari_no: randomClient.ejari_no || `EJ-${Math.floor(Math.random() * 10000000000)}`,
+        commission: 300,
+        admin_fee: 200,
+        sec_deposit: 1000,
+        vat: 150,
+        page_no: i + 1,
+        payments: randomPayments
+      });
     }
+  }
 
-    // اضافة عملاء
-    const clientsData = [];
-    for (let i = 1; i <= 10; i++) {
-        clientsData.push({
-            name: `Client ${i}`,
-            phone: `+20100${i}0000${i}`,
-            email: `client${i}@example.com`
-        });
-    }
+  await Booking.insertMany(bookingsData);
+  console.log(`✅ Inserted ${bookingsData.length} bookings`);
 
-    const clients = await Client.insertMany(clientsData);
-    console.log(`✅ Inserted ${clients.length} clients`);
-
-    // ✅ اضافة حجوزات وهمية
-    let bookingsData = [];
-    const today = new Date();
-
-    for (let i = 0; i < allOffices.length; i++) {
-        // نحجز مثلا كل مكتب رقم %4 == 0 → كل 4 مكاتب نحجز واحد
-        if (i % 4 === 0) {
-            const office = allOffices[i];
-            const randomClient = clients[Math.floor(Math.random() * clients.length)];
-
-            bookingsData.push({
-                office_id: office._id,
-                client_id: randomClient._id,
-                start_date: today,
-                end_date: new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()), // +1 شهر
-                contract_type: 'monthly',
-                initial_payment: 500,
-                total_price: 1500,
-                payments: [
-                    {
-                        amount: 500,
-                        payment_date: today,
-                        payment_type: 'initial'
-                    }
-                ]
-            });
-        }
-    }
-
-    const bookings = await Booking.insertMany(bookingsData);
-    console.log(`✅ Inserted ${bookings.length} bookings`);
-
-    console.log('✅ Seeding completed.');
-    mongoose.connection.close();
+  console.log('✅ Seeding Completed.');
+  mongoose.connection.close();
 });

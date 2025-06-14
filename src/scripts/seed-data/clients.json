@@ -1,0 +1,42 @@
+[
+  {
+    "company": "Tech Solutions LLC",
+    "registered_owner_name": "Ahmed Khaled",
+    "mobile": "+971501234567",
+    "nationality": "Egyptian",
+    "emirates_id_status": "OK",
+    "contract_status": "OK",
+    "license_status": "OK",
+    "ejari_no": "EJ1234567890"
+  },
+  {
+    "company": "Bright Future Trading",
+    "registered_owner_name": "Sarah Younes",
+    "mobile": "+971502345678",
+    "nationality": "Lebanese",
+    "emirates_id_status": "NOT NEED",
+    "contract_status": "OK",
+    "license_status": "OK",
+    "ejari_no": "EJ9876543210"
+  },
+  {
+    "company": "Global Ventures FZ",
+    "registered_owner_name": "Omar Al-Farsi",
+    "mobile": "+971503456789",
+    "nationality": "Emirati",
+    "emirates_id_status": "OK",
+    "contract_status": "OK",
+    "license_status": "OK",
+    "ejari_no": "EJ1122334455"
+  },
+  {
+    "company": "Sunrise Holdings",
+    "registered_owner_name": "Layla Hassan",
+    "mobile": "+971504567890",
+    "nationality": "Jordanian",
+    "emirates_id_status": "UNAVAILABLE",
+    "contract_status": "NO",
+    "license_status": "NO",
+    "ejari_no": "EJ5566778899"
+  }
+]

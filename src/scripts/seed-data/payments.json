@@ -1,0 +1,22 @@
+[
+  {
+    "amount": 1000,
+    "payment_date": "2025-06-01T00:00:00.000Z",
+    "payment_type": "initial"
+  },
+  {
+    "amount": 500,
+    "payment_date": "2025-06-10T00:00:00.000Z",
+    "payment_type": "installment"
+  },
+  {
+    "amount": 600,
+    "payment_date": "2025-06-20T00:00:00.000Z",
+    "payment_type": "installment"
+  },
+  {
+    "amount": 400,
+    "payment_date": "2025-07-01T00:00:00.000Z",
+    "payment_type": "installment"
+  }
+]

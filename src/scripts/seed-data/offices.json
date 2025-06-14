@@ -1,0 +1,10 @@
+[
+  { "branchIndex": 0, "office_number": "#1", "floor": 1, "monthly_price": 1000, "yearly_price": 12000 },
+  { "branchIndex": 0, "office_number": "#2", "floor": 1, "monthly_price": 1050, "yearly_price": 12500 },
+  { "branchIndex": 1, "office_number": "#1", "floor": 1, "monthly_price": 1100, "yearly_price": 13000 },
+  { "branchIndex": 1, "office_number": "#2", "floor": 2, "monthly_price": 1150, "yearly_price": 13500 },
+  { "branchIndex": 2, "office_number": "#1", "floor": 1, "monthly_price": 1200, "yearly_price": 14000 },
+  { "branchIndex": 2, "office_number": "#2", "floor": 2, "monthly_price": 1250, "yearly_price": 14500 },
+  { "branchIndex": 3, "office_number": "#1", "floor": 1, "monthly_price": 1300, "yearly_price": 15000 },
+  { "branchIndex": 3, "office_number": "#2", "floor": 2, "monthly_price": 1350, "yearly_price": 15500 }
+]

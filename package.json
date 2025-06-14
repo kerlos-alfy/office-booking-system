@@ -14,11 +14,14 @@
   "description": "",
   "dependencies": {
     "body-parser": "^2.2.0",
+    "docxtemplater": "^3.63.3",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mongoose": "^8.15.1",
     "morgan": "^1.10.0",
-    "multer": "^2.0.1"
+    "multer": "^2.0.1",
+    "pizzip": "^3.2.0",
+    "puppeteer": "^24.10.1"
   }
 }

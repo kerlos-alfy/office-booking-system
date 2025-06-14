@@ -10,17 +10,16 @@ const clientSchema = new mongoose.Schema({
     license_status: { type: String, enum: ['OK', 'NO'], required: true },
     ejari_no: { type: String },
 
-    // New — Files (optional paths):
     license_file_path: { type: String },
     ejari_file_path: { type: String },
     emirates_id_file_path: { type: String },
     passport_file_path: { type: String },
-
     contract_file_path: { type: String },
-    additional_files: [String] // array of filenames
+    additional_files: [String]
 }, {
     timestamps: true
 });
+
 
 const Client = mongoose.model('Client', clientSchema);
 
