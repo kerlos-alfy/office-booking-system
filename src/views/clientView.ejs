@@ -228,21 +228,35 @@ body > .container {
 
 <div class="container">
 
-<h1 class="mb-4 text-primary">👤 Client Details</h1>
+<h1 class="mb-4 text-primary">👤 Client Details <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold">
+  ✏️ Edit Client
+</a>
+</h1>
 
 <div class="card shadow mb-4">
-    <div class="card-header bg-primary text-white fw-bold">Client Info</div>
-    <div class="card-body">
-        <p><strong>Company:</strong> <%= client.company %></p>
-        <p><strong>Registered Owner Name:</strong> <%= client.registered_owner_name %></p>
-        <p><strong>Mobile:</strong> <%= client.mobile %></p>
-        <p><strong>Nationality:</strong> <%= client.nationality %></p>
-        <p><strong>Emirates ID Status:</strong> <%= client.emirates_id_status %></p>
-        <p><strong>Contract Status:</strong> <%= client.contract_status %></p>
-        <p><strong>License Status:</strong> <%= client.license_status %></p>
-        <p><strong>Ejari No:</strong> <%= client.ejari_no %></p>
-    </div>
+  <div class="card-header bg-primary text-white fw-bold">Client Info</div>
+  <div class="card-body">
+    <p><strong>Company:</strong> <%= client.company_en %> (<%= client.company_ar %>)</p>
+    <p><strong>Registered Owner Name:</strong> <%= client.registered_owner_name_en %> (<%= client.registered_owner_name_ar %>)</p>
+    <p><strong>Mobile:</strong> <%= client.mobile %></p>
+    <p><strong>Nationality:</strong> <%= client.nationality_en %> (<%= client.nationality_ar %>)</p>
+    <p><strong>Emirates ID Status:</strong> <%= client.emirates_id_status %></p>
+    <p><strong>Contract Status:</strong> <%= client.contract_status %></p>
+    <p><strong>License Status:</strong> <%= client.license_status %></p>
+    <p><strong>License Number:</strong> <%= client.license_number %></p>
+<p><strong>License Expiry:</strong>
+  <% if (client.license_expiry) { %>
+    <%= new Date(client.license_expiry).toISOString().split('T')[0] %>
+  <% } else { %>
+    Not provided
+  <% } %>
+</p>
+
+
+    <p><strong>Ejari No:</strong> <%= client.ejari_no %></p>
+  </div>
 </div>
+
 
 <h3 class="mb-3 text-secondary">📂 Client Files</h3>
 

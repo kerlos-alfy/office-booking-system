@@ -9,7 +9,7 @@
 <% } else { %>
     <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
-            <tr>
+            <tr style="font-size: 14px;">
                 <th>#</th>
                 <th>Mobile</th>
                 <th>Company</th>
@@ -21,6 +21,7 @@
                 <th>Ejari No</th>
                 <th>Documents</th>
                 <th>Details</th>
+                <th>Edit</th>
             </tr>
         </thead>
         <tbody>
@@ -63,6 +64,10 @@
                     <td>
     <a href="/clients/<%= client._id %>/view" class="btn btn-sm btn-outline-info">View Details</a>
 </td>
+ <td><a style="font-size: 12px;" href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold">
+  ✏️ Edit Client
+</a></td>
+
 
                 </tr>
             <% }) %>

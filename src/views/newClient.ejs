@@ -10,52 +10,110 @@
         <input type="text" name="mobile" class="form-control" required>
     </div>
 
-    <!-- Company -->
+    <!-- Company Name -->
     <div class="mb-3">
-        <label class="form-label fw-bold">🏢 Company Name</label>
-        <input type="text" name="company" class="form-control" required>
+        <label class="form-label fw-bold">🏢 Company Name (English)</label>
+        <input type="text" name="company_en" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">🏢 اسم الشركة (بالعربية)</label>
+        <input type="text" name="company_ar" class="form-control" required>
     </div>
 
     <!-- Registered Owner Name -->
     <div class="mb-3">
-        <label class="form-label fw-bold">👤 Registered Owner Name</label>
-        <input type="text" name="registered_owner_name" class="form-control" required>
+        <label class="form-label fw-bold">👤 Registered Owner Name (English)</label>
+        <input type="text" name="registered_owner_name_en" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">👤 اسم المالك المسجل (بالعربية)</label>
+        <input type="text" name="registered_owner_name_ar" class="form-control" required>
     </div>
 
     <!-- Nationality -->
+
+<!-- Nationality -->
+<!-- <div class="mb-3">
+    <label class="form-label fw-bold">🌍 Nationality</label>
+    <select name="nationality_en" class="form-select" required>
+        <% nationalities.forEach(function(nationality) { %>
+            <option value="<%= nationality.en %>"><%= nationality.en %></option>
+        <% }); %>
+    </select>
+</div> -->
+
+
+    <!-- <div class="mb-3">
+        <label class="form-label fw-bold">🌍 Nationality (English)</label>
+        <input type="text" name="nationality_en" class="form-control" required>
+    </div> -->
+    <!-- <div class="mb-3">
+        <label class="form-label fw-bold">🌍 الجنسية (بالعربية)</label>
+        <input type="text" name="nationality_ar" class="form-control" required>
+    </div> -->
+
+
+
+
+
+<div class="mb-3">
+  <label class="form-label fw-bold">🌍 الجنسية</label>
+  <select  name="nationality_ar" class="form-select js-select2" required>
+    <option disabled selected>أختر الجنسية</option>
+    <% nationalities.forEach(function(n) { %>
+      <option  value="<%= n.ar %>"><%= n.ar %></option>
+    <% }); %>
+  </select>
+</div>
+
+<div class="mb-3">
+  <label class="form-label fw-bold">🌍 Nationality</label>
+  <select name="en" class="form-select js-select2" required>
+    <option disabled selected>Choose Nationality</option>
+    <% nationalities.forEach(function(n) { %>
+      <option value="<%= n.en %>"><%= n.en %></option>
+    <% }); %>
+  </select>
+</div>
+
+    <!-- Emirates ID Status -->
     <div class="mb-3">
-        <label class="form-label fw-bold">🌍 Nationality</label>
-        <input type="text" name="nationality" class="form-control" required>
+        <label class="form-label fw-bold">🆔 Emirates ID Status</label>
+        <select name="emirates_id_status" class="form-select" required>
+            <option value="OK">OK</option>
+            <option value="NOT NEED">NOT NEED</option>
+            <option value="UNAVAILABLE">UNAVAILABLE</option>
+        </select>
     </div>
 
-   <!-- Emirates ID Status -->
+    <!-- Contract Status -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">📄 Contract Status</label>
+        <select name="contract_status" class="form-select" required>
+            <option value="OK">OK</option>
+            <option value="NO">NO</option>
+        </select>
+    </div>
+
+    <!-- License Status -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">🏷️ License Status</label>
+        <select name="license_status" class="form-select" required>
+            <option value="OK">OK</option>
+            <option value="NO">NO</option>
+        </select>
+    </div>
+<!-- License Number -->
 <div class="mb-3">
-    <label class="form-label fw-bold">🆔 Emirates ID Status</label>
-    <select name="emirates_id_status" class="form-select" required>
-        <option value="OK">OK</option>
-        <option value="NOT NEED">NOT NEED</option>
-        <option value="UNAVAILABLE">UNAVAILABLE</option>
-    </select>
+    <label class="form-label fw-bold">🏷️ License Number</label>
+    <input type="text" name="license_number" class="form-control" required>
 </div>
 
-<!-- Contract Status -->
+<!-- License Expiry Date -->
 <div class="mb-3">
-    <label class="form-label fw-bold">📄 Contract Status</label>
-    <select name="contract_status" class="form-select" required>
-        <option value="OK">OK</option>
-        <option value="NO">NO</option>
-    </select>
+    <label class="form-label fw-bold">📅 License Expiry Date</label>
+    <input type="date" name="license_expiry" class="form-control" required>
 </div>
-
-<!-- License Status -->
-<div class="mb-3">
-    <label class="form-label fw-bold">🏷️ License Status</label>
-    <select name="license_status" class="form-select" required>
-        <option value="OK">OK</option>
-        <option value="NO">NO</option>
-    </select>
-</div>
-
 
     <!-- Ejari No -->
     <div class="mb-3">
@@ -68,7 +126,6 @@
 
 </form>
 
-<!-- Fade In -->
 <style>
     body {
         animation: fadeIn 0.5s ease-in;

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Client = require('../models/Client');
 const upload = require('../utils/multer');
-
+const nationalities = require('../utils/nationalities');
 // View all clients
 router.get('/', async (req, res) => {
     try {
@@ -15,32 +15,42 @@ router.get('/', async (req, res) => {
 
 // New Client Form
 router.get('/new', (req, res) => {
-    res.render('newClient');
+    res.render('newClient',{nationalities });
 });
 
 // Save new client
 router.post('/new', async (req, res) => {
     try {
         const {
-            mobile,
-            company,
-            registered_owner_name,
-            nationality,
-            emirates_id_status,
-            contract_status,
-            license_status,
-            ejari_no
+       mobile,
+    company_en,
+    company_ar,
+    registered_owner_name_en,
+    registered_owner_name_ar,
+    nationality_en,
+    nationality_ar,
+    license_number,
+    license_expiry,
+    emirates_id_status,
+    contract_status,
+    license_status,
+    ejari_no
         } = req.body;
 
         const client = new Client({
             mobile,
-            company,
-            registered_owner_name,
-            nationality,
-            emirates_id_status: String(emirates_id_status),
-            contract_status: String(contract_status),
-            license_status: String(license_status),
-            ejari_no
+    company_en,
+    company_ar,
+    registered_owner_name_en,
+    registered_owner_name_ar,
+    nationality_en,
+    nationality_ar,
+    license_number,
+    license_expiry,
+    emirates_id_status: String(emirates_id_status),
+    contract_status: String(contract_status),
+    license_status: String(license_status),
+    ejari_no
         });
 
         await client.save();
@@ -50,6 +60,7 @@ router.post('/new', async (req, res) => {
         res.status(500).send('Error saving client');
     }
 });
+
 
 // Upload Page
 router.get('/:clientId/upload', async (req, res) => {
@@ -133,6 +144,47 @@ router.get('/:clientId/view', async (req, res) => {
         res.render('clientView', { client });
     } catch (err) {
         res.status(500).send('Error loading client details');
+    }
+});
+
+
+
+// Edit Client Form
+router.get('/:clientId/edit', async (req, res) => {
+    try {
+        const client = await Client.findById(req.params.clientId);
+        if (!client) return res.status(404).send('Client not found');
+
+        const nationalities = require('../utils/nationalities');
+        res.render('editClient', { client, nationalities });
+    } catch (err) {
+        res.status(500).send('Error loading edit form');
+    }
+});
+// Update Client
+router.post('/:clientId/edit', async (req, res) => {
+    try {
+        const updateData = {
+            mobile: req.body.mobile,
+            company_en: req.body.company_en,
+            company_ar: req.body.company_ar,
+            registered_owner_name_en: req.body.registered_owner_name_en,
+            registered_owner_name_ar: req.body.registered_owner_name_ar,
+            nationality_en: req.body.nationality_en,
+            nationality_ar: req.body.nationality_ar,
+            emirates_id_status: req.body.emirates_id_status,
+            contract_status: req.body.contract_status,
+            license_status: req.body.license_status,
+            ejari_no: req.body.ejari_no,
+            license_number: req.body.license_number,
+            license_expiry: req.body.license_expiry
+        };
+
+        await Client.findByIdAndUpdate(req.params.clientId, updateData);
+        res.redirect(`/clients/${req.params.clientId}/view`);
+    } catch (err) {
+        console.error('Error updating client:', err);
+        res.status(500).send('Error updating client');
     }
 });
 

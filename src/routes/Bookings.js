@@ -248,63 +248,70 @@ router.get('/success', (req, res) => {
 });
 
 
+
 router.get('/:bookingId/generate-contract', async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.bookingId)
-      .populate('office_id')
-      .populate({ path: 'office_id', populate: { path: 'branch_id' } })
-      .populate('client_id');
+    try {
+        console.log('🔁 Generating PDF contract for booking:', req.params.bookingId);
 
-    if (!booking) return res.status(404).send('Booking not found');
+        const booking = await Booking.findById(req.params.bookingId)
+            .populate('office_id')
+            .populate({
+                path: 'office_id',
+                populate: { path: 'branch_id' }
+            })
+            .populate('client_id');
 
- const data = {
-  tenant_name: booking.client_id?.registered_owner_name || '',
-  company_name: booking.client_id?.company || '',
-  phone: booking.client_id?.phone || '',
-  unit_number: booking.office_id?.office_number || '',
-  branch_name: booking.office_id?.branch_id?.name || '',
-  start_date: booking.start_date.toISOString().split('T')[0],
-  end_date: booking.end_date.toISOString().split('T')[0],
-  total_price: booking.total_price,
-  office_rent: booking.total_price || 0,  // ✅ أضف دا هنا
-  ejari: booking.ejari_no || '',
-  page_no: booking.page_no || '',
-  cheques: booking.cheques || [],
-  license_no: booking.client_id?.license_no || '',
-  email: booking.client_id?.email || '',
-  license_expiry: booking.client_id?.license_expiry
-    ? new Date(booking.client_id.license_expiry).toISOString().split('T')[0]
-    : '',
-  vat: booking.vat || 0,
-  commission: booking.commission || 0,
-  admin_fee: booking.admin_fee || 0,
-  sec_deposit: booking.sec_deposit || 0
-};
+        if (!booking) return res.status(404).send('Booking not found');
 
+        // 📄 مسار القالب
+        const templatePath = path.join(__dirname, '../templates/contractTemplate.ejs');
 
-    const html = await ejs.renderFile(
-      path.join(__dirname, '../templates/contractTemplate.ejs'),
-      data
-    );
+        const html = await ejs.renderFile(templatePath, {
+            tenant_name: booking.client_id?.registered_owner_name || '',
+            license_no: booking.client_id?.license_no || '',
+            email: booking.client_id?.email || '',
+            phone: booking.client_id?.phone || '',
+            license_expiry: booking.client_id?.license_expiry
+                ? booking.client_id.license_expiry.toISOString().split('T')[0]
+                : '',
+            unit_number: booking.office_id?.office_number || '',
+            ejari: booking.ejari_no || '0',
+            vat: booking.vat || '0',
+            commission: booking.commission || '0',
+            office_rent: booking.total_price - (booking.vat || 0) - (booking.commission || 0),
+            total_price: booking.total_price || 0,
+            start_date: booking.start_date.toISOString().split('T')[0],
+            end_date: booking.end_date.toISOString().split('T')[0],
+            cheques: booking.cheques.map((chq) => ({
+                date: new Date(chq.date).toISOString().split('T')[0],
+                amount: chq.amount
+            }))
+        });
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+        const browser = await puppeteer.launch({ headless: 'new' });
+        const page = await browser.newPage();
 
-    const pdfBuffer = await page.pdf({ format: 'A4' });
-    await browser.close();
+        await page.setContent(html, { waitUntil: 'networkidle0' });
+        const pdfBuffer = await page.pdf({
+            format: 'A4',
+            printBackground: true,
+            margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' }
+        });
 
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="Contract_${booking._id}.pdf"`
-    });
+        await browser.close();
 
-    res.send(pdfBuffer);
-  } catch (err) {
-    console.error('❌ Error generating PDF contract:', err.message);
-    res.status(500).send('Error generating contract');
-  }
+        const filename = `Tenancy_Contract_${booking._id}.pdf`;
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${filename}"`
+        });
+
+        res.send(pdfBuffer);
+
+    } catch (err) {
+        console.error('❌ Error generating PDF contract:', err.message);
+        res.status(500).send('Error generating contract');
+    }
 });
-
 
 module.exports = router;

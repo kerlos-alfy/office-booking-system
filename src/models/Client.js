@@ -2,9 +2,23 @@ const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
     mobile: { type: String, required: true },
-    company: { type: String, required: true },
-    registered_owner_name: { type: String, required: true },
-    nationality: { type: String, required: true },
+
+    // Company Name
+    company_en: { type: String, required: true },
+    company_ar: { type: String, required: true },
+
+    // Registered Owner Name
+    registered_owner_name_en: { type: String, required: true },
+    registered_owner_name_ar: { type: String, required: true },
+
+    // Nationality
+    nationality_en: { type: String, required: true },
+    nationality_ar: { type: String, required: true },
+
+    // License Info
+    license_number: { type: String, required: true },
+    license_expiry: { type: Date, required: true },
+
     emirates_id_status: { type: String, enum: ['OK', 'NOT NEED', 'UNAVAILABLE'], required: true },
     contract_status: { type: String, enum: ['OK', 'NO'], required: true },
     license_status: { type: String, enum: ['OK', 'NO'], required: true },
@@ -19,7 +33,6 @@ const clientSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
 
 const Client = mongoose.model('Client', clientSchema);
 
