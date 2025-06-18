@@ -3,56 +3,56 @@
 <h1 class="mb-4 text-primary">💰 Payments for Booking</h1>
 
 <div class="mb-4">
-    <h5>Office: <%= booking.office_id.office_number %></h5>
-    <h5>Client: <%= booking.client_id.name %></h5>
-    <h5>Contract Type: <%= booking.contract_type %></h5>
-    <h5>Total Price: $<%= booking.total_price %></h5>
-    <h5>Initial Payment: $<%= booking.initial_payment %></h5>
+	<h5>Office: <%= booking.office_id.office_number %></h5>
+	<h5>Client: <%= booking.client_id.name %></h5>
+	<h5>Contract Type: <%= booking.contract_type %></h5>
+	<h5>Total Price: $<%= booking.total_price %></h5>
+	<h5>Initial Payment: $<%= booking.initial_payment %></h5>
 </div>
 
-<hr>
+<hr />
 
 <h4 class="mb-3">Existing Payments</h4>
 <table class="table table-bordered bg-white">
-    <thead class="table-dark">
-        <tr>
-            <th>#</th>
-            <th>Amount</th>
-            <th>Payment Date</th>
-            <th>Payment Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% booking.payments.forEach((payment, index) => { %>
-            <tr>
-                <td><%= index + 1 %></td>
-                <td>$<%= payment.amount %></td>
-                <td><%= payment.payment_date.toISOString().split('T')[0] %></td>
-                <td><%= payment.payment_type %></td>
-            </tr>
-        <% }) %>
-    </tbody>
+	<thead class="table-dark">
+		<tr>
+			<th>#</th>
+			<th>Amount</th>
+			<th>Payment Date</th>
+			<th>Payment Type</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% booking.payments.forEach((payment, index) => { %>
+		<tr>
+			<td><%= index + 1 %></td>
+			<td>$<%= payment.amount %></td>
+			<td><%= payment.payment_date.toISOString().split('T')[0] %></td>
+			<td><%= payment.payment_type %></td>
+		</tr>
+		<% }) %>
+	</tbody>
 </table>
 
-<hr>
+<hr />
 
 <h4 class="mb-3">Add New Payment</h4>
 <form method="POST" action="/payments/booking/<%= booking._id %>/payments" class="bg-white p-4 rounded shadow-sm">
-    <div class="mb-3">
-        <label class="form-label">Amount:</label>
-        <input type="number" name="amount" class="form-control" required>
-    </div>
+	<div class="mb-3">
+		<label class="form-label">Amount:</label>
+		<input type="number" name="amount" class="form-control" required />
+	</div>
 
-    <div class="mb-3">
-        <label class="form-label">Payment Type:</label>
-        <select name="payment_type" class="form-control" required>
-            <option value="installment">Installment</option>
-            <option value="initial">Initial (Rarely used again)</option>
-        </select>
-    </div>
+	<div class="mb-3">
+		<label class="form-label">Payment Type:</label>
+		<select name="payment_type" class="form-control" required>
+			<option value="installment">Installment</option>
+			<option value="initial">Initial (Rarely used again)</option>
+		</select>
+	</div>
 
-    <button type="submit" class="btn btn-primary">Add Payment</button>
-    <a href="/bookings" class="btn btn-secondary ms-2">Back to Bookings</a>
+	<button type="submit" class="btn btn-primary">Add Payment</button>
+	<a href="/bookings" class="btn btn-secondary ms-2">Back to Bookings</a>
 </form>
 
 <%- include('partials/footer') %>

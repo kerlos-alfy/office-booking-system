@@ -1,333 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Your Own Business Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Your Own Business Center</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-    
-    body {
-        padding-bottom: 50px;
-        background-color: #f9f9fb;
-    }
+		<style>
+			body {
+				padding-bottom: 50px;
+				background-color: #f9f9fb;
+			}
 
-    h1 {
-        font-weight: 700;
-        font-size: 1.8rem;
-        color: #2c3e50;
-    }
+			h1 {
+				font-weight: 700;
+				font-size: 1.8rem;
+				color: #2c3e50;
+			}
 
-    .card {
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    }
+			.card {
+				border-radius: 12px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+			}
 
-    .card-header {
-        font-size: 1.05rem;
-        font-weight: 600;
-    }
+			.card-header {
+				font-size: 1.05rem;
+				font-weight: 600;
+			}
 
-    .table {
-        border-radius: 8px;
-        overflow: hidden;
-    }
+			.table {
+				border-radius: 8px;
+				overflow: hidden;
+			}
 
-    .table thead th {
-        background-color: #34495e;
-        color: white;
-    }
+			.table thead th {
+				background-color: #34495e;
+				color: white;
+			}
 
-    .table-hover tbody tr:hover {
-        background-color: #f1f1f1;
-        transition: 0.3s ease;
-    }
+			.table-hover tbody tr:hover {
+				background-color: #f1f1f1;
+				transition: 0.3s ease;
+			}
 
-    .table-summary th {
-        background-color: #0d6efd;
-        color: white;
-        font-size: 1.1rem;
-    }
+			.table-summary th {
+				background-color: #0d6efd;
+				color: white;
+				font-size: 1.1rem;
+			}
 
-    .table-summary td {
-        font-size: 1rem;
-        padding: 0.75rem 1rem;
-    }
+			.table-summary td {
+				font-size: 1rem;
+				padding: 0.75rem 1rem;
+			}
 
-    form .form-select,
-    form .form-control {
-        min-width: 160px;
-    }
+			form .form-select,
+			form .form-control {
+				min-width: 160px;
+			}
 
-    .btn-primary {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
+			.btn-primary {
+				background-color: #0d6efd;
+				border-color: #0d6efd;
+			}
 
-    .btn-primary:hover {
-        background-color: #0b5ed7;
-        border-color: #0b5ed7;
-    }
+			.btn-primary:hover {
+				background-color: #0b5ed7;
+				border-color: #0b5ed7;
+			}
 
-    @media (max-width: 767px) {
-        .table-summary td, .table-summary th {
-            font-size: 0.95rem;
-        }
+			@media (max-width: 767px) {
+				.table-summary td,
+				.table-summary th {
+					font-size: 0.95rem;
+				}
 
-        h1 {
-            font-size: 1.5rem;
-        }
-    }
+				h1 {
+					font-size: 1.5rem;
+				}
+			}
 
-    .office-box {
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
+			.office-box {
+				border: 2px solid #e0e0e0;
+				border-radius: 12px;
+				background-color: #fff;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
 
-    .office-available {
-        background-color: #e8f5e9;
-        border-color: #81c784;
-    }
+			.office-available {
+				background-color: #e8f5e9;
+				border-color: #81c784;
+			}
 
-    .office-booked {
-        background-color: #fff3f3;
-        border-color: #e57373;
-    }
+			.office-booked {
+				background-color: #fff3f3;
+				border-color: #e57373;
+			}
 
-    .office-box:hover {
-        border-color: #0d6efd;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
-    }
+			.office-box:hover {
+				border-color: #0d6efd;
+				box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+				transform: translateY(-4px);
+			}
 
-    .office-box h5 {
-        font-size: 1.1rem;
-        color: #333;
-    }
+			.office-box h5 {
+				font-size: 1.1rem;
+				color: #333;
+			}
 
-    .office-box p {
-        font-size: 0.9rem;
-        color: #555;
-    }
+			.office-box p {
+				font-size: 0.9rem;
+				color: #555;
+			}
 
-    a.text-decoration-none.text-dark:hover {
-        text-decoration: none !important;
-        color: inherit !important;
-    }
+			a.text-decoration-none.text-dark:hover {
+				text-decoration: none !important;
+				color: inherit !important;
+			}
 
-    .branch-card {
-        transition: all 0.2s ease;
-        border: 2px solid #e0e0e0;
-        background-color: #fff;
-        cursor: pointer;
-        border-radius: 12px;
-        padding: 20px;
-    }
+			.branch-card {
+				transition: all 0.2s ease;
+				border: 2px solid #e0e0e0;
+				background-color: #fff;
+				cursor: pointer;
+				border-radius: 12px;
+				padding: 20px;
+			}
 
-    .branch-card:hover {
-        border-color: #0d6efd;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        transform: translateY(-5px);
-    }
+			.branch-card:hover {
+				border-color: #0d6efd;
+				box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+				transform: translateY(-5px);
+			}
 
-    body {
-        animation: fadeIn 0.5s ease-in;
-    }
+			body {
+				animation: fadeIn 0.5s ease-in;
+			}
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
-html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-}
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+				display: flex;
+				flex-direction: column;
+			}
 
-body > .container {
-    flex: 1;
-}
-.office-box {
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    background-color: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+			body > .container {
+				flex: 1;
+			}
+			.office-box {
+				border: 2px solid #e0e0e0;
+				border-radius: 12px;
+				background-color: #fff;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
 
-.office-available {
-    background-color: #e8f5e9;
-    border-color: #81c784;
-}
+			.office-available {
+				background-color: #e8f5e9;
+				border-color: #81c784;
+			}
 
-.office-booked {
-    background-color: #fff3f3;
-    border-color: #e57373;
-}
+			.office-booked {
+				background-color: #fff3f3;
+				border-color: #e57373;
+			}
 
-.office-box:hover {
-    border-color: #0d6efd;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-4px);
-}
-
-</style>
-
-</head>
-<body class="bg-light">
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-            <img src="/images/logo.png" alt="Logo" class="me-2" style="height: 40px;">
-            <span class="fw-bold fs-5">Your Own Business Center</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/branches">🏢 Branches</a>
-                </li>
-                <!-- <li class="nav-item">
+			.office-box:hover {
+				border-color: #0d6efd;
+				box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+				transform: translateY(-4px);
+			}
+		</style>
+	</head>
+	<body class="bg-light">
+		<!-- Navbar -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
+			<div class="container-fluid">
+				<a class="navbar-brand d-flex align-items-center" href="/">
+					<img src="/images/logo.png" alt="Logo" class="me-2" style="height: 40px" />
+					<span class="fw-bold fs-5">Your Own Business Center</span>
+				</a>
+				<button
+					class="navbar-toggler"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#navbarNav"
+					aria-controls="navbarNav"
+					aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav ms-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="/branches">🏢 Branches</a>
+						</li>
+						<!-- <li class="nav-item">
                     <a class="nav-link" href="/offices">Offices</a>
                 </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/clients">Clients</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/bookings">📋 Bookings</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/bookings/archive">📦 Archive</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/payments">Payments</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/reports/revenue">Revenue Report</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/reports/timeline">Revenue Timeline</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+						<li class="nav-item">
+							<a class="nav-link" href="/clients">Clients</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/bookings">📋 Bookings</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/bookings/archive">📦 Archive</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/payments">Payments</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/reports/revenue">Revenue Report</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/reports/timeline">Revenue Timeline</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
 
-<div class="container">
+		<div class="container">
+			<h1 class="mb-4 text-primary">👤 Client Details <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold"> ✏️ Edit Client </a></h1>
 
-<h1 class="mb-4 text-primary">👤 Client Details <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold">
-  ✏️ Edit Client
-</a>
-</h1>
+			<div class="card shadow mb-4">
+				<div class="card-header bg-primary text-white fw-bold">Client Info</div>
+				<div class="card-body">
+					<p><strong>Company:</strong> <%= client.company_en %> (<%= client.company_ar %>)</p>
+					<p><strong>Registered Owner Name:</strong> <%= client.registered_owner_name_en %> (<%= client.registered_owner_name_ar %>)</p>
+					<p><strong>Mobile:</strong> <%= client.mobile %></p>
+					<p><strong>Nationality:</strong> <%= client.nationality_en %> (<%= client.nationality_ar %>)</p>
+					<p><strong>Emirates ID Status:</strong> <%= client.emirates_id_status %></p>
+					<p><strong>Contract Status:</strong> <%= client.contract_status %></p>
+					<p><strong>License Status:</strong> <%= client.license_status %></p>
+					<p><strong>License Number:</strong> <%= client.license_number %></p>
+					<p>
+						<strong>License Expiry:</strong>
+						<% if (client.license_expiry) { %> <%= new Date(client.license_expiry).toISOString().split('T')[0] %> <% } else { %> Not provided <% } %>
+					</p>
+					<a href="/clients/<%= client._id %>/invoice/download" class="btn btn-outline-success"> 💾 تحميل الفاتورة PDF </a>
 
-<div class="card shadow mb-4">
-  <div class="card-header bg-primary text-white fw-bold">Client Info</div>
-  <div class="card-body">
-    <p><strong>Company:</strong> <%= client.company_en %> (<%= client.company_ar %>)</p>
-    <p><strong>Registered Owner Name:</strong> <%= client.registered_owner_name_en %> (<%= client.registered_owner_name_ar %>)</p>
-    <p><strong>Mobile:</strong> <%= client.mobile %></p>
-    <p><strong>Nationality:</strong> <%= client.nationality_en %> (<%= client.nationality_ar %>)</p>
-    <p><strong>Emirates ID Status:</strong> <%= client.emirates_id_status %></p>
-    <p><strong>Contract Status:</strong> <%= client.contract_status %></p>
-    <p><strong>License Status:</strong> <%= client.license_status %></p>
-    <p><strong>License Number:</strong> <%= client.license_number %></p>
-<p><strong>License Expiry:</strong>
-  <% if (client.license_expiry) { %>
-    <%= new Date(client.license_expiry).toISOString().split('T')[0] %>
-  <% } else { %>
-    Not provided
-  <% } %>
-</p>
+					<p><strong>Ejari No:</strong> <%= client.ejari_no %></p>
+				</div>
+			</div>
 
+			<h3 class="mb-3 text-secondary">📂 Client Files</h3>
 
-    <p><strong>Ejari No:</strong> <%= client.ejari_no %></p>
-  </div>
-</div>
+			<div class="row g-3">
+				<% if (client.license_file_path) { %>
+				<div class="col-md-4">
+					<div class="card p-3 h-100">
+						<h6 class="fw-bold">📄 License</h6>
+						<a href="<%= client.license_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
+					</div>
+				</div>
+				<% } %> <% if (client.ejari_file_path) { %>
+				<div class="col-md-4">
+					<div class="card p-3 h-100">
+						<h6 class="fw-bold">📄 Ejari</h6>
+						<a href="<%= client.ejari_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
+					</div>
+				</div>
+				<% } %> <% if (client.emirates_id_file_path) { %>
+				<div class="col-md-4">
+					<div class="card p-3 h-100">
+						<h6 class="fw-bold">📄 Emirates ID</h6>
+						<a href="<%= client.emirates_id_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
+					</div>
+				</div>
+				<% } %> <% if (client.passport_file_path) { %>
+				<div class="col-md-4">
+					<div class="card p-3 h-100">
+						<h6 class="fw-bold">📄 Passport</h6>
+						<a href="<%= client.passport_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
+					</div>
+				</div>
+				<% } %> <% if (client.contract_file_path) { %>
+				<div class="col-md-4">
+					<div class="card p-3 h-100">
+						<h6 class="fw-bold">📄 Contract</h6>
+						<a href="<%= client.contract_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
+					</div>
+				</div>
+				<% } %> <% if (client.additional_files && client.additional_files.length > 0) { %>
+				<div class="col-12">
+					<h5 class="fw-bold text-primary">📎 Additional Files</h5>
+					<% client.additional_files.forEach(file => { %>
+					<div class="mb-2">
+						<a href="<%= file %>" target="_blank" class="text-decoration-none">📄 View Additional File</a>
+					</div>
+					<% }); %>
+				</div>
+				<% } %>
+			</div>
+		</div>
+		<!-- Close container -->
 
+		<!-- Footer -->
+		<footer class="bg-dark text-white text-center py-3 mt-4">
+			<small style="font-size: 0.9rem">&copy; 2025 Your Own Business Center. All rights reserved.</small>
+		</footer>
 
-<h3 class="mb-3 text-secondary">📂 Client Files</h3>
-
-<div class="row g-3">
-
-    <% if (client.license_file_path) { %>
-    <div class="col-md-4">
-        <div class="card p-3 h-100">
-            <h6 class="fw-bold">📄 License</h6>
-            <a href="<%= client.license_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
-        </div>
-    </div>
-    <% } %>
-
-    <% if (client.ejari_file_path) { %>
-    <div class="col-md-4">
-        <div class="card p-3 h-100">
-            <h6 class="fw-bold">📄 Ejari</h6>
-            <a href="<%= client.ejari_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
-        </div>
-    </div>
-    <% } %>
-
-    <% if (client.emirates_id_file_path) { %>
-    <div class="col-md-4">
-        <div class="card p-3 h-100">
-            <h6 class="fw-bold">📄 Emirates ID</h6>
-            <a href="<%= client.emirates_id_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
-        </div>
-    </div>
-    <% } %>
-
-    <% if (client.passport_file_path) { %>
-    <div class="col-md-4">
-        <div class="card p-3 h-100">
-            <h6 class="fw-bold">📄 Passport</h6>
-            <a href="<%= client.passport_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
-        </div>
-    </div>
-    <% } %>
-
-    <% if (client.contract_file_path) { %>
-    <div class="col-md-4">
-        <div class="card p-3 h-100">
-            <h6 class="fw-bold">📄 Contract</h6>
-            <a href="<%= client.contract_file_path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">View File</a>
-        </div>
-    </div>
-    <% } %>
-
-    <% if (client.additional_files && client.additional_files.length > 0) { %>
-    <div class="col-12">
-        <h5 class="fw-bold text-primary">📎 Additional Files</h5>
-        <% client.additional_files.forEach(file => { %>
-            <div class="mb-2">
-                <a href="<%= file %>" target="_blank" class="text-decoration-none">📄 View Additional File</a>
-            </div>
-        <% }); %>
-    </div>
-    <% } %>
-
-</div>
-
-</div> <!-- Close container -->
-
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-3 mt-4">
-    <small style="font-size: 0.9rem;">&copy; 2025 Your Own Business Center. All rights reserved.</small>
-</footer>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	</body>
 </html>

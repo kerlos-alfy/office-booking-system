@@ -1,10 +1,352 @@
 [
-  { "branchIndex": 0, "office_number": "#1", "floor": 1, "monthly_price": 1000, "yearly_price": 12000 },
-  { "branchIndex": 0, "office_number": "#2", "floor": 1, "monthly_price": 1050, "yearly_price": 12500 },
-  { "branchIndex": 1, "office_number": "#1", "floor": 1, "monthly_price": 1100, "yearly_price": 13000 },
-  { "branchIndex": 1, "office_number": "#2", "floor": 2, "monthly_price": 1150, "yearly_price": 13500 },
-  { "branchIndex": 2, "office_number": "#1", "floor": 1, "monthly_price": 1200, "yearly_price": 14000 },
-  { "branchIndex": 2, "office_number": "#2", "floor": 2, "monthly_price": 1250, "yearly_price": 14500 },
-  { "branchIndex": 3, "office_number": "#1", "floor": 1, "monthly_price": 1300, "yearly_price": 15000 },
-  { "branchIndex": 3, "office_number": "#2", "floor": 2, "monthly_price": 1350, "yearly_price": 15500 }
+  {
+    "branchIndex": 9,
+    "office_number": "233",
+    "floor": "10",
+    "monthly_price": 2174,
+    "yearly_price": 63916
+  },
+  {
+    "branchIndex": 4,
+    "office_number": "853",
+    "floor": "1",
+    "monthly_price": 2715,
+    "yearly_price": 65018
+  },
+  {
+    "branchIndex": 7,
+    "office_number": "956",
+    "floor": "2",
+    "monthly_price": 2233,
+    "yearly_price": 54529
+  },
+  {
+    "branchIndex": 5,
+    "office_number": "433",
+    "floor": "1",
+    "monthly_price": 5345,
+    "yearly_price": 40849
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "711",
+    "floor": "5",
+    "monthly_price": 3374,
+    "yearly_price": 29076
+  },
+  {
+    "branchIndex": 2,
+    "office_number": "219",
+    "floor": "4",
+    "monthly_price": 4869,
+    "yearly_price": 25097
+  },
+  {
+    "branchIndex": 5,
+    "office_number": "198",
+    "floor": "8",
+    "monthly_price": 2774,
+    "yearly_price": 48681
+  },
+  {
+    "branchIndex": 7,
+    "office_number": "533",
+    "floor": "1",
+    "monthly_price": 2799,
+    "yearly_price": 46455
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "389",
+    "floor": "3",
+    "monthly_price": 2928,
+    "yearly_price": 40870
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "933",
+    "floor": "3",
+    "monthly_price": 2674,
+    "yearly_price": 52858
+  },
+  {
+    "branchIndex": 8,
+    "office_number": "495",
+    "floor": "3",
+    "monthly_price": 2679,
+    "yearly_price": 41619
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "910",
+    "floor": "8",
+    "monthly_price": 2011,
+    "yearly_price": 68639
+  },
+  {
+    "branchIndex": 4,
+    "office_number": "225",
+    "floor": "9",
+    "monthly_price": 4769,
+    "yearly_price": 75797
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "538",
+    "floor": "5",
+    "monthly_price": 5250,
+    "yearly_price": 79510
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "889",
+    "floor": "4",
+    "monthly_price": 4683,
+    "yearly_price": 37563
+  },
+  {
+    "branchIndex": 6,
+    "office_number": "668",
+    "floor": "5",
+    "monthly_price": 2487,
+    "yearly_price": 28004
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "277",
+    "floor": "1",
+    "monthly_price": 5754,
+    "yearly_price": 70756
+  },
+  {
+    "branchIndex": 7,
+    "office_number": "294",
+    "floor": "1",
+    "monthly_price": 2124,
+    "yearly_price": 67772
+  },
+  {
+    "branchIndex": 6,
+    "office_number": "117",
+    "floor": "7",
+    "monthly_price": 4292,
+    "yearly_price": 65152
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "130",
+    "floor": "1",
+    "monthly_price": 5824,
+    "yearly_price": 61206
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "871",
+    "floor": "7",
+    "monthly_price": 3897,
+    "yearly_price": 29260
+  },
+  {
+    "branchIndex": 7,
+    "office_number": "983",
+    "floor": "6",
+    "monthly_price": 3436,
+    "yearly_price": 63539
+  },
+  {
+    "branchIndex": 2,
+    "office_number": "655",
+    "floor": "9",
+    "monthly_price": 2823,
+    "yearly_price": 33310
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "710",
+    "floor": "10",
+    "monthly_price": 4031,
+    "yearly_price": 54312
+  },
+  {
+    "branchIndex": 1,
+    "office_number": "561",
+    "floor": "8",
+    "monthly_price": 3654,
+    "yearly_price": 34133
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "246",
+    "floor": "4",
+    "monthly_price": 4977,
+    "yearly_price": 64471
+  },
+  {
+    "branchIndex": 2,
+    "office_number": "136",
+    "floor": "3",
+    "monthly_price": 5260,
+    "yearly_price": 76711
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "161",
+    "floor": "4",
+    "monthly_price": 4918,
+    "yearly_price": 50638
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "366",
+    "floor": "6",
+    "monthly_price": 3009,
+    "yearly_price": 68520
+  },
+  {
+    "branchIndex": 7,
+    "office_number": "630",
+    "floor": "2",
+    "monthly_price": 3294,
+    "yearly_price": 61909
+  },
+  {
+    "branchIndex": 4,
+    "office_number": "507",
+    "floor": "4",
+    "monthly_price": 4275,
+    "yearly_price": 71029
+  },
+  {
+    "branchIndex": 1,
+    "office_number": "855",
+    "floor": "4",
+    "monthly_price": 5469,
+    "yearly_price": 49964
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "263",
+    "floor": "1",
+    "monthly_price": 4513,
+    "yearly_price": 75034
+  },
+  {
+    "branchIndex": 3,
+    "office_number": "440",
+    "floor": "9",
+    "monthly_price": 2145,
+    "yearly_price": 79463
+  },
+  {
+    "branchIndex": 8,
+    "office_number": "836",
+    "floor": "3",
+    "monthly_price": 3220,
+    "yearly_price": 79955
+  },
+  {
+    "branchIndex": 6,
+    "office_number": "115",
+    "floor": "9",
+    "monthly_price": 5708,
+    "yearly_price": 58249
+  },
+  {
+    "branchIndex": 4,
+    "office_number": "198",
+    "floor": "6",
+    "monthly_price": 4971,
+    "yearly_price": 77089
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "789",
+    "floor": "9",
+    "monthly_price": 4956,
+    "yearly_price": 37620
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "721",
+    "floor": "10",
+    "monthly_price": 2878,
+    "yearly_price": 65464
+  },
+  {
+    "branchIndex": 0,
+    "office_number": "628",
+    "floor": "2",
+    "monthly_price": 4205,
+    "yearly_price": 41067
+  },
+  {
+    "branchIndex": 4,
+    "office_number": "358",
+    "floor": "8",
+    "monthly_price": 3990,
+    "yearly_price": 50560
+  },
+  {
+    "branchIndex": 9,
+    "office_number": "401",
+    "floor": "1",
+    "monthly_price": 3942,
+    "yearly_price": 70748
+  },
+  {
+    "branchIndex": 2,
+    "office_number": "232",
+    "floor": "1",
+    "monthly_price": 4865,
+    "yearly_price": 30411
+  },
+  {
+    "branchIndex": 6,
+    "office_number": "686",
+    "floor": "7",
+    "monthly_price": 5157,
+    "yearly_price": 65617
+  },
+  {
+    "branchIndex": 1,
+    "office_number": "168",
+    "floor": "6",
+    "monthly_price": 4792,
+    "yearly_price": 34169
+  },
+  {
+    "branchIndex": 1,
+    "office_number": "670",
+    "floor": "1",
+    "monthly_price": 4841,
+    "yearly_price": 33442
+  },
+  {
+    "branchIndex": 1,
+    "office_number": "412",
+    "floor": "9",
+    "monthly_price": 3983,
+    "yearly_price": 63106
+  },
+  {
+    "branchIndex": 0,
+    "office_number": "377",
+    "floor": "5",
+    "monthly_price": 3385,
+    "yearly_price": 52685
+  },
+  {
+    "branchIndex": 5,
+    "office_number": "728",
+    "floor": "4",
+    "monthly_price": 3726,
+    "yearly_price": 42402
+  },
+  {
+    "branchIndex": 2,
+    "office_number": "991",
+    "floor": "1",
+    "monthly_price": 4962,
+    "yearly_price": 52607
+  }
 ]

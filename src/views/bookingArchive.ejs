@@ -7,62 +7,76 @@
 
 <!-- Filter Client -->
 <form method="GET" action="/bookings/archive" class="mb-3">
-    <div class="row g-2 align-items-center">
-        <div class="col-auto">
-            <input type="text" name="client" placeholder="Search by Client Name" class="form-control" value="<%= typeof client !== 'undefined' ? client : '' %>">
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="/bookings/archive" class="btn btn-secondary">Clear</a>
-        </div>
-    </div>
+	<div class="row g-2 align-items-center">
+		<div class="col-auto">
+			<input type="text" name="client" placeholder="Search by Client Name" class="form-control" value="<%= typeof client !== 'undefined' ? client : '' %>" />
+		</div>
+		<div class="col-auto">
+			<button type="submit" class="btn btn-primary">Filter</button>
+			<a href="/bookings/archive" class="btn btn-secondary">Clear</a>
+		</div>
+	</div>
 </form>
 
 <% if (archivedBookings.length === 0) { %>
-    <div class="alert alert-info">No archived bookings found.</div>
+<div class="alert alert-info">No archived bookings found.</div>
 <% } else { %>
-    <table class="table table-bordered table-hover table-striped bg-white">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Office</th>
-                <th>Client</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Page No</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% archivedBookings.forEach((booking, index) => { %>
-                <tr>
-                    <td><%= index + 1 %></td>
-                    <td><%= booking.office_id?.office_number %></td>
-                    <td><%= booking.client_id?.name || 'N/A' %></td>
-                    <td><%= new Date(booking.start_date).toISOString().split('T')[0] %></td>
-                    <td><%= new Date(booking.end_date).toISOString().split('T')[0] %></td>
-                    <td><%= booking.page_no %></td>
-                    <td><span class="badge bg-secondary">Archived</span></td>
-                </tr>
-            <% }); %>
-        </tbody>
-    </table>
+<table class="table table-bordered table-hover table-striped bg-white">
+	<thead class="table-dark">
+		<tr>
+			<th>#</th>
+			<th>Office</th>
+			<th>Client</th>
+			<th>Start Date</th>
+			<th>End Date</th>
+			<th>Page No</th>
+			<th>Status</th>
+			<th>Cancel Reason</th>
+			<th>View Office</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% archivedBookings.forEach((booking, index) => { %>
+		<tr>
+			<td><%= index + 1 %></td>
+			<td><%= booking.office_id?.office_number %></td>
+			<td><%= booking.client_id?.registered_owner_name_en || booking.client_id?.company_en || 'N/A' %></td>
+			<td><%= new Date(booking.start_date).toISOString().split('T')[0] %></td>
+			<td><%= new Date(booking.end_date).toISOString().split('T')[0] %></td>
+			<td><%= booking.page_no %></td>
+			<td><span class="badge bg-secondary">Archived</span></td>
+			<td><%= booking.cancel_reason || '—' %></td>
+			<td>
+				<% if (booking.office_id) { %>
+				<a href="/bookings/archive/<%= booking._id %>" class="btn btn-sm btn-outline-info">Details</a>
+				<% } else { %>
+				<span class="text-muted">N/A</span>
+				<% } %>
+			</td>
+		</tr>
+		<% }); %>
+	</tbody>
+</table>
 <% } %>
 
 <!-- Page Fade In -->
 <style>
-    body {
-        animation: fadeIn 0.5s ease-in;
-    }
+	body {
+		animation: fadeIn 0.5s ease-in;
+	}
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
 
-    table tr:hover {
-        background-color: #f8f9fa;
-    }
+	table tr:hover {
+		background-color: #f8f9fa;
+	}
 </style>
 
 <%- include('partials/footer') %>

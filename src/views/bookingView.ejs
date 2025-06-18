@@ -4,181 +4,168 @@
 
 <!-- UX Actions -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <a href="/bookings" class="btn btn-outline-secondary">
-        🔙 Back to Bookings
-    </a>
-    <button class="btn btn-outline-primary" onclick="window.print()">
-        🖨️ Print Page
-    </button>
+	<a href="/bookings" class="btn btn-outline-secondary">🔙 Back to Bookings</a>
+	<button class="btn btn-outline-primary" onclick="window.print()">🖨️ Print Page</button>
 </div>
 
 <div class="card shadow mb-4">
-    <div class="card-header bg-primary text-white fw-bold">
-        Booking Info
-    </div>
-    <div class="card-body">
+	<div class="card-header bg-primary text-white fw-bold">Booking Info</div>
+	<div class="card-body">
+		<!-- Office & Client Info -->
+		<p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
+		<p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
+		<p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.name %></p>
 
-        <!-- Office & Client Info -->
-        <p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
-        <p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
-        <p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.name %></p>
-<!-- Contract Download Button -->
-<a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success fw-bold mb-3">
-    📄 تحميل العقد
-</a>
+		<!-- Contract Download -->
+		<a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success fw-bold mb-3">📄 تحميل العقد</a>
 
-        <!-- Dates -->
-        <p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
-        <p class="mb-2"><strong>End Date:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
+		<!-- Dates -->
+		<p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
+		<p class="mb-2"><strong>End Date:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
 
-        <!-- Contract Info -->
-        <p class="mb-2"><strong>Contract Page No:</strong> <%= booking.page_no %></p>
-        <p class="mb-2"><strong>Status:</strong>
-            <% if (booking.status === 'archived') { %>
-                <span class="badge bg-secondary">Archived</span>
-            <% } else { %>
-                <span class="badge bg-success">Active</span>
-            <% } %>
-        </p>
+		<!-- Contract Info -->
+		<p class="mb-2"><strong>Contract Page No:</strong> <%= booking.page_no %></p>
+		<p class="mb-2">
+			<strong>Status:</strong>
+			<% if (booking.status === 'archived') { %>
+			<span class="badge bg-secondary">Archived</span>
+			<% } else { %>
+			<span class="badge bg-success">Active</span>
+			<% } %>
+		</p>
 
-        <!-- Financial Info -->
-        <hr>
-        <h5 class="text-primary fw-bold mb-3">💰 Financial Details</h5>
-        <p class="mb-2"><strong>Total Price:</strong> $<%= booking.total_price %></p>
-        <p class="mb-2"><strong>Down Payment:</strong> $<%= booking.initial_payment %></p>
-        <p class="mb-2"><strong>VAT:</strong> $<%= booking.vat %></p>
-        <p class="mb-2"><strong>Security Deposit:</strong> $<%= booking.sec_deposit %></p>
-        <p class="mb-2"><strong>Admin Fee:</strong> $<%= booking.admin_fee %></p>
-        <p class="mb-2"><strong>Commission:</strong> $<%= booking.commission %></p>
-        <p class="mb-2"><strong>Ejari No:</strong> <%= booking.ejari_no %></p>
+		<% if (booking.status === 'active') { %>
+		<hr />
+		<h5 class="text-danger fw-bold mt-4">❌ Cancel Booking</h5>
+		<form action="/bookings/<%= booking._id %>/archive" method="POST" onsubmit="return confirm('هل أنت متأكد من إلغاء الحجز؟')">
+			<div class="mb-3">
+				<label for="cancel_reason" class="form-label">سبب الإلغاء (اختياري)</label>
+				<textarea name="cancel_reason" id="cancel_reason" class="form-control" rows="2" placeholder="اكتب السبب هنا إن وجد..."></textarea>
+			</div>
+			<button type="submit" class="btn btn-danger">إلغاء الحجز</button>
+		</form>
+		<% } else { %>
+		<hr />
+		<div class="alert alert-warning mt-4">
+			<strong>⚠️ تم أرشفة هذا الحجز</strong><br />
+			<strong>السبب:</strong> <%= booking.cancel_reason || 'غير محدد' %>
+		</div>
+		<% } %>
 
-        <!-- Cheques -->
-        <hr>
-        <h5 class="text-primary fw-bold mb-3">📝 Cheques</h5>
+		<!-- Financial Info -->
+		<hr />
+		<h5 class="text-primary fw-bold mb-3">💰 Financial Details</h5>
+		<p class="mb-2"><strong>Total Price:</strong> $<%= booking.total_price %></p>
+		<p class="mb-2"><strong>Down Payment:</strong> $<%= booking.initial_payment %></p>
+		<p class="mb-2"><strong>VAT:</strong> $<%= booking.vat %></p>
+		<p class="mb-2"><strong>Security Deposit:</strong> $<%= booking.sec_deposit %></p>
+		<p class="mb-2"><strong>Admin Fee:</strong> $<%= booking.admin_fee %></p>
+		<p class="mb-2"><strong>Commission:</strong> $<%= booking.commission %></p>
+		<p class="mb-2"><strong>Ejari No:</strong> <%= booking.ejari_no %></p>
 
-        <%
-            const today = new Date();
-        %>
+		<!-- Cheques -->
+		<hr />
+		<h5 class="text-primary fw-bold mb-3">📝 Cheques</h5>
+		<% const today = new Date(); %> <% if (booking.cheques && booking.cheques.length > 0) { %>
+		<div class="table-responsive">
+			<table class="table table-bordered table-hover bg-white">
+				<thead class="table-light">
+					<tr>
+						<th>#</th>
+						<th>Amount</th>
+						<th>Due Date</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% booking.cheques.forEach((cheque, index) => { const dueDate = new Date(cheque.due_date); let statusText = ''; let rowClass = ''; if
+					(cheque.collected) { statusText = '✅ Collected'; rowClass = 'table-success'; } else if (dueDate < today) { statusText = '❌ Overdue'; rowClass =
+					'table-danger'; } else { statusText = '⏳ Upcoming'; rowClass = 'table-warning'; } %>
+					<tr class="<%= rowClass %>">
+						<td><%= index + 1 %></td>
+						<td>$<%= cheque.amount %></td>
+						<td><%= dueDate.toISOString().split('T')[0] %></td>
+						<td><%= statusText %></td>
+						<td>
+							<% if (!cheque.collected) { %>
+							<form method="POST" action="/bookings/<%= booking._id %>/cheques/<%= index %>/toggle-collected" style="display: inline">
+								<button type="submit" class="btn btn-sm btn-success">Mark as Collected</button>
+							</form>
+							<% } else { %>
+							<span class="text-success fw-bold">✅ Collected</span>
+							<% } %>
+						</td>
+					</tr>
+					<% }); %>
+				</tbody>
+			</table>
+		</div>
+		<% } else { %>
+		<p>No cheques.</p>
+		<% } %>
 
-        <% if (booking.cheques && booking.cheques.length > 0) { %>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover bg-white">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Amount</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% booking.cheques.forEach((cheque, index) => {
-                            const dueDate = new Date(cheque.due_date);
-                            let statusText = '';
-                            let rowClass = '';
-
-                            if (cheque.collected) {
-                                statusText = '✅ Collected';
-                                rowClass = 'table-success';
-                            } else if (dueDate < today) {
-                                statusText = '❌ Overdue';
-                                rowClass = 'table-danger';
-                            } else {
-                                statusText = '⏳ Upcoming';
-                                rowClass = 'table-warning';
-                            }
-                        %>
-                            <tr class="<%= rowClass %>">
-                                <td><%= index + 1 %></td>
-                                <td>$<%= cheque.amount %></td>
-                                <td><%= dueDate.toISOString().split('T')[0] %></td>
-                                <td><%= statusText %></td>
-                                <td>
-                                    <% if (!cheque.collected) { %>
-                                        <!-- لو الشيك مش متحصل → أظهر الزر -->
-                                        <form method="POST" action="/bookings/<%= booking._id %>/cheques/<%= index %>/toggle-collected" style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-success">
-                                                Mark as Collected
-                                            </button>
-                                        </form>
-                                    <% } else { %>
-                                        <!-- لو متحصل → مايظهرش زر → يظهر Text ✅ -->
-                                        <span class="text-success fw-bold">✅ Collected</span>
-                                    <% } %>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            </div>
-        <% } else { %>
-            <p>No cheques.</p>
-        <% } %>
-
-        <!-- Payments -->
-        <hr>
-        <h5 class="text-primary fw-bold mb-3">💳 Payments</h5>
-        <% if (booking.payments && booking.payments.length > 0) { %>
-            <table class="table table-bordered table-hover bg-white">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Amount</th>
-                        <th>Payment Date</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% booking.payments.forEach((payment, index) => { %>
-                        <tr>
-                            <td><%= index + 1 %></td>
-                            <td>$<%= payment.amount %></td>
-                            <td><%= new Date(payment.payment_date).toISOString().split('T')[0] %></td>
-                            <td><%= payment.payment_type %></td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-        <% } else { %>
-            <p>No payments recorded.</p>
-        <% } %>
-
-    </div>
-    
+		<!-- Payments -->
+		<hr />
+		<h5 class="text-primary fw-bold mb-3">💳 Payments</h5>
+		<% if (booking.payments && booking.payments.length > 0) { %>
+		<table class="table table-bordered table-hover bg-white">
+			<thead class="table-light">
+				<tr>
+					<th>#</th>
+					<th>Amount</th>
+					<th>Payment Date</th>
+					<th>Type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% booking.payments.forEach((payment, index) => { %>
+				<tr>
+					<td><%= index + 1 %></td>
+					<td>$<%= payment.amount %></td>
+					<td><%= new Date(payment.payment_date).toISOString().split('T')[0] %></td>
+					<td><%= payment.payment_type %></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+		<% } else { %>
+		<p>No payments recorded.</p>
+		<% } %>
+	</div>
 </div>
 
-<!-- Page Fade In + Card Styling -->
 <style>
-    body {
-        animation: fadeIn 0.5s ease-in;
-    }
+	body {
+		animation: fadeIn 0.5s ease-in;
+	}
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
 
-    .card {
-        border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-    }
+	.card {
+		border-radius: 12px;
+		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+	}
 
-    .card-header {
-        font-size: 1.1rem;
-    }
+	.card-header {
+		font-size: 1.1rem;
+	}
 
-    .table {
-        font-size: 0.95rem;
-    }
+	.table {
+		font-size: 0.95rem;
+	}
 
-    .btn-outline-primary {
-        font-weight: 600;
-    }
-
-    .btn-outline-secondary {
-        font-weight: 600;
-    }
+	.btn-outline-primary,
+	.btn-outline-secondary {
+		font-weight: 600;
+	}
 </style>
 
 <%- include('partials/footer') %>
