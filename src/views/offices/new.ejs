@@ -1,0 +1,69 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+  <h1 class="mb-4 text-primary">➕ Add New Office</h1>
+
+  <form action="/offices" method="POST" enctype="multipart/form-data">
+    <div class="row">
+      <!-- Basic Info -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Office Number</label>
+          <input type="text" name="office_number" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Floor</label>
+          <input type="number" name="floor" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Monthly Price (AED)</label>
+          <input type="number" name="monthly_price" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Yearly Price (AED)</label>
+          <input type="number" name="yearly_price" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Size Category</label>
+          <select name="size_category" class="form-select" required>
+            <option value="">-- Select Size Range --</option>
+            <option value="100-120">100 - 120 sqft</option>
+            <option value="120-150">120 - 150 sqft</option>
+            <option value="150-200">150 - 200 sqft</option>
+            <option value="200-250">200 - 250 sqft</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Branch</label>
+          <select name="branch_id" class="form-select" required>
+            <% branches.forEach(branch => { %>
+              <option value="<%= branch._id %>"><%= branch.name %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+
+      <!-- Image Uploads -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Main Image</label>
+          <input type="file" name="main_image" class="form-control" accept="image/*" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Gallery Images (optional)</label>
+          <input type="file" name="gallery" class="form-control" accept="image/*" multiple>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">➕ Create Office</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

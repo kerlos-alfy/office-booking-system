@@ -33,15 +33,17 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
 	console.log(`✅ Created ${branches.length} branches`);
 
 	// Validate and insert offices
-	const officesData = officesDataRaw
-		.filter((o) => typeof o.branchIndex === "number" && o.branchIndex < branches.length)
-		.map((o) => ({
-			branch_id: branches[o.branchIndex]._id,
-			office_number: o.office_number,
-			floor: o.floor,
-			monthly_price: o.monthly_price,
-			yearly_price: o.yearly_price,
-		}));
+const officesData = officesDataRaw
+  .filter((o) => typeof o.branchIndex === "number" && o.branchIndex < branches.length)
+  .map((o) => ({
+    branch_id: branches[o.branchIndex]._id,
+    office_number: o.office_number,
+    floor: o.floor,
+    monthly_price: o.monthly_price,
+    yearly_price: o.yearly_price,
+    size_category: o.size_category // لازم يكون موجود في ملف JSON
+  }));
+
 
 	const allOffices = await Office.insertMany(officesData);
 	console.log(`✅ Created ${allOffices.length} offices`);

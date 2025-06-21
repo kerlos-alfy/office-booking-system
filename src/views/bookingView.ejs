@@ -1,171 +1,201 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📄 Booking Details</h1>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary">📋 Booking Overview</h1>
+    <div>
+      <a href="/bookings" class="btn btn-outline-secondary me-2">🔙 Back</a>
+      <button class="btn btn-outline-primary" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
 
-<!-- UX Actions -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-	<a href="/bookings" class="btn btn-outline-secondary">🔙 Back to Bookings</a>
-	<button class="btn btn-outline-primary" onclick="window.print()">🖨️ Print Page</button>
+  <div class="card shadow-lg border-0 mb-4">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">📄 Contract & Client Info</h5>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <p><strong>🏢 Office:</strong> <%= booking.office_id?.office_number %></p>
+          <p><strong>📍 Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
+          <p><strong>👤 Client:</strong> <%= booking.client_id?.registered_owner_name || booking.client_id?.company_en || booking.client_id?.name || booking.client_id?.email || 'N/A' %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>📅 From:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
+          <p><strong>📅 To:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
+          <p><strong>📄 Page No:</strong> <%= booking.page_no %></p>
+          <p><strong>📌 Status:</strong> <span class="badge <%= booking.status === 'archived' ? 'bg-secondary' : 'bg-success' %>"><%= booking.status === 'archived' ? 'Archived' : 'Active' %></span></p>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success">📄 Contract</a>
+        <a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-warning">🧾 Tax Invoice</a>
+      </div>
+    </div>
+  </div>
+
+  <% if (booking.status === 'active') { %>
+  <div class="card border-danger mb-4">
+    <div class="card-header bg-danger text-white">
+      <strong>❌ Cancel Booking</strong>
+    </div>
+    <div class="card-body">
+      <form action="/bookings/<%= booking._id %>/archive" method="POST" onsubmit="return confirm('هل أنت متأكد من إلغاء الحجز؟')">
+        <div class="mb-3">
+          <label class="form-label">سبب الإلغاء (اختياري)</label>
+          <textarea name="cancel_reason" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger">إلغاء الحجز</button>
+      </form>
+    </div>
+  </div>
+  <% } else { %>
+  <div class="alert alert-warning fw-bold text-center">
+    ⚠️ هذا الحجز مؤرشف — السبب: <%= booking.cancel_reason || 'غير محدد' %>
+  </div>
+  <% } %>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0 text-primary">💰 Financial Summary</h5>
+    </div>
+    <div class="card-body px-4">
+      <table class="table table-bordered text-center align-middle">
+        <tbody>
+          <tr>
+            <th>Total Price</th>
+            <td>AED <%= booking.total_price %></td>
+            <th>Down Payment</th>
+            <td>AED <%= booking.initial_payment %></td>
+          </tr>
+          <tr>
+            <th>VAT</th>
+            <td>AED <%= booking.vat %></td>
+            <th>Security Deposit</th>
+            <td>AED <%= booking.sec_deposit %></td>
+          </tr>
+          <tr>
+            <th>Admin Fee</th>
+            <td>AED <%= booking.admin_fee %></td>
+            <th>Commission</th>
+            <td>AED <%= booking.commission %></td>
+          </tr>
+          <tr>
+            <th>Ejari No</th>
+            <td colspan="3"><%= booking.ejari_no %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert alert-info fw-bold">
+    🕵️ Remaining Free Inspections:
+    <% if (remainingFree > 0) { %>
+      <span class="text-danger"> <%= remainingFree %> still required</span>
+    <% } else { %>
+      <span class="text-success">✅ All free inspections completed</span>
+    <% } %>
+  </div>
+
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-light">
+      <h5 class="mb-0 text-primary">🔍 Inspection Records</h5>
+    </div>
+    <div class="card-body">
+      <% if (inspections && inspections.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light text-center">
+            <tr>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Paid</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% inspections.forEach(ins => { %>
+            <tr class="<%= ins.status === 'done' ? 'table-success' : 'table-warning' %>">
+              <td class="text-center fw-bold">
+                <%= ins.type === 'labor' ? '🧑‍🔧 Labor' : ins.type === 'bank' ? '🏦 Bank' : '✍️ Custom' %>
+              </td>
+              <td class="text-center"><%= ins.date ? ins.date.toISOString().split("T")[0] : '-' %></td>
+              <td class="text-center">
+                <span class="badge <%= ins.paid ? 'bg-success' : 'bg-secondary' %>"><%= ins.paid ? 'Yes' : 'No' %></span>
+              </td>
+              <td class="text-center">
+                <span class="badge <%= ins.status === 'done' ? 'bg-success' : 'bg-warning text-dark' %>"><%= ins.status === 'done' ? 'Done ✅' : 'Pending ⏳' %></span>
+              </td>
+              <td><%= ins.notes || '-' %></td>
+              <td>
+                <form method="POST" action="/inspections/<%= ins._id %>/update" class="row g-1">
+                  <div class="col-md-4">
+                    <select name="status" class="form-select form-select-sm">
+                      <option value="pending" <%= ins.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                      <option value="done" <%= ins.status === 'done' ? 'selected' : '' %>>Done</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <input type="date" name="date" class="form-control form-control-sm" value="<%= ins.date ? ins.date.toISOString().split('T')[0] : '' %>">
+                  </div>
+                  <div class="col-md-4 d-flex">
+                    <button class="btn btn-sm btn-primary w-100">💾 Save</button>
+                  </div>
+                  <div class="col-12 mt-1">
+                    <input type="text" name="notes" placeholder="Notes" class="form-control form-control-sm" value="<%= ins.notes || '' %>">
+                  </div>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } else { %>
+      <p class="text-muted">No inspections recorded.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0 text-primary">➕ Add Custom Inspection</h5>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="/inspections/add" class="row g-3 mb-4">
+        <input type="hidden" name="booking_id" value="<%= booking._id %>" />
+        <div class="col-md-4">
+          <label class="form-label">Type</label>
+          <select name="type" class="form-select" required>
+            <option value="custom">Custom</option>
+            <option value="labor">Labor</option>
+            <option value="bank">Bank</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Date</label>
+          <input type="date" name="date" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Paid</label>
+          <select name="paid" class="form-select">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="col-md-10">
+          <label class="form-label">Notes</label>
+          <input type="text" name="notes" class="form-control" placeholder="Optional notes..." />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-dark w-100">➕ Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-
-<div class="card shadow mb-4">
-	<div class="card-header bg-primary text-white fw-bold">Booking Info</div>
-	<div class="card-body">
-		<!-- Office & Client Info -->
-		<p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
-		<p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
-		<p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.name %></p>
-
-		<!-- Contract Download -->
-		<a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success fw-bold mb-3">📄 تحميل العقد</a>
-
-		<!-- Dates -->
-		<p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
-		<p class="mb-2"><strong>End Date:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
-
-		<!-- Contract Info -->
-		<p class="mb-2"><strong>Contract Page No:</strong> <%= booking.page_no %></p>
-		<p class="mb-2">
-			<strong>Status:</strong>
-			<% if (booking.status === 'archived') { %>
-			<span class="badge bg-secondary">Archived</span>
-			<% } else { %>
-			<span class="badge bg-success">Active</span>
-			<% } %>
-		</p>
-
-		<% if (booking.status === 'active') { %>
-		<hr />
-		<h5 class="text-danger fw-bold mt-4">❌ Cancel Booking</h5>
-		<form action="/bookings/<%= booking._id %>/archive" method="POST" onsubmit="return confirm('هل أنت متأكد من إلغاء الحجز؟')">
-			<div class="mb-3">
-				<label for="cancel_reason" class="form-label">سبب الإلغاء (اختياري)</label>
-				<textarea name="cancel_reason" id="cancel_reason" class="form-control" rows="2" placeholder="اكتب السبب هنا إن وجد..."></textarea>
-			</div>
-			<button type="submit" class="btn btn-danger">إلغاء الحجز</button>
-		</form>
-		<% } else { %>
-		<hr />
-		<div class="alert alert-warning mt-4">
-			<strong>⚠️ تم أرشفة هذا الحجز</strong><br />
-			<strong>السبب:</strong> <%= booking.cancel_reason || 'غير محدد' %>
-		</div>
-		<% } %>
-
-		<!-- Financial Info -->
-		<hr />
-		<h5 class="text-primary fw-bold mb-3">💰 Financial Details</h5>
-		<p class="mb-2"><strong>Total Price:</strong> $<%= booking.total_price %></p>
-		<p class="mb-2"><strong>Down Payment:</strong> $<%= booking.initial_payment %></p>
-		<p class="mb-2"><strong>VAT:</strong> $<%= booking.vat %></p>
-		<p class="mb-2"><strong>Security Deposit:</strong> $<%= booking.sec_deposit %></p>
-		<p class="mb-2"><strong>Admin Fee:</strong> $<%= booking.admin_fee %></p>
-		<p class="mb-2"><strong>Commission:</strong> $<%= booking.commission %></p>
-		<p class="mb-2"><strong>Ejari No:</strong> <%= booking.ejari_no %></p>
-
-		<!-- Cheques -->
-		<hr />
-		<h5 class="text-primary fw-bold mb-3">📝 Cheques</h5>
-		<% const today = new Date(); %> <% if (booking.cheques && booking.cheques.length > 0) { %>
-		<div class="table-responsive">
-			<table class="table table-bordered table-hover bg-white">
-				<thead class="table-light">
-					<tr>
-						<th>#</th>
-						<th>Amount</th>
-						<th>Due Date</th>
-						<th>Status</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<% booking.cheques.forEach((cheque, index) => { const dueDate = new Date(cheque.due_date); let statusText = ''; let rowClass = ''; if
-					(cheque.collected) { statusText = '✅ Collected'; rowClass = 'table-success'; } else if (dueDate < today) { statusText = '❌ Overdue'; rowClass =
-					'table-danger'; } else { statusText = '⏳ Upcoming'; rowClass = 'table-warning'; } %>
-					<tr class="<%= rowClass %>">
-						<td><%= index + 1 %></td>
-						<td>$<%= cheque.amount %></td>
-						<td><%= dueDate.toISOString().split('T')[0] %></td>
-						<td><%= statusText %></td>
-						<td>
-							<% if (!cheque.collected) { %>
-							<form method="POST" action="/bookings/<%= booking._id %>/cheques/<%= index %>/toggle-collected" style="display: inline">
-								<button type="submit" class="btn btn-sm btn-success">Mark as Collected</button>
-							</form>
-							<% } else { %>
-							<span class="text-success fw-bold">✅ Collected</span>
-							<% } %>
-						</td>
-					</tr>
-					<% }); %>
-				</tbody>
-			</table>
-		</div>
-		<% } else { %>
-		<p>No cheques.</p>
-		<% } %>
-
-		<!-- Payments -->
-		<hr />
-		<h5 class="text-primary fw-bold mb-3">💳 Payments</h5>
-		<% if (booking.payments && booking.payments.length > 0) { %>
-		<table class="table table-bordered table-hover bg-white">
-			<thead class="table-light">
-				<tr>
-					<th>#</th>
-					<th>Amount</th>
-					<th>Payment Date</th>
-					<th>Type</th>
-				</tr>
-			</thead>
-			<tbody>
-				<% booking.payments.forEach((payment, index) => { %>
-				<tr>
-					<td><%= index + 1 %></td>
-					<td>$<%= payment.amount %></td>
-					<td><%= new Date(payment.payment_date).toISOString().split('T')[0] %></td>
-					<td><%= payment.payment_type %></td>
-				</tr>
-				<% }); %>
-			</tbody>
-		</table>
-		<% } else { %>
-		<p>No payments recorded.</p>
-		<% } %>
-	</div>
-</div>
-
-<style>
-	body {
-		animation: fadeIn 0.5s ease-in;
-	}
-
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-
-	.card {
-		border-radius: 12px;
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-	}
-
-	.card-header {
-		font-size: 1.1rem;
-	}
-
-	.table {
-		font-size: 0.95rem;
-	}
-
-	.btn-outline-primary,
-	.btn-outline-secondary {
-		font-weight: 600;
-	}
-</style>
 
 <%- include('partials/footer') %>

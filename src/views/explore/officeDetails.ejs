@@ -1,0 +1,95 @@
+<%- include('../partials/explore-header') %>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- 📸 الصور -->
+    <div class="col-12 col-lg-7">
+     <!-- Main Image -->
+<!-- Main Image -->
+<div class="mb-4 text-center">
+  <div class="rounded-4 overflow-hidden shadow" style="max-height: 420px;">
+    <img src="<%= office.main_image %>" alt="Main Image" class="img-fluid w-100" style="object-fit: cover;">
+  </div>
+</div>
+
+<!-- Thumbnails Centered in a Row -->
+<% if (office.gallery && office.gallery.length > 0) { %>
+  <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+    <% office.gallery.forEach((img, index) => { %>
+      <a href="<%= img %>" data-lightbox="office-gallery" data-title="Office Image <%= index + 1 %>">
+        <div class="thumbnail-wrapper rounded-3 overflow-hidden shadow-sm border" style="width: 100px; height: 70px;">
+          <img src="<%= img %>" alt="Gallery Image" class="img-fluid w-100 h-100" style="object-fit: cover;">
+        </div>
+      </a>
+    <% }) %>
+  </div>
+<% } %>
+
+    </div>
+
+    <!-- 📋 بيانات المكتب -->
+  <div style="margin: auto;" class="col-12 col-lg-5">
+  <div class="card border-0 shadow-sm rounded-4 p-4 bg-light-subtle">
+    <h4 class="fw-bold text-primary-emphasis mb-4 text-center">
+      🏢 Office <%= office.office_number %>
+    </h4>
+
+    <div class="text-center mb-3">
+ <span class="badge bg-<%= isBooked ? 'danger' : 'success' %> px-4 py-2 fs-6 rounded-pill shadow-sm">
+  <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
+</span>
+
+
+    </div>
+
+    <ul class="list-group list-group-flush mb-4">
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>📍 <strong>Branch:</strong></span>
+        <span><%= office.branch_id?.name || 'N/A' %></span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>📏 <strong>Size:</strong></span>
+        <span><%= office.size_category %> sqft</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>🏢 <strong>Floor:</strong></span>
+        <span><%= office.floor %></span>
+      </li>
+      <!-- <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>💰 <strong>Monthly:</strong></span>
+        <span>AED <%= office.monthly_price %></span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>📆 <strong>Yearly:</strong></span>
+        <span>AED <%= office.yearly_price %></span>
+      </li> -->
+    </ul>
+
+    <a href="/bookings/new/<%= office._id %>" class="btn btn-primary w-100 fw-bold py-2 fs-6 rounded-pill shadow-sm">
+      🚀 Book This Office
+    </a>
+  </div>
+</div>
+
+  </div>
+</div>
+<!-- Lightbox2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
+<!-- Lightbox2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+<style>
+  @media (max-width: 768px) {
+    .main-image img {
+      max-height: 250px;
+    }
+    .card h4 {
+      font-size: 20px;
+    }
+    .btn {
+      font-size: 15px;
+    }
+  }
+</style>
+
+<%- include('../partials/footer') %>

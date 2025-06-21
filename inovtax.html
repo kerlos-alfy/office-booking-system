@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tax Invoice</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      background: #fff;
+      padding: 0;
+    }
+
+    body {
+      padding: 5mm;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      text-transform: uppercase;
+    }
+
+    .flex-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .half-table {
+      width: 49%;
+    }
+
+    th, td {
+      border: 1px solid #000;
+      padding: 4px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .small {
+      font-size: 10px;
+    }
+
+    .bottom-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .bottom-right {
+      width: 40%;
+    }
+
+    .bottom-left {
+      width: 58%;
+    }
+
+    @media print {
+      html, body {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        padding: 8mm;
+      }
+    }
+    
+  </style>
+</head>
+<body>
+  <h1>TAX INVOICE</h1>
+  <p ><strong>TRN:</strong> 100028267100003</p>
+
+  <div class="flex-container">
+    <table class="half-table">
+      <tr><td><strong>Lessee's Name:</strong></td><td>Your Own Business Centre</td></tr>
+      <tr><td><strong>Occupant / Trade Name:</strong></td><td>Your Own Business Centre (Branch)</td></tr>
+      <tr><td><strong>Lessee's Address:</strong></td><td>Shop OFFA,1,2, Dubai, UAE</td></tr>
+      <tr><td><strong>Unit No.:</strong></td><td>OFF-A,Shop1&2</td></tr>
+      <tr><td><strong>Property Name:</strong></td><td>Al Maskan</td></tr>
+      <tr><td><strong>Currency:</strong></td><td>AED</td></tr>
+    </table>
+
+    <table class="half-table">
+      <tr><td><strong>Invoice Number:</strong></td><td>3010000306</td></tr>
+      <tr><td><strong>Invoice Date:</strong></td><td>01.07.2024</td></tr>
+      <tr><td><strong>Contract No:</strong></td><td>200222</td></tr>
+      <tr><td><strong>Unit Type:</strong></td><td>Shop</td></tr>
+      <tr><td><strong>Property Location:</strong></td><td>Al Karama</td></tr>
+      <tr><td><strong>Contract Period:</strong></td><td>15-07-2024 to 14-07-2025</td></tr>
+    </table>
+  </div>
+
+  <table>
+    <tr class="bold center">
+      <th>Description</th><th>Qty</th><th>Rate</th><th>Gross</th><th>Discount</th><th>Taxable</th><th>VAT%</th><th>VAT Amount</th><th>Total AED</th><th>VAT Key</th>
+    </tr>
+    <tr><td>Basic rent</td><td>1</td><td>60,172.00</td><td>60,172.00</td><td>0.00</td><td>60,172.00</td><td>5</td><td>3,008.60</td><td>63,180.60</td><td>S2</td></tr>
+    <tr><td>Basic rent</td><td>1</td><td>60,172.00</td><td>60,172.00</td><td>0.00</td><td>60,172.00</td><td>5</td><td>3,008.60</td><td>63,180.60</td><td>S2</td></tr>
+    <tr><td>Basic rent</td><td>1</td><td>604,656.00</td><td>604,656.00</td><td>0.00</td><td>604,656.00</td><td>5</td><td>30,232.80</td><td>634,888.80</td><td>S2</td></tr>
+    <tr><td>Ejari - Govt Fee</td><td>1</td><td>174.60</td><td>174.60</td><td>0.00</td><td>174.60</td><td>0</td><td>0.00</td><td>174.60</td><td>O1</td></tr>
+    <tr><td>Ejari - Revenue</td><td>1</td><td>38.48</td><td>38.48</td><td>0.00</td><td>38.48</td><td>5</td><td>1.92</td><td>40.40</td><td>S2</td></tr>
+    <tr><td>Agreed Security Deposit</td><td>1</td><td>60,500.00</td><td>60,500.00</td><td>0.00</td><td>60,500.00</td><td>0</td><td>0.00</td><td>60,500.00</td><td>O1</td></tr>
+    <tr class="bold">
+      <td colspan="5">Total</td>
+      <td>785,713.08</td><td></td><td>36,251.92</td><td>821,965.00</td><td></td>
+    </tr>
+  </table>
+
+  <div class="bottom-section">
+    <div class="bottom-left">
+      <table>
+        <tr><td class="bold">Total Amount in Words</td><td>AED Eight Hundred Twenty-One Thousand Nine Hundred Sixty-Five and Zero Fils Only</td></tr>
+        <tr><td class="bold">Payment Terms</td><td>Immediate</td></tr>
+      </table>
+
+      <table>
+        <tr><td class="bold">Cheque in Favor of</td><td>Saeed Mohamed Saeed Alghandi</td></tr>
+        <tr><td class="bold">Note</td><td>Cheque to be crossed with the wording “A/C Payee Only”</td></tr>
+        <tr><td class="bold">Bank Name</td><td>Commercial Bank of Dubai</td></tr>
+        <tr><td class="bold">Bank Address</td><td>P.O. Box: 2668, Main Branch, Al Ittihad Street, Port Saeed, Deira - Dubai, UAE</td></tr>
+        <tr><td class="bold">Account Number</td><td>1000081800</td></tr>
+        <tr><td class="bold">IBAN</td><td>AE18023000001000081800</td></tr>
+        <tr><td class="bold">Swift Code</td><td>CBDUAEAD</td></tr>
+      </table>
+    </div>
+
+    <div class="bottom-right">
+      <table>
+        <tr><td class="bold">Taxable Amount</td><td>725,038.48</td></tr>
+        <tr><td class="bold">Non Taxable Amount</td><td>60,674.60</td></tr>
+        <tr><td class="bold">VAT Amount</td><td>36,251.92</td></tr>
+        <tr><td class="bold">Advance Amount if any</td><td>0.00</td></tr>
+        <tr><td class="bold">Total Invoice Amount</td><td>821,965.00</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p class="small">* VAT Key: O1 = 0% Local Supply - Out of Scope, S2 = 5% Standard Rated Supply - Services</p>
+</body>
+</html>

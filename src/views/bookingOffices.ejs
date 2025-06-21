@@ -1,6 +1,11 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">🗂️ Offices in Branch</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary">🗂️ Offices in Branch</h1>
+    <a href="/offices/new?branch_id=<%= branchId %>" class="btn btn-success">
+        ➕ Add New Office
+    </a>
+</div>
 
 <!-- Filter -->
 <form method="GET" action="/bookings/branch/<%= branchId %>" class="mb-4">
@@ -84,14 +89,15 @@
 
 <%
     const today = new Date();
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 %>
 
 <!-- Office Grid -->
 <div class="row g-3">
     <% offices.forEach(office => {
-        const booking = bookings.find(b => b.office_id.toString() === office._id.toString());
-        const isBooked = booking !== undefined;
-        const isExpiringSoon = isBooked && (new Date(booking.end_date) - today) / (1000 * 60 * 60 * 24) <= 7;
+        const booking = bookings.find(b => b.office_id?.toString() === office._id.toString());
+        const isBooked = !!booking;
+        const isExpiringSoon = isBooked && new Date(booking.end_date) >= today && new Date(booking.end_date) <= endOfMonth;
 
         if (filter === 'all' || (filter === 'available' && !isBooked) || (filter === 'booked' && isBooked)) { %>
 
@@ -111,19 +117,21 @@
                 <h5 class="fw-bold mb-2">Office <%= office.office_number %></h5>
                 <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
 
+                <% if (isExpiringSoon) { %>
+                    <span class="badge bg-warning text-dark mb-2">⚠️ Expires This Month</span>
+                <% } %>
+
                 <% if (isBooked) { %>
-<p class="mb-1">
-  <strong>Booked by:</strong>
-  <%= booking.client_id?.company_en || 'N/A' %>
-</p>
+                    <p class="mb-1"><strong>Booked by:</strong> <%= booking.client_id?.company_en || booking.client_id?.name || 'N/A' %></p>
+
+                    <% if (inspectionStatusMap && inspectionStatusMap[booking._id.toString()] !== undefined) { %>
+                        <div class="remaining-inspections">
+                            🛡️ <%= inspectionStatusMap[booking._id.toString()] %> free inspections remaining
+                        </div>
+                    <% } %>
+
                     <p class="mb-1"><strong>From:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
                     <p class="mb-1"><strong>To:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
-
-                    <!-- Form to Unbook with Reason -->
-                    <!-- <form method="POST" action="/bookings/office/<%= office._id %>/unbook" onsubmit="return confirm('هل تريد إزالة الحجز من هذا المكتب؟');">
-                        <input type="text" name="cancel_reason" class="form-control form-control-sm mb-2" placeholder="سبب الإلغاء (اختياري)">
-                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">🗃️ إزالة الحجز</button>
-                    </form> -->
                 <% } %>
 
                 <% if (isBooked) { %></a><% } %>

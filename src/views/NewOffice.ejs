@@ -1,38 +1,63 @@
 <%- include('partials/header') %>
 
-    <div class="container py-5">
-        <h1 class="mb-4 text-success">➕ Add New Office</h1>
+<div class="container py-5">
+  <h1 class="mb-4 text-success">➕ Add New Office</h1>
 
-        <form method="POST" action="/offices/new" class="bg-white p-4 rounded shadow-sm">
-
-            <div class="mb-3">
-                <label class="form-label">Branch:</label>
-                <select name="branch_id" class="form-control" required>
-                    <% branches.forEach(branch => { %>
-                        <option value="<%= branch._id %>"><%= branch.name %></option>
-                    <% }) %>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Office Number:</label>
-                <input type="text" name="office_number" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Monthly Price:</label>
-                <input type="number" name="monthly_price" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Yearly Price:</label>
-                <input type="number" name="yearly_price" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Save Office</button>
-            <a href="/offices" class="btn btn-secondary ms-2">Back to Offices</a>
-
-        </form>
+  <form action="/offices/new" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label">Office Number</label>
+      <input type="text" name="office_number" class="form-control" required>
     </div>
-<%- include('partials/footer') %>
 
+    <div class="mb-3">
+      <label class="form-label">Branch</label>
+      <select name="branch_id" class="form-select" required>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>"><%= branch.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Floor</label>
+      <input type="text" name="floor" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Monthly Price (AED)</label>
+      <input type="number" name="monthly_price" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Yearly Price (AED)</label>
+      <input type="number" name="yearly_price" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Size Category</label>
+      <select name="size_category" class="form-select" required>
+        <option value="">-- Select --</option>
+        <option value="100-120">100 - 120 sqft</option>
+        <option value="120-150">120 - 150 sqft</option>
+        <option value="150-200">150 - 200 sqft</option>
+        <option value="200-250">200 - 250 sqft</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Main Image</label>
+      <!-- ✅ لازم اسم الحقل يكون مطابق لـ "main_image" -->
+      <input type="file" name="main_image" class="form-control" accept="image/*" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Gallery Images</label>
+      <!-- ✅ لازم اسم الحقل يكون "gallery" لأن multer متوقعه -->
+      <input type="file" name="gallery" class="form-control" accept="image/*" multiple>
+    </div>
+
+    <button type="submit" class="btn btn-primary">➕ Save Office</button>
+  </form>
+</div>
+
+<%- include('partials/footer') %>
