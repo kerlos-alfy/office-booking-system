@@ -19,6 +19,10 @@ const clientSchema = new mongoose.Schema({
     license_number: { type: String, required: true },
     license_expiry: { type: Date, required: true },
 
+    // New Fields
+    trn: { type: String }, // الرقم الضريبي
+    email: { type: String }, // الإيميل
+
     emirates_id_status: { type: String, enum: ['OK', 'NOT NEED', 'UNAVAILABLE'], required: true },
     contract_status: { type: String, enum: ['OK', 'NO'], required: true },
     license_status: { type: String, enum: ['OK', 'NO'], required: true },

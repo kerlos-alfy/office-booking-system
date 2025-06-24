@@ -1,0 +1,17 @@
+<%- include('../../partials/header') %>
+
+<h1 class="text-primary">✏️ Edit Permission</h1>
+
+<form method="POST" action="/admin/permissions/<%= permission._id %>?_method=PUT">
+  <div class="mb-3">
+    <label for="key">Permission Key</label>
+    <input type="text" id="key" name="key" class="form-control" value="<%= permission.key %>" required>
+  </div>
+  <div class="mb-3">
+    <label for="name">Permission Name</label>
+    <input type="text" id="name" name="name" class="form-control" value="<%= permission.name %>" required>
+  </div>
+  <button class="btn btn-primary">💾 Update</button>
+</form>
+
+<%- include('../../partials/footer') %>

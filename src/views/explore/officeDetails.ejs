@@ -1,95 +1,114 @@
 <%- include('../partials/explore-header') %>
 
-<div class="container py-4">
-  <div class="row g-4">
+<div class="container py-5 mt-4">
+  <div class="row g-4 align-items-start">
     <!-- 📸 الصور -->
-    <div class="col-12 col-lg-7">
-     <!-- Main Image -->
-<!-- Main Image -->
-<div class="mb-4 text-center">
-  <div class="rounded-4 overflow-hidden shadow" style="max-height: 420px;">
-    <img src="<%= office.main_image %>" alt="Main Image" class="img-fluid w-100" style="object-fit: cover;">
-  </div>
-</div>
+    <div class="col-lg-6">
+      <!-- الصورة الرئيسية -->
+      <div class="rounded-4 overflow-hidden shadow-sm mb-3">
+        <img src="/<%= office.main_image %>" class="img-fluid w-100" alt="Main Office Image" style="object-fit: cover; max-height: 420px;">
+      </div>
 
-<!-- Thumbnails Centered in a Row -->
-<% if (office.gallery && office.gallery.length > 0) { %>
-  <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-    <% office.gallery.forEach((img, index) => { %>
-      <a href="<%= img %>" data-lightbox="office-gallery" data-title="Office Image <%= index + 1 %>">
-        <div class="thumbnail-wrapper rounded-3 overflow-hidden shadow-sm border" style="width: 100px; height: 70px;">
-          <img src="<%= img %>" alt="Gallery Image" class="img-fluid w-100 h-100" style="object-fit: cover;">
+      <!-- الصور المصغرة -->
+      <% if (office.gallery && office.gallery.length > 0) { %>
+        <div class="d-flex flex-wrap gap-2">
+          <% office.gallery.forEach((img, index) => { %>
+            <a href="/<%= img %>" data-lightbox="gallery" data-title="Gallery <%= index + 1 %>">
+              <img src="/<%= img %>" class="img-thumbnail rounded-3" style="width: 90px; height: 60px; object-fit: cover;">
+            </a>
+          <% }) %>
         </div>
-      </a>
-    <% }) %>
+      <% } %>
+    </div>
+
+    <!-- 📋 تفاصيل المكتب -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-4 p-4">
+        <h4 class="fw-bold text-primary mb-3">🏢 Office <%= office.office_number %></h4>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="badge bg-<%= isBooked ? 'danger' : 'success' %> px-3 py-2 rounded-pill">
+            <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
+          </span>
+          <span class="text-muted"><i class="fas fa-layer-group me-1"></i> <%= office.size_category %> sqft</span>
+        </div>
+
+        <ul class="list-group list-group-flush mb-3">
+          <li class="list-group-item d-flex justify-content-between">
+            <strong>📍 Branch:</strong> <span><%= office.branch_id?.name || 'N/A' %></span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <strong>🏢 Floor:</strong> <span><%= office.floor %></span>
+          </li>
+        </ul>
+
+        <div class="mt-3 mb-4">
+          <h6 class="fw-semibold mb-2">✨ Features:</h6>
+          <ul class="ps-3">
+            <li>Fully Furnished</li>
+            <li>Free Wi-Fi & Utilities</li>
+            <li>Prime Location</li>
+          </ul>
+        </div>
+
+        <% if (office.branch_id?.whatsapp_number) { %>
+          <div class="text-center">
+            <a href="https://wa.me/<%= office.branch_id.whatsapp_number %>" target="_blank" class="btn btn-success rounded-pill w-100 fw-bold py-2">
+              <i class="fab fa-whatsapp me-2"></i> Chat on WhatsApp
+            </a>
+            <small class="text-muted d-block mt-2">WhatsApp: <%= office.branch_id.whatsapp_number %></small>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+<% if (office.payment_plans && office.payment_plans.length > 0) { %>
+  <div style="font-weight: bold;" class="container my-5">
+    <h4 class="text-center fw-bold mb-4 text-uppercase" style="color: #000;">
+      OFFICE NO. <%= office.office_number %>
+    </h4>
+
+    <div class="table-responsive">
+      <table class="table table-bordered text-center align-middle" style="border: 2px solid #000; font-family: 'Arial'; font-size: 1rem;">
+        <thead>
+          <tr style="border: 2px solid #000;">
+            <th style="border: 1px solid #000;">1<sup>ST</sup> OPTION</th>
+            <th style="border: 1px solid #000;">2<sup>ND</sup> OPTION</th>
+            <th style="border: 1px solid #000;">3<sup>RD</sup> OPTION</th>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000;"><%= office.payment_plans[0]?.total_price.toLocaleString() %> AED</td>
+            <td style="border: 1px solid #000;"><%= office.payment_plans[1]?.total_price.toLocaleString() %> AED</td>
+            <td style="border: 1px solid #000;"><%= office.payment_plans[2]?.total_price.toLocaleString() %> AED</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #000; font-weight: bold;">ONE PAYMENT</td>
+            <td style="border: 1px solid #000;">
+              50% First Month <br> + <br> 50% Second Month
+            </td>
+            <td style="border: 1px solid #000;">
+              <%= office.payment_plans[2]?.down_payment.toLocaleString() %> D.P <br> + <br>
+              <%= ((office.payment_plans[2]?.total_price - office.payment_plans[2]?.down_payment) / office.payment_plans[2]?.number_of_cheques).toLocaleString() %> × <%= office.payment_plans[2]?.number_of_cheques %> Cheques
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-center fw-bold mt-3" style="color: #b30000; font-size: 15px;">
+      THESE PRICES DO NOT INCLUDE ( 5% VAT / 5% COMMISSION / 5% INSURANCE )
+    </p>
   </div>
 <% } %>
 
-    </div>
-
-    <!-- 📋 بيانات المكتب -->
-  <div style="margin: auto;" class="col-12 col-lg-5">
-  <div class="card border-0 shadow-sm rounded-4 p-4 bg-light-subtle">
-    <h4 class="fw-bold text-primary-emphasis mb-4 text-center">
-      🏢 Office <%= office.office_number %>
-    </h4>
-
-    <div class="text-center mb-3">
- <span class="badge bg-<%= isBooked ? 'danger' : 'success' %> px-4 py-2 fs-6 rounded-pill shadow-sm">
-  <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
-</span>
-
-
-    </div>
-
-    <ul class="list-group list-group-flush mb-4">
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>📍 <strong>Branch:</strong></span>
-        <span><%= office.branch_id?.name || 'N/A' %></span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>📏 <strong>Size:</strong></span>
-        <span><%= office.size_category %> sqft</span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>🏢 <strong>Floor:</strong></span>
-        <span><%= office.floor %></span>
-      </li>
-      <!-- <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>💰 <strong>Monthly:</strong></span>
-        <span>AED <%= office.monthly_price %></span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>📆 <strong>Yearly:</strong></span>
-        <span>AED <%= office.yearly_price %></span>
-      </li> -->
-    </ul>
-
-    <a href="/bookings/new/<%= office._id %>" class="btn btn-primary w-100 fw-bold py-2 fs-6 rounded-pill shadow-sm">
-      🚀 Book This Office
-    </a>
-  </div>
 </div>
 
-  </div>
-</div>
-<!-- Lightbox2 CSS -->
+
+<!-- ✅ Lightbox2 -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
-<!-- Lightbox2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
-
-<style>
-  @media (max-width: 768px) {
-    .main-image img {
-      max-height: 250px;
-    }
-    .card h4 {
-      font-size: 20px;
-    }
-    .btn {
-      font-size: 15px;
-    }
-  }
-</style>
 
 <%- include('../partials/footer') %>

@@ -1,3 +1,4 @@
+// 📁 routes/offices.js
 const express = require("express");
 const router = express.Router();
 const Office = require("../models/Office");
@@ -6,15 +7,12 @@ const Booking = require("../models/Booking");
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
-const PizZip = require("pizzip");
-const Docxtemplater = require("docxtemplater");
 
-// Multer storage setup
+const tempUploadPath = path.join(__dirname, "../../public/uploads/offices/temp");
+fs.mkdirSync(tempUploadPath, { recursive: true });
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath = path.join(__dirname, "../public/uploads/offices");
-    fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
+    cb(null, tempUploadPath);
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -25,11 +23,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// 🏢 عرض كل المكاتب
 router.get("/", async (req, res) => {
   try {
     let offices = await Office.find().populate("branch_id");
-
     offices = offices.sort((a, b) => {
       const aNum = parseInt(a.office_number.replace(/\D/g, "")) || 0;
       const bNum = parseInt(b.office_number.replace(/\D/g, "")) || 0;
@@ -40,115 +36,154 @@ router.get("/", async (req, res) => {
       status: "active",
       end_date: { $gte: new Date() },
     });
-
     const bookedOfficeIds = activeBookings.map((b) => b.office_id.toString());
 
-    res.render("offices", {
-      offices,
-      bookedOfficeIds,
-    });
+    res.render("offices", { offices, bookedOfficeIds });
   } catch (err) {
     console.error("Error loading offices", err);
     res.status(500).send("Error loading offices");
   }
 });
 
-// ➕ صفحة الإضافة
 router.get("/new", async (req, res) => {
   const branches = await Branch.find();
   res.render("newOffice", { branches });
 });
 
-// ✅ حفظ مكتب جديد
-router.post(
-  "/new",
-  upload.fields([
-    { name: "main_image", maxCount: 1 },
-    { name: "gallery", maxCount: 10 },
-  ]),
-  async (req, res) => {
-    try {
-      console.log("🖼️ Uploaded Files:", req.files);
-      const {
-        office_number,
-        branch_id,
-        monthly_price,
-        yearly_price,
-        floor,
-        size_category,
-      } = req.body;
+router.post("/new", upload.fields([
+  { name: "main_image", maxCount: 1 },
+  { name: "gallery", maxCount: 10 },
+]), async (req, res) => {
+  try {
+    const {
+      office_number,
+      branch_id,
+      monthly_price,
+      yearly_price,
+      floor,
+      size_category,
+      payment_plans_json
+    } = req.body;
 
-      const mainImage = req.files["main_image"]?.[0]?.filename;
-      const galleryImages = req.files["gallery"]?.map(f => f.filename) || [];
+    const payment_plans = payment_plans_json ? JSON.parse(payment_plans_json) : [];
 
-      const newOffice = await Office.create({
-        office_number,
-        branch_id,
-        monthly_price,
-        yearly_price,
-        floor,
-        size_category,
-        status: "available",
-        main_image: mainImage ? `/uploads/offices/${mainImage}` : "",
-        gallery: galleryImages.map(name => `/uploads/offices/${name}`),
-      });
+    const officeNumberClean = office_number.replace(/\s+/g, "");
+    const timestamp = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 12);
+    const folderName = `office_${officeNumberClean}_${timestamp}`;
+    const folderPath = path.join(__dirname, "../../public/uploads/offices", folderName);
+    fs.mkdirSync(folderPath, { recursive: true });
 
-      console.log("✅ New office saved:", newOffice);
-      res.redirect("/offices");
-    } catch (err) {
-      console.error("❌ Error saving office", err);
-      res.status(500).send("Error saving office");
+    const mainImage = req.files["main_image"]?.[0];
+    const galleryImages = req.files["gallery"] || [];
+
+    let mainImagePath = "";
+    if (mainImage) {
+      const targetPath = path.join(folderPath, mainImage.filename);
+      fs.renameSync(mainImage.path, targetPath);
+      mainImagePath = path.posix.join("uploads/offices", folderName, mainImage.filename);
     }
+
+    const galleryPaths = [];
+    for (const file of galleryImages) {
+      const targetPath = path.join(folderPath, file.filename);
+      fs.renameSync(file.path, targetPath);
+      galleryPaths.push(path.posix.join("uploads/offices", folderName, file.filename));
+    }
+
+    const newOffice = await Office.create({
+      office_number,
+      branch_id,
+      monthly_price,
+      yearly_price,
+      floor,
+      size_category,
+      status: "available",
+      main_image: mainImagePath,
+      gallery: galleryPaths,
+      image_folder: path.posix.join("uploads/offices", folderName),
+      payment_plans
+    });
+
+    res.redirect("/offices");
+  } catch (err) {
+    console.error("❌ Error saving office", err);
+    res.status(500).send("Error saving office");
   }
-);
-
-// 📄 عقد الحجز بناءً على المكتب
-router.get("/:officeId/booking-contract", async (req, res) => {
-  const office = await Office.findById(req.params.officeId);
-  const booking = await Booking.findOne({ office_id: office._id }).populate("client_id");
-
-  if (!booking || !booking.client_id) return res.status(404).send("Booking not found");
-
-  const client = booking.client_id;
-
-  const templatePath = path.join(__dirname, "../templates/contract-template.docx");
-  const content = fs.readFileSync(templatePath, "binary");
-  const zip = new PizZip(content);
-  const doc = new Docxtemplater(zip);
-
-  doc.setData({
-    tenant_name: client.registered_owner_name,
-    company: client.company,
-    mobile: client.mobile,
-    start_date: booking.start_date.toISOString().split("T")[0],
-    end_date: booking.end_date.toISOString().split("T")[0],
-    total_price: booking.total_price,
-    vat: booking.vat,
-    office_number: office.office_number,
-    ejari_no: booking.ejari_no || "---",
-  });
-
-  doc.render();
-  const buffer = doc.getZip().generate({ type: "nodebuffer" });
-
-  res.set({
-    "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "Content-Disposition": `attachment; filename="Contract-${office.office_number}.docx"`,
-  });
-
-  res.send(buffer);
 });
 
-// 🖼️ صفحة تفاصيل المكتب
-router.get("/:officeId", async (req, res) => {
+router.get('/:id/edit', async (req, res) => {
+  const office = await Office.findById(req.params.id).populate("branch_id");
+  const branches = await Branch.find();
+  if (!office) return res.status(404).send("Office not found");
+
+  const allImages = office.gallery.includes(office.main_image)
+    ? [...office.gallery]
+    : [office.main_image, ...office.gallery];
+
+  res.render("editOffice", { office, branches, allImages });
+});
+
+router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
   try {
-    const office = await Office.findById(req.params.officeId).populate("branch_id");
+    const office = await Office.findById(req.params.id);
     if (!office) return res.status(404).send("Office not found");
-    console.log("📷 Main Image Path:", office.main_image);
-    res.render("explore/officeDetails", { office });
+
+    const {
+      office_number,
+      branch_id,
+      monthly_price,
+      yearly_price,
+      floor,
+      size_category,
+      main_image,
+      sorted_gallery = [],
+      delete_images = [],
+      payment_plans_json,
+    } = req.body;
+
+    const deleteArr = Array.isArray(delete_images) ? delete_images : [delete_images];
+    deleteArr.forEach(img => {
+      office.gallery = office.gallery.filter(existing => existing !== img);
+      if (img === office.main_image) office.main_image = null;
+      const fullPath = path.join(__dirname, "../../public", img);
+      if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+    });
+
+    const folderPath = path.join(__dirname, "../../public", office.image_folder);
+    fs.mkdirSync(folderPath, { recursive: true });
+
+    req.files.forEach(file => {
+      const targetPath = path.join(folderPath, file.originalname);
+      fs.renameSync(file.path, targetPath);
+      const relativePath = path.posix.join(office.image_folder, file.originalname);
+      office.gallery.push(relativePath);
+    });
+
+    const sortArr = Array.isArray(sorted_gallery) ? sorted_gallery : [sorted_gallery];
+    const filteredSorted = sortArr.filter(img => office.gallery.includes(img));
+    const extra = office.gallery.filter(img => !filteredSorted.includes(img));
+    office.gallery = [...filteredSorted, ...extra];
+
+    if (main_image) office.main_image = main_image;
+
+    office.office_number = office_number;
+    office.branch_id = branch_id;
+    office.monthly_price = monthly_price;
+    office.yearly_price = yearly_price;
+    office.floor = floor;
+    office.size_category = size_category;
+
+    try {
+      office.payment_plans = payment_plans_json ? JSON.parse(payment_plans_json) : [];
+    } catch (e) {
+      console.error("Error parsing payment plans", e);
+    }
+
+    await office.save();
+    res.redirect("/offices");
   } catch (err) {
-    console.error("Error loading office details", err);
-    res.status(500).send("Error loading office details");
+    console.error("❌ Error updating office:", err);
+    res.status(500).send("Error updating office");
   }
 });
 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Invoice</title>
+</head>
+<body>
+  <h2>Edit Invoice for <%= booking.client_id?.name %></h2>
+
+  <form action="/generate-invoice-preview" method="POST">
+    <input type="hidden" name="bookingId" value="<%= booking._id %>">
+
+    <label>Office Rent:</label>
+    <input type="number" name="total_price" value="<%= booking.total_price %>" step="0.01" required><br><br>
+
+    <label>Admin Fee:</label>
+    <input type="number" name="admin_fee" value="<%= booking.admin_fee %>" step="0.01" required><br><br>
+
+    <label>Commission:</label>
+    <input type="number" name="commission" value="<%= booking.commission %>" step="0.01" required><br><br>
+
+    <label>Security Deposit:</label>
+    <input type="number" name="sec_deposit" value="<%= booking.sec_deposit %>" step="0.01"><br><br>
+
+    <button type="submit">Preview Invoice</button>
+  </form>
+</body>
+</html>

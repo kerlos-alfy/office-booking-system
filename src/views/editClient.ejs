@@ -279,6 +279,19 @@ body > .container {
     <input type="text" name="registered_owner_name_ar" class="form-control" value="<%= client.registered_owner_name_ar %>" required>
   </div>
 
+  <!-- Email -->
+<div class="mb-3">
+  <label class="form-label fw-bold">📧 Email</label>
+  <input type="email" name="email" class="form-control" value="<%= client.email || '' %>">
+</div>
+
+<!-- TRN -->
+<div class="mb-3">
+  <label class="form-label fw-bold">🧾 TRN (Tax Registration Number)</label>
+  <input type="text" name="trn" class="form-control" value="<%= client.trn || '' %>">
+</div>
+
+
   <!-- Nationality -->
   <div class="mb-3">
     <label class="form-label fw-bold">🌍 الجنسية</label>

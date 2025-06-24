@@ -1,0 +1,55 @@
+<%- include('../../partials/header') %>
+
+<div class="container py-5">
+	<h2 class="mb-4 text-primary fw-bold">👥 قائمة المستخدمين</h2>
+
+	<% if (users.length === 0) { %>
+		<div class="alert alert-warning">لا يوجد مستخدمون بعد.</div>
+	<% } else { %>
+		<div class="table-responsive">
+			<table class="table table-hover table-bordered shadow-sm bg-white">
+				<thead class="table-light text-center">
+					<tr>
+						<th>#</th>
+						<th>👤 الاسم</th>
+						<th>📧 الإيميل</th>
+						<th>🎭 الدور</th>
+						<th>🛡️ الصلاحيات</th>
+						<th>⚙️ التحكم</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% users.forEach((user, index) => { %>
+						<tr>
+							<td class="text-center"><%= index + 1 %></td>
+							<td><strong><%= user.name %></strong></td>
+							<td><%= user.email %></td>
+							<td><span class="badge bg-dark text-white"><%= user.role?.name || 'بدون' %></span></td>
+							<td>
+								<% if (user.role?.permissions?.length) { %>
+									<% user.role.permissions.forEach(p => { %>
+										<span class="badge bg-info text-dark mb-1"><%= p.key %></span>
+									<% }) %>
+								<% } else { %>
+									<span class="text-muted">لا يوجد</span>
+								<% } %>
+							</td>
+							<td class="text-center">
+								<a href="/admin/users/<%= user._id %>/edit" class="btn btn-sm btn-warning me-1">✏️ تعديل</a>
+								<form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST" class="d-inline">
+									<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من الحذف؟')">🗑️ حذف</button>
+								</form>
+							</td>
+						</tr>
+					<% }) %>
+				</tbody>
+			</table>
+		</div>
+	<% } %>
+
+	<div class="text-end mt-4">
+		<a href="/admin/users/new" class="btn btn-primary btn-lg">➕ إضافة مستخدم جديد</a>
+	</div>
+</div>
+
+<%- include('../../partials/footer') %>

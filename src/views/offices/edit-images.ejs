@@ -1,0 +1,243 @@
+<%- include('../partials/header') %>
+
+<style>
+  .custom-upload {
+    position: relative;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    background-color: #f8f9fa;
+  }
+  .custom-upload:hover {
+    background-color: #e9ecef;
+    border-color: #999;
+  }
+  .custom-upload input[type="file"] {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .custom-upload i {
+    font-size: 2rem;
+    color: #198754;
+  }
+  .custom-upload span {
+    display: block;
+    margin-top: 10px;
+    font-weight: 500;
+    color: #555;
+  }
+</style>
+
+<section class="container py-4">
+  <h1 class="mb-4 text-center text-dark display-6 fw-bold">
+    🛠️ تعديل المكتب <span class="text-primary">#<%= office.office_number %></span>
+  </h1>
+
+  <form action="/offices/<%= office._id %>/edit" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded shadow-sm">
+
+    <h4 class="mb-3 text-secondary fw-semibold">📂 الصور الحالية</h4>
+    <div class="row g-3 mb-4" id="gallery-container">
+      <% allImages.forEach((img, i) => { %>
+        <div class="col-md-3 image-item" data-image="<%= img %>">
+          <div class="card h-100 border border-light shadow-sm position-relative">
+            <img src="/<%= img %>" class="card-img-top rounded-top" style="height: 160px; object-fit: cover;">
+            <% if (img === office.main_image) { %>
+              <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">⭐ رئيسية</span>
+            <% } %>
+            <div class="card-body p-2">
+              <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" name="delete_images[]" value="<%= img %>" id="delete_<%= i %>">
+                <label class="form-check-label small" for="delete_<%= i %>">🗑️ حذف</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="main_image" value="<%= img %>" id="main_<%= i %>" <%= img === office.main_image ? "checked" : "" %>>
+                <label class="form-check-label small" for="main_<%= i %>">⭐ تعيين كـ رئيسية</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div id="sortedImages"></div>
+
+    <h5 class="text-secondary mb-2">📤 رفع صور جديدة</h5>
+    <div class="custom-upload mb-3">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <span id="uploadText">اضغط هنا لاختيار الصور</span>
+      <input type="file" name="new_images" multiple accept="image/*">
+    </div>
+    <div id="previewContainer" class="row g-3 mb-4"></div>
+
+    <hr class="my-4">
+
+    <h4 class="text-dark fw-bold mb-3">📋 بيانات المكتب</h4>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Office Number</label>
+        <input type="text" name="office_number" class="form-control" value="<%= office.office_number %>" required>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Branch</label>
+        <select name="branch_id" class="form-select" required>
+          <% branches.forEach(branch => { %>
+            <option value="<%= branch._id %>" <%= office.branch_id?._id?.toString() === branch._id.toString() ? 'selected' : '' %>>
+              <%= branch.name %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Floor</label>
+        <input type="text" name="floor" class="form-control" value="<%= office.floor %>" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Monthly Price</label>
+        <input type="number" name="monthly_price" class="form-control" value="<%= office.monthly_price %>" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Yearly Price</label>
+        <input type="number" name="yearly_price" class="form-control" value="<%= office.yearly_price %>" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Size Category</label>
+        <select name="size_category" class="form-select" required>
+          <% ["100-120", "120-150", "150-200", "200-250"].forEach(size => { %>
+            <option value="<%= size %>" <%= office.size_category === size ? 'selected' : '' %>><%= size %> sqft</option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <h5 class="fw-bold text-primary">💳 Payment Plans</h5>
+    <div id="paymentPlansContainer"></div>
+    <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addPaymentPlan()">➕ Add Payment Plan</button>
+    <input type="hidden" name="payment_plans_json" id="paymentPlansJson">
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+        💾 حفظ التعديلات
+      </button>
+    </div>
+  </form>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+  const sortable = new Sortable(document.getElementById('gallery-container'), {
+    animation: 200,
+    onEnd: function () {
+      const order = [];
+      document.querySelectorAll('#gallery-container .image-item').forEach(el => {
+        order.push(el.dataset.image);
+      });
+      const orderInputs = document.getElementById('sortedImages');
+      orderInputs.innerHTML = '';
+      order.forEach(img => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'sorted_gallery[]';
+        input.value = img;
+        orderInputs.appendChild(input);
+      });
+    }
+  });
+  window.addEventListener("DOMContentLoaded", () => sortable.option("onEnd")());
+
+  const input = document.querySelector('input[name="new_images"]');
+  const previewContainer = document.getElementById('previewContainer');
+  const uploadText = document.getElementById('uploadText');
+  input.addEventListener('change', function () {
+    previewContainer.innerHTML = '';
+    if (this.files.length > 0) {
+      uploadText.textContent = `${this.files.length} صورة مختارة`;
+    } else {
+      uploadText.textContent = 'اضغط هنا لاختيار الصور';
+    }
+    Array.from(this.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const col = document.createElement('div');
+        col.className = 'col-md-3';
+        col.innerHTML = `
+          <div class="card border border-success shadow-sm">
+            <img src="${e.target.result}" class="card-img-top" style="height: 160px; object-fit: cover;">
+            <div class="card-body p-2 text-center text-success small fw-bold">📥 صورة جديدة</div>
+          </div>`;
+        previewContainer.appendChild(col);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  const container = document.getElementById('paymentPlansContainer');
+  const jsonInput = document.getElementById('paymentPlansJson');
+
+  function addPaymentPlan(plan = {}) {
+    const planDiv = document.createElement('div');
+    planDiv.className = 'border p-3 rounded mb-3 bg-light-subtle';
+    planDiv.innerHTML = `
+      <div class="mb-2">
+        <label class="form-label">Type</label>
+        <select name="plan_type" class="form-select" onchange="toggleChequeFields(this)">
+          <option value="single" ${plan.type === 'single' ? 'selected' : ''}>One-Time</option>
+          <option value="two-installments" ${plan.type === 'two-installments' ? 'selected' : ''}>Two Installments</option>
+          <option value="cheques" ${plan.type === 'cheques' ? 'selected' : ''}>Cheques</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Total Price (AED)</label>
+        <input type="number" name="plan_price" class="form-control" value="${plan.total_price || ''}">
+      </div>
+      <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
+        <label class="form-label">Down Payment (AED)</label>
+        <input type="number" name="plan_down" class="form-control" value="${plan.down_payment || ''}">
+      </div>
+      <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
+        <label class="form-label">Number of Cheques</label>
+        <input type="number" name="plan_cheques" class="form-control" value="${plan.number_of_cheques || ''}">
+      </div>
+    `;
+    container.appendChild(planDiv);
+  }
+
+  function toggleChequeFields(select) {
+    const parent = select.closest('div').parentNode;
+    const chequeFields = parent.querySelectorAll('.cheque-fields');
+    chequeFields.forEach(field => {
+      field.style.display = (select.value === 'cheques') ? 'block' : 'none';
+    });
+  }
+
+  document.querySelector('form').addEventListener('submit', function () {
+    const plans = [];
+    const planDivs = container.children;
+    for (let div of planDivs) {
+      const type = div.querySelector('select[name="plan_type"]').value;
+      const total_price = Number(div.querySelector('input[name="plan_price"]').value);
+      const down_payment = div.querySelector('input[name="plan_down"]')?.value;
+      const number_of_cheques = div.querySelector('input[name="plan_cheques"]')?.value;
+      const plan = { type, total_price };
+      if (type === 'cheques') {
+        plan.down_payment = Number(down_payment);
+        plan.number_of_cheques = Number(number_of_cheques);
+      }
+      plans.push(plan);
+    }
+    jsonInput.value = JSON.stringify(plans);
+  });
+
+  const existingPlans = <%- JSON.stringify(office.payment_plans || []) %>;
+  existingPlans.forEach(p => addPaymentPlan(p));
+</script>
+
+<%- include('../partials/footer') %>

@@ -21,10 +21,12 @@ router.get('/new', (req, res) => {
 // حفظ فرع جديد
 router.post('/new', async (req, res) => {
     try {
-        const branch = new Branch({
-            name: req.body.name,
-            location: req.body.location
-        });
+     const branch = new Branch({
+    name: req.body.name,
+    location: req.body.location,
+    whatsapp_number: req.body.whatsapp_number
+});
+
         await branch.save();
         res.redirect('/branches');
     } catch (err) {

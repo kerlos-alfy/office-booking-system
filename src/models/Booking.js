@@ -7,10 +7,13 @@ const paymentSchema = new mongoose.Schema({
 });
 
 const chequeSchema = new mongoose.Schema({
-	amount: { type: Number, required: true },
-	due_date: { type: Date, required: true },
-	collected: { type: Boolean, default: false }, // ✅ Added
+  amount: { type: Number, required: true },
+  due_date: { type: Date, required: true },
+  collected: { type: Boolean, default: false },
+  collected_at: { type: Date, default: null },      // ✅ تاريخ التحصيل
+  note: { type: String, default: "" },              // ✅ ملاحظات
 });
+
 
 const bookingSchema = new mongoose.Schema(
 	{

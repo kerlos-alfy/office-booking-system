@@ -334,4 +334,132 @@ router.get("/archive/:bookingId", async (req, res) => {
 	}
 });
 
+
+router.get("/:bookingId/tax-invoice", async (req, res) => {
+  try {
+    console.log("📌 Fetching booking...");
+    const booking = await Booking.findById(req.params.bookingId)
+      .populate({
+        path: "office_id",
+        populate: { path: "branch_id" }
+      })
+      .populate("client_id");
+
+    if (!booking) {
+      console.log("❌ Booking not found");
+      return res.status(404).send("Booking not found");
+    }
+
+    // ✅ حساب مبالغ الفاتورة
+    const invoiceTotal = booking.total_price || 0;
+    const vatAmount = booking.vat || 0;
+    const taxableAmount = invoiceTotal - vatAmount;
+
+    // ✅ مسار قالب EJS
+    const templatePath = path.join(__dirname, "../templates/taxInvoiceTemplate.ejs");
+    console.log("📄 Template path:", templatePath);
+
+    // ✅ بيانات للقالب
+    const html = await ejs.renderFile(
+      templatePath,
+      {
+        client: {
+          name: booking.client_id?.name || booking.client_id?.registered_owner_name || "",
+          trn: booking.client_id?.trn || "---",
+          phone: booking.client_id?.phone || "",
+          email: booking.client_id?.email || "",
+        },
+        company: {
+          trn: "000000000000000", // أو اجلبه من config
+          bank_name: "Emirates NBD",
+          account_number: "1234567890",
+          iban: "AE12 3456 7890 1234 5678 90",
+          swift: "EBILAEAD"
+        },
+        contract: {
+          period: `${new Date(booking.start_date).toLocaleDateString()} - ${new Date(booking.end_date).toLocaleDateString()}`
+        },
+        office: {
+          unit_number: booking.office_id?.office_number || "",
+          location: booking.office_id?.branch_id?.name || ""
+        },
+        invoice: {
+          number: `INV-${booking._id.toString().slice(-6)}`,
+          date: new Date().toLocaleDateString(),
+          total: invoiceTotal,
+          total_in_words: "Twenty-One Thousand Dirhams Only", // يمكن استبدالها لاحقًا بمكتبة تحويل رقم لكلمات
+          items: [
+            {
+              description: "Office Rent",
+              qty: 1,
+              rate: taxableAmount,
+              gross: taxableAmount,
+              discount: 0,
+              taxable: taxableAmount,
+              vat_rate: "5%",
+              vat_amount: vatAmount,
+              total: invoiceTotal,
+              vat_key: "SR1"
+            }
+          ]
+        }
+      },
+      {
+        filename: templatePath,
+        views: [path.join(__dirname, "../templates")]
+      }
+    );
+
+    console.log("🧾 Rendering HTML...");
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "10mm", bottom: "10mm", left: "10mm", right: "10mm" }
+    });
+
+    await browser.close();
+    console.log("✅ PDF generated successfully");
+
+    const filename = `Tax_Invoice_${booking._id}.pdf`;
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="${filename}"`
+    });
+
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error("❌ Error generating tax invoice:", err);
+    res.status(500).send("Error generating tax invoice");
+  }
+});
+
+router.post("/:bookingId/cheques/:index/mark-collected", async (req, res) => {
+  const { bookingId, index } = req.params;
+  const { note } = req.body;
+
+  try {
+    const booking = await Booking.findById(bookingId);
+    if (!booking || !booking.cheques[index]) return res.status(404).send("Booking or Cheque not found");
+
+    booking.cheques[index].collected = true;
+    booking.cheques[index].collected_at = new Date();  // 🕒 تاريخ التحصيل
+    booking.cheques[index].note = note || "";          // ✍️ الملاحظة
+
+    await booking.save();
+    res.redirect(`/bookings/view/${bookingId}`);
+  } catch (err) {
+    console.error("❌ Error marking cheque as collected:", err);
+    res.status(500).send("Error updating cheque");
+  }
+});
+
+
 module.exports = router;

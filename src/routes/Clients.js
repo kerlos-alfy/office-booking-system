@@ -21,9 +21,10 @@ router.get("/new", (req, res) => {
 });
 
 // Save new client
+// Save new client
 router.post("/new", async (req, res) => {
 	try {
-		console.log("🚀 req.body:", req.body); // <--- هنا اطبع الداتا
+		console.log("🚀 req.body:", req.body);
 		const {
 			mobile,
 			company_en,
@@ -38,6 +39,8 @@ router.post("/new", async (req, res) => {
 			contract_status,
 			license_status,
 			ejari_no,
+			trn,
+			email // ✅ الحقول الجديدة
 		} = req.body;
 
 		const client = new Client({
@@ -54,6 +57,8 @@ router.post("/new", async (req, res) => {
 			contract_status: String(contract_status),
 			license_status: String(license_status),
 			ejari_no,
+			trn,   // ✅ إضافة الرقم الضريبي
+			email  // ✅ إضافة البريد الإلكتروني
 		});
 
 		await client.save();
@@ -80,62 +85,80 @@ router.get("/:clientId/upload", async (req, res) => {
 
 // Upload POST
 router.post(
-	"/:clientId/upload",
-	upload.fields([
-		{ name: "license_file", maxCount: 1 },
-		{ name: "ejari_file", maxCount: 1 },
-		{ name: "emirates_id_file", maxCount: 1 },
-		{ name: "passport_file", maxCount: 1 },
-		{ name: "contract_file", maxCount: 1 },
-		{ name: "additional_files", maxCount: 10 },
-	]),
-	async (req, res) => {
-		try {
-			const client = await Client.findById(req.params.clientId);
-			if (!client) return res.status(404).send("Client not found");
+  "/:clientId/upload",
+  async (req, res, next) => {
+    try {
+      const client = await Client.findById(req.params.clientId);
+      if (!client) return res.status(404).send("Client not found");
 
-			// 📄 License
-			if (req.files["license_file"]) {
-				client.license_file_path = `/uploads/clients/${client._id}/` + req.files["license_file"][0].filename;
-				client.license_status = "OK";
-			}
+      // تجهيز اسم الفولدر من اسم الشركة وآخر 5 من ID
+      const shortId = client._id.toString().slice(-5);
+      const safeCompany = client.company_en.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
+      req.clientFolderName = `${safeCompany}-${shortId}`;
 
-			// 📄 Ejari
-			if (req.files["ejari_file"]) {
-				client.ejari_file_path = `/uploads/clients/${client._id}/` + req.files["ejari_file"][0].filename;
-			}
+      req.client = client; // نحفظ الـ client لاستخدامه لاحقًا بدون طلب تاني
+      next();
+    } catch (err) {
+      console.error("Error setting client folder name:", err);
+      res.status(500).send("Error preparing upload");
+    }
+  },
+  upload.fields([
+    { name: "license_file", maxCount: 1 },
+    { name: "ejari_file", maxCount: 1 },
+    { name: "emirates_id_file", maxCount: 1 },
+    { name: "passport_file", maxCount: 1 },
+    { name: "contract_file", maxCount: 1 },
+    { name: "additional_files", maxCount: 10 },
+  ]),
+  async (req, res) => {
+    try {
+      const client = req.client;
+      const folderPath = `/uploads/clients/${req.clientFolderName}`;
 
-			// 🆔 Emirates ID
-			if (req.files["emirates_id_file"]) {
-				client.emirates_id_file_path = `/uploads/clients/${client._id}/` + req.files["emirates_id_file"][0].filename;
-				client.emirates_id_status = "OK";
-			}
+      // 📄 License
+      if (req.files["license_file"]) {
+        client.license_file_path = `${folderPath}/` + req.files["license_file"][0].filename;
+        client.license_status = "OK";
+      }
 
-			// 📄 Contract
-			if (req.files["contract_file"]) {
-				client.contract_file_path = `/uploads/clients/${client._id}/` + req.files["contract_file"][0].filename;
-				client.contract_status = "OK";
-			}
+      // 📄 Ejari
+      if (req.files["ejari_file"]) {
+        client.ejari_file_path = `${folderPath}/` + req.files["ejari_file"][0].filename;
+      }
 
-			// 🛂 Passport
-			if (req.files["passport_file"]) {
-				client.passport_file_path = `/uploads/clients/${client._id}/` + req.files["passport_file"][0].filename;
-			}
+      // 🆔 Emirates ID
+      if (req.files["emirates_id_file"]) {
+        client.emirates_id_file_path = `${folderPath}/` + req.files["emirates_id_file"][0].filename;
+        client.emirates_id_status = "OK";
+      }
 
-			// 🗂️ Additional Files
-			if (req.files["additional_files"]) {
-				client.additional_files = req.files["additional_files"].map((file) => `/uploads/clients/${client._id}/additional/` + file.filename);
-			}
+      // 📄 Contract
+      if (req.files["contract_file"]) {
+        client.contract_file_path = `${folderPath}/` + req.files["contract_file"][0].filename;
+        client.contract_status = "OK";
+      }
 
-			await client.save();
-			res.redirect("/clients");
-		} catch (err) {
-			console.error("Error uploading files:", err);
-			res.status(500).send("Error uploading files");
-		}
-	}
+      // 🛂 Passport
+      if (req.files["passport_file"]) {
+        client.passport_file_path = `${folderPath}/` + req.files["passport_file"][0].filename;
+      }
+
+      // 🗂️ Additional Files
+      if (req.files["additional_files"]) {
+        client.additional_files = req.files["additional_files"].map((file) =>
+          `${folderPath}/additional/` + file.filename
+        );
+      }
+
+      await client.save();
+      res.redirect("/clients");
+    } catch (err) {
+      console.error("Error uploading files:", err);
+      res.status(500).send("Error uploading files");
+    }
+  }
 );
-
 // View Client Details
 router.get("/:clientId/view", async (req, res) => {
 	try {
@@ -162,6 +185,7 @@ router.get("/:clientId/edit", async (req, res) => {
 		res.status(500).send("Error loading edit form");
 	}
 });
+
 // Update Client
 router.post("/:clientId/edit", async (req, res) => {
 	try {
@@ -179,6 +203,8 @@ router.post("/:clientId/edit", async (req, res) => {
 			ejari_no: req.body.ejari_no,
 			license_number: req.body.license_number,
 			license_expiry: req.body.license_expiry,
+			trn: req.body.trn,       // ✅
+			email: req.body.email    // ✅
 		};
 
 		await Client.findByIdAndUpdate(req.params.clientId, updateData);
@@ -189,6 +215,7 @@ router.post("/:clientId/edit", async (req, res) => {
 	}
 });
 
+
 router.get("/:clientId/invoice", async (req, res) => {
 	const client = await Client.findById(req.params.clientId);
 
@@ -198,7 +225,7 @@ router.get("/:clientId/invoice", async (req, res) => {
 		invoice: {
 			number: `INV-${client._id.toString().slice(-6)}`,
 			date: new Date().toLocaleDateString("en-GB"),
-			trn: "100028267100003",
+			trn: client.trn || "N/A",  // ✅ استخدام TRN من قاعدة البيانات
 			contract_no: "200222",
 			contract_period: "15-07-2024 to 14-07-2025",
 			unit_no: "OFF-A,Shop1&2",
@@ -211,8 +238,9 @@ router.get("/:clientId/invoice", async (req, res) => {
 			name: client.company_en,
 			branch: client.registered_owner_name_en,
 			phone: client.mobile,
-			email: client.email || "",
-			address: "Dubai, UAE",
+			email: client.email || "N/A",   // ✅ إيميل العميل
+			trn: client.trn || "N/A",       // ✅ TRN داخل كائن client (اختياري لو بتستخدمه في التصميم)
+			address: "Dubai, UAE"
 		},
 		items: [
 			{

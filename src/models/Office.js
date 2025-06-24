@@ -1,5 +1,19 @@
 const mongoose = require("mongoose");
 
+const paymentPlanSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ["single", "two-installments", "cheques"],
+    required: true,
+  },
+  total_price: {
+    type: Number,
+    required: true,
+  },
+  down_payment: Number, // فقط للطريقة التالتة
+  number_of_cheques: Number, // فقط للطريقة التالتة
+});
+
 const officeSchema = new mongoose.Schema(
   {
     branch_id: { type: mongoose.Schema.Types.ObjectId, ref: "Branch", required: true },
@@ -8,38 +22,38 @@ const officeSchema = new mongoose.Schema(
     yearly_price: { type: Number, required: true },
     floor: { type: String, required: true },
 
-   
-
-    // 🟢 التصنيف حسب المساحة (للعرض)
     size_category: {
       type: String,
       enum: ["100-120", "120-150", "150-200", "200-250"],
       required: true,
     },
 
-    // 🟢 الحالة الحالية للمكتب
     status: {
       type: String,
       enum: ["available", "booked", "archived"],
       default: "available",
     },
 
-    // 🟢 الحجز الحالي إن وُجد
     currentBooking: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
       default: null,
     },
+
     main_image: {
-  type: String,
-  default: null,
-},
+      type: String,
+      default: null,
+    },
 
-gallery: {
-  type: [String],
-  default: [],
-},
+    gallery: {
+      type: [String],
+      default: [],
+    },
 
+    image_folder: { type: String },
+
+    // 🟢 خطط الدفع
+    payment_plans: [paymentPlanSchema],
   },
   {
     timestamps: true,
