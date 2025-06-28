@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenancy Contract - عقد إيجار</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 8mm;
+        }
+        
+        /* Logo and Header */
+        .header-section {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 8px;
+            background: linear-gradient(45deg, #000 0%, #000 25%, #e53e3e 25%, #e53e3e 50%, #38a169 50%, #38a169 75%, #fff 75%);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .logo::after {
+            content: "YOUR OWN\AReal Estate";
+            white-space: pre;
+        }
+        
+        .main-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .main-title-arabic {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            background: #c6f6d5;
+            border: 1px solid #000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 3px;
+            margin-bottom: 0;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+        
+        td, th {
+            border: 1px solid #000;
+            padding: 3px 5px;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+        
+        /* Lessor Table */
+        .lessor-table td:first-child {
+            background: #f7fafc;
+            font-weight: bold;
+            width: 15%;
+        }
+        
+        .lessor-table td:nth-child(2) {
+            background: white;
+            font-weight: bold;
+            width: 35%;
+        }
+        
+        .lessor-table td:last-child {
+            background: white;
+            text-align: right;
+            direction: rtl;
+            font-weight: bold;
+            width: 50%;
+        }
+        
+        /* Payment Table */
+        .payment-table th {
+            background: #f7fafc;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .payment-left {
+            background: #e6fffa;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .payment-empty {
+            background: white;
+        }
+        
+        .payment-total {
+            background: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 9px;
+        }
+        
+        .payment-bottom-border {
+            background: #e6fffa;
+            border-bottom: 2px solid #000;
+        }
+        
+        /* Details Table */
+        .details-table td:first-child {
+            background: #f7fafc;
+            font-weight: bold;
+            text-align: center;
+            width: 50%;
+        }
+        
+        .details-table td:last-child {
+            background: white;
+            font-weight: bold;
+            text-align: center;
+            width: 50%;
+        }
+        
+        .details-dates {
+            background: #c6f6d5 !important;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* Terms */
+        .terms {
+            font-size: 6px;
+            line-height: 1.2;
+            margin: 10px 0;
+        }
+        
+        .terms-arabic {
+            text-align: right;
+            direction: rtl;
+            margin-bottom: 5px;
+        }
+        
+        .terms-english {
+            text-align: left;
+        }
+        
+        /* Signatures */
+        .signatures {
+            margin-top: 15px;
+            border-top: 1px dotted #000;
+            padding-top: 10px;
+        }
+        
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .signature-box {
+            width: 45%;
+            text-align: center;
+            font-size: 8px;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #000;
+            height: 25px;
+            margin-bottom: 3px;
+        }
+        
+        .footer-info {
+            text-align: center;
+            font-size: 7px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-section">
+        <div class="logo"></div>
+        <div class="main-title">TENANCY CONTRACT</div>
+        <div class="main-title-arabic">عقد إيجار</div>
+    </div>
+
+    <!-- Lessor Section -->
+    <div class="section-header">Lessor/المؤجر</div>
+    <table class="lessor-table">
+        <tr>
+            <td>Lessor Name :</td>
+            <td>YOUR OWN REAL ESTATE L.L.C</td>
+            <td>اسم المؤجر : يور اون للعقارات ش.ذ.م.م</td>
+        </tr>
+        <tr>
+            <td>LAND AREA :</td>
+            <td>ASWAAQ COMMUNITY MALL - AL MIZHAR</td>
+            <td>المنطقة :</td>
+        </tr>
+    </table>
+
+    <!-- Tenant Section -->
+    <div class="section-header">Tenant/المستأجر</div>
+    <table class="lessor-table">
+        <tr>
+            <td>Tenant Name :</td>
+            <td colspan="2">JOHNSUZ CLEANING SERVICES L.L.C</td>
+                <td colspan="2">kero - جوهانز لخدمات التنظيف ش.ذ.م.م</td>
+            <td>أسم المستأجر </td>
+            
+        </tr>
+        <tr>
+            <td>License No :</td>
+            <td>1441632  </td>
+            <td> رقم الرخصة: </td>
+             <td> Email</td>
+            <td> Uaevisaexcursions@gmail.com</td>
+            <td>الايميل</td>
+        </tr>
+                <tr>
+            <td>License EXPIRY :</td>
+            <td>17/12/2025 </td>
+            <td>انتهاء الرخصة </td>
+             <td> CONTACT NO</td>
+            <td> +237658387687</td>
+            <td>الهاتف</td>
+        </tr>
+    </table>
+
+    <!-- Payment Section -->
+    <div class="section-header">بيان الدفعات/details</div>
+    <table class="payment-table">
+        <thead>
+            <tr>
+                <th>Number Of Payments</th>
+                <th>Cheque Date</th>
+                <th>Amount AED</th>
+                <th>Number Of Payments</th>
+                <th>Cheque Date</th>
+                <th>Amount AED</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="payment-left">1</td>
+                <td class="payment-left">13/05/2025</td>
+                <td class="payment-left">8,000 AED</td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+            </tr>
+            <tr>
+                <td class="payment-left">2</td>
+                <td class="payment-left">15/10/2025</td>
+                <td class="payment-left">9,000 AED</td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+            </tr>
+            <tr>
+                <td class="payment-left">3</td>
+                <td class="payment-left">15/01/2026</td>
+                <td class="payment-left">8,000 AED</td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+                <td class="payment-total">------------------25,000 AED------------------</td>
+            </tr>
+            <tr>
+                <td class="payment-bottom-border"></td>
+                <td class="payment-bottom-border"></td>
+                <td class="payment-bottom-border"></td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+                <td class="payment-empty"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Details Section -->
+    <div class="section-header">تفاصيل العقد/details</div>
+    <table class="details-table">
+        <tr>
+            <td>Unit number / رقم المكتب :</td>
+            <td>63</td>
+        </tr>
+        <tr>
+            <td>Ejari inscription/ تسجيل الإيجاري :</td>
+            <td>500 AED</td>
+        </tr>
+        <tr>
+            <td>VAT %/ الضريبة :</td>
+            <td>1190 AED</td>
+        </tr>
+        <tr>
+            <td>Commission/ عمولة :</td>
+            <td>1110 AED</td>
+        </tr>
+        <tr>
+            <td>Office Rent / قيمة الإيجار :</td>
+            <td>22,200 AED</td>
+        </tr>
+        <tr>
+            <td>TOTAL / المجموع</td>
+            <td>25,000 AED</td>
+        </tr>
+        <tr>
+            <td class="details-dates">Start Date : 01/06/2025</td>
+            <td class="details-dates">End Date : 30/5/2026</td>
+        </tr>
+    </table>
+
+    <!-- Terms -->
+    <div class="terms">
+        <div class="terms-arabic">
+            يحق للمستأجر موقف مجاني له وآخر مجاني لأحد موظفيه / عملائه، عدا ذلك يكون مدفوع.
+            يلتزم المستأجر بدفع 5%تأمين عن المنقولات بالإضافة إلى رسوم تسجيل الإيجاري ويضاف 5% ضريبة.
+            يلتزم المستأجر بدفع 100 درهم شهرياً مقابل استخدام قاعة الاجتماعات وكافة الخدمات.
+            هذا العقد متمم ومكمل للعقد الإيجاري - يوافق المستأجر على أي تعديلات خاصة بنقل موقع المكتب طبقاً لمتطلبات الصيانة
+            في حالة التأخير عن سداد أي دفعة يقر ويوافق المستأجر بفسخ التعاقد وبموافقته يوكل المؤجر بفتح المكتب وحجز المنقولات لحين السداد ويحق للمؤجر تأجير المكتب فهذا شرط فاسخ صريح للتعاقد. كما يقر المستأجر بالموافقة على دفع قيمة ثلاثة أشهر عند طلب إنهاء التعاقد كتعويض اتفاقي - يوافق المستأجر على الإجازات الرسمية للدولة وأي إجازات تتطلبها الصيانة وأن مواعيد العمل من 8ص إلى 6م.
+        </div>
+        
+        <div class="terms-english">
+            The tenant has 1 free parking for him and another free parking for one of his employees / customers, other than that is paid.
+            The tenant is obligated to pay 5% insurance for the movables, in addition to the lease registration fees.
+            The tenant is obligated to pay 100 dirhams monthly for using the meeting room and all services.
+            This contract is complementary and complementary to the rental contract - The tenant agrees to any modifications related to moving the office site in accordance with the maintenance requirements
+            In the event of delay in paying any payment, the tenant acknowledges and agrees to terminate the contract. With his consent, the lessor is authorized to open the office and seize the movables until payment, and the lessor has the right to rent the office, as this is a nullifying condition for the contract.
+            As any 5% The tenant agreed to the state's official holidays and any vacations required for maintenance, and that the working hours are from 8 am to 6 pm. The tenant also acknowledges agreeing to pay the value of three months when requesting termination of the contract as an agreement compensation
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="signatures">
+        <div class="signature-row">
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <div>المؤجر/ يور اون للعقارات</div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <div>مستأجر/</div>
+            </div>
+        </div>
+        
+        <div class="footer-info">
+            <div style="font-weight: bold;">ASWAAQ COMMUNITY MALL - AL MIZHAR</div>
+            <div>PHONE: +971 58 900 0915</div>
+        </div>
+    </div>
+</body>
+</html>

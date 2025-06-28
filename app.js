@@ -62,7 +62,10 @@ const invoiceRoutes = require("./src/routes/invoice");
 // Register Routes
 app.use(authRoutes); // مهم يكون في الأول
 //app.use('/admin', adminRoutes);
+app.get("/", (req, res) => {
+  res.redirect("/client");
 
+});
 // Routes with prefixes
 app.use("/admin", adminRoutes);
 app.use("/admin/roles", adminRolesRouter);
@@ -81,12 +84,14 @@ app.use(generalRoutes);
 app.use("/", invoiceRoutes);
 
 // Homepage Route
-app.get("/", (req, res) => {
-  res.render("index", { title: "Office Booking Dashboard" });
-});
+// app.get("/", (req, res) => {
+//   res.render("index", { title: "Office Booking Dashboard" });
+// });
+
 
 // Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+  

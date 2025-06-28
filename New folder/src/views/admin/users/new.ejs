@@ -1,0 +1,40 @@
+    <%- include('../../partials/header') %>
+
+    <div class="container py-5">
+        <h2 class="mb-4 text-success">➕ إضافة مستخدم جديد</h2>
+
+        <form action="/admin/users" method="POST" class="shadow p-4 bg-white rounded">
+
+            <div class="mb-3">
+                <label class="form-label">الاسم الكامل</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">البريد الإلكتروني</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">كلمة المرور</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">الدور</label>
+                <select name="role" class="form-select" required>
+                    <option value="">-- اختر الدور --</option>
+                    <% roles.forEach(role => { %>
+                        <option value="<%= role._id %>"><%= role.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="text-end">
+                <a href="/admin/users" class="btn btn-outline-secondary">رجوع</a>
+                <button type="submit" class="btn btn-success">💾 حفظ المستخدم</button>
+            </div>
+        </form>
+    </div>
+
+    <%- include('../../partials/footer') %>

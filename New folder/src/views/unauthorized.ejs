@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+
+<style>
+  .unauthorized-box {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    max-width: 600px;
+    margin: 80px auto;
+    text-align: center;
+  }
+
+  .unauthorized-box h1 {
+    font-size: 2.5rem;
+    color: #dc3545;
+    margin-bottom: 20px;
+  }
+
+  .unauthorized-box p {
+    font-size: 1.2rem;
+    color: #6c757d;
+  }
+
+  .unauthorized-box i {
+    font-size: 4rem;
+    color: #dc3545;
+    margin-bottom: 15px;
+  }
+</style>
+
+<div class="unauthorized-box">
+  <i class="fas fa-ban"></i>
+  <h1>🚫 Access Denied</h1>
+  <p>You do not have permission to access this page or section of the system.</p>
+  <a href="/admin/dashboard" class="btn btn-outline-secondary mt-4">
+    🔙 Back to Dashboard
+  </a>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,62 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+	<div class="text-center mb-5">
+		<h1 class="display-6 fw-bold text-dark">✨ Admin Dashboard</h1>
+		<p class="text-muted">مرحبًا <strong><%= user.name %></strong>، تحكم بكل الصلاحيات من مكان واحد</p>
+	</div>
+
+	<div class="row g-4">
+		<!-- المستخدمين -->
+		<div class="col-md-4">
+			<div class="card border-0 shadow h-100">
+				<div class="card-body text-center">
+					<div class="fs-2 text-primary mb-3">
+						<i class="fas fa-users"></i>
+					</div>
+					<h5 class="card-title">المستخدمين</h5>
+					<p class="text-muted">إدارة المشرفين والصلاحيات</p>
+					<a href="/admin/users" class="btn btn-primary btn-sm">👤 عرض المستخدمين</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- الأدوار -->
+		<div class="col-md-4">
+			<div class="card border-0 shadow h-100">
+				<div class="card-body text-center">
+					<div class="fs-2 text-success mb-3">
+						<i class="fas fa-user-shield"></i>
+					</div>
+					<h5 class="card-title">الأدوار</h5>
+					<p class="text-muted">إضافة وتعديل الأدوار</p>
+					<a href="/admin/roles" class="btn btn-success btn-sm">🛡️ إدارة الأدوار</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- الصلاحيات -->
+		<div class="col-md-4">
+			<div class="card border-0 shadow h-100">
+				<div class="card-body text-center">
+					<div class="fs-2 text-warning mb-3">
+						<i class="fas fa-cogs"></i>
+					</div>
+					<h5 class="card-title">الصلاحيات</h5>
+					<p class="text-muted">تحكم كامل في صلاحيات النظام</p>
+					<a href="/admin/permissions" class="btn btn-warning btn-sm">🔧 تعديل الصلاحيات</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr class="my-5">
+
+	<div class="text-center">
+		<a href="/logout" class="btn btn-outline-danger btn-sm">
+			<i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+		</a>
+	</div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,99 @@
+<%- include('partials/header') %>
+
+<h1 class="mb-4 text-primary">📦 Archived Booking Details</h1>
+
+<!-- UX Actions -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<a href="/bookings/archive" class="btn btn-outline-secondary">🔙 Back to Archive</a>
+	<button class="btn btn-outline-primary" onclick="window.print()">🖨️ Print Page</button>
+</div>
+
+<div class="card shadow mb-4">
+	<div class="card-header bg-secondary text-white fw-bold">Archived Booking Info</div>
+	<div class="card-body">
+		<!-- Office & Client Info -->
+		<p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
+		<p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
+		<p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.registered_owner_name_en || booking.client_id?.name || 'N/A' %></p>
+
+		<!-- Dates -->
+		<p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
+		<p class="mb-2"><strong>End Date:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
+
+		<!-- Contract Info -->
+		<p class="mb-2"><strong>Contract Page No:</strong> <%= booking.page_no %></p>
+		<p class="mb-2"><strong>Ejari No:</strong> <%= booking.ejari_no %></p>
+		<p class="mb-2"><strong>Status:</strong> <span class="badge bg-secondary">Archived</span></p>
+
+		<hr />
+		<div class="alert alert-warning"><strong>❌ Cancelled Reason:</strong> <%= booking.cancel_reason || 'غير محدد' %></div>
+
+		<!-- Financial Info -->
+		<hr />
+		<h5 class="text-primary fw-bold mb-3">💰 Financial Details</h5>
+		<p class="mb-2"><strong>Total Price:</strong> $<%= booking.total_price %></p>
+		<p class="mb-2"><strong>Down Payment:</strong> $<%= booking.initial_payment %></p>
+		<p class="mb-2"><strong>VAT:</strong> $<%= booking.vat %></p>
+		<p class="mb-2"><strong>Security Deposit:</strong> $<%= booking.sec_deposit %></p>
+		<p class="mb-2"><strong>Admin Fee:</strong> $<%= booking.admin_fee %></p>
+		<p class="mb-2"><strong>Commission:</strong> $<%= booking.commission %></p>
+
+		<!-- Cheques -->
+		<hr />
+		<h5 class="text-primary fw-bold mb-3">📝 Cheques</h5>
+		<% if (booking.cheques && booking.cheques.length > 0) { %>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Amount</th>
+					<th>Due Date</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% booking.cheques.forEach((cheque, index) => { %>
+				<tr>
+					<td><%= index + 1 %></td>
+					<td>$<%= cheque.amount %></td>
+					<td><%= new Date(cheque.due_date).toISOString().split('T')[0] %></td>
+					<td><%= cheque.collected ? '✅ Collected' : '❌ Uncollected' %></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+		<% } else { %>
+		<p>No cheques.</p>
+		<% } %>
+
+		<!-- Payments -->
+		<hr />
+		<h5 class="text-primary fw-bold mb-3">💳 Payments</h5>
+		<% if (booking.payments && booking.payments.length > 0) { %>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Amount</th>
+					<th>Date</th>
+					<th>Type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% booking.payments.forEach((payment, index) => { %>
+				<tr>
+					<td><%= index + 1 %></td>
+					<td>$<%= payment.amount %></td>
+					<td><%= new Date(payment.payment_date).toISOString().split('T')[0] %></td>
+					<td><%= payment.payment_type %></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+		<% } else { %>
+		<p>No payments recorded.</p>
+		<% } %>
+	</div>
+</div>
+
+<%- include('partials/footer') %>

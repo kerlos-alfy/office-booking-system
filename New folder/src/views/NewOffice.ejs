@@ -1,0 +1,138 @@
+<%- include('partials/header') %>
+
+<div class="container py-5">
+  <h1 class="mb-4 text-success">➕ Add New Office</h1>
+
+  <form action="/offices/new" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label">Office Number</label>
+      <input type="text" name="office_number" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Branch</label>
+      <select name="branch_id" class="form-select" required>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>"><%= branch.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Floor</label>
+      <input type="text" name="floor" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Monthly Price (AED)</label>
+      <input type="number" name="monthly_price" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Yearly Price (AED)</label>
+      <input type="number" name="yearly_price" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Size Category</label>
+      <select name="size_category" class="form-select" required>
+        <option value="">-- Select --</option>
+        <option value="100-120">100 - 120 sqft</option>
+        <option value="120-150">120 - 150 sqft</option>
+        <option value="150-200">150 - 200 sqft</option>
+        <option value="200-250">200 - 250 sqft</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Main Image</label>
+      <!-- ✅ لازم اسم الحقل يكون مطابق لـ "main_image" -->
+      <input type="file" name="main_image" class="form-control" accept="image/*" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Gallery Images</label>
+      <!-- ✅ لازم اسم الحقل يكون "gallery" لأن multer متوقعه -->
+      <input type="file" name="gallery" class="form-control" accept="image/*" multiple>
+    </div>
+<hr class="my-4">
+
+<h5 class="fw-bold text-primary">💳 Payment Plans</h5>
+
+<div id="paymentPlansContainer"></div>
+
+<button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addPaymentPlan()">➕ Add Payment Plan</button>
+
+<!-- مخفي: لحفظ بيانات أنظمة الدفع على هيئة JSON -->
+<input type="hidden" name="payment_plans_json" id="paymentPlansJson">
+
+    <button type="submit" class="btn btn-primary">➕ Save Office</button>
+  </form>
+</div>
+<script>
+  const container = document.getElementById('paymentPlansContainer');
+  const jsonInput = document.getElementById('paymentPlansJson');
+
+  function addPaymentPlan(plan = {}) {
+    const planDiv = document.createElement('div');
+    planDiv.className = 'border p-3 rounded mb-3 bg-light-subtle';
+
+    planDiv.innerHTML = `
+      <div class="mb-2">
+        <label class="form-label">Type</label>
+        <select name="plan_type" class="form-select" onchange="toggleChequeFields(this)">
+          <option value="single" ${plan.type === 'single' ? 'selected' : ''}>One-Time</option>
+          <option value="two-installments" ${plan.type === 'two-installments' ? 'selected' : ''}>Two Installments</option>
+          <option value="cheques" ${plan.type === 'cheques' ? 'selected' : ''}>Cheques</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Total Price (AED)</label>
+        <input type="number" name="plan_price" class="form-control" value="${plan.total_price || ''}">
+      </div>
+      <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
+        <label class="form-label">Down Payment (AED)</label>
+        <input type="number" name="plan_down" class="form-control" value="${plan.down_payment || ''}">
+      </div>
+      <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
+        <label class="form-label">Number of Cheques</label>
+        <input type="number" name="plan_cheques" class="form-control" value="${plan.number_of_cheques || ''}">
+      </div>
+    `;
+
+    container.appendChild(planDiv);
+  }
+
+  function toggleChequeFields(select) {
+    const parent = select.closest('div').parentNode;
+    const chequeFields = parent.querySelectorAll('.cheque-fields');
+    chequeFields.forEach(field => {
+      field.style.display = (select.value === 'cheques') ? 'block' : 'none';
+    });
+  }
+
+  document.querySelector('form').addEventListener('submit', function (e) {
+    const plans = [];
+    const planDivs = container.children;
+
+    for (let div of planDivs) {
+      const type = div.querySelector('select[name="plan_type"]').value;
+      const total_price = Number(div.querySelector('input[name="plan_price"]').value);
+      const down_payment = div.querySelector('input[name="plan_down"]')?.value;
+      const number_of_cheques = div.querySelector('input[name="plan_cheques"]')?.value;
+
+      const plan = { type, total_price };
+
+      if (type === 'cheques') {
+        plan.down_payment = Number(down_payment);
+        plan.number_of_cheques = Number(number_of_cheques);
+      }
+
+      plans.push(plan);
+    }
+
+    jsonInput.value = JSON.stringify(plans);
+  });
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Branch 1",
+    "location": "3405 Diana Streets Apt. 358\nNorth Robertview, AL 33234"
+  },
+  {
+    "name": "Branch 2",
+    "location": "USS Sullivan\nFPO AE 63241"
+  },
+  {
+    "name": "Branch 3",
+    "location": "0923 Oneill Knolls\nMorrisburgh, HI 64994"
+  },
+  {
+    "name": "Branch 4",
+    "location": "29354 Hines Field\nLake Jessicaton, CA 40812"
+  },
+  {
+    "name": "Branch 5",
+    "location": "8540 Nicholas Lock\nEast Thomasstad, NV 89848"
+  },
+  {
+    "name": "Branch 6",
+    "location": "PSC 9054, Box 3391\nAPO AA 16201"
+  },
+  {
+    "name": "Branch 7",
+    "location": "2346 Jackson Curve Suite 430\nJamieberg, AZ 66641"
+  },
+  {
+    "name": "Branch 8",
+    "location": "208 Victoria Harbor Suite 375\nPort Julieberg, AK 57369"
+  },
+  {
+    "name": "Branch 9",
+    "location": "851 Stanton Isle Suite 191\nKimberlyside, SD 98651"
+  },
+  {
+    "name": "Branch 10",
+    "location": "USNS Lopez\nFPO AP 23687"
+  }
+]

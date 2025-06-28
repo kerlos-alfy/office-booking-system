@@ -1,0 +1,250 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+  <h2 class="text-center mb-4">🧾 Invoice Editor</h2>
+  <form action="/generate-invoice-preview" method="POST">
+    <input type="hidden" name="bookingId" value="<%= booking._id %>">
+
+    <!-- 🧍 Client Info -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label>Client Name</label>
+        <input type="text" class="form-control" value="<%= booking.client_id?.registered_owner_name_en %>" readonly>
+      </div>
+      <div class="col-md-4">
+        <label>Company Name</label>
+        <input type="text" class="form-control" value="<%= booking.client_id?.company_en %>" readonly>
+      </div>
+      <div class="col-md-4">
+        <label>TRN</label>
+        <input type="text" class="form-control" name="client_trn" value="<%= booking.client_id?.license_number || '' %>">
+
+      </div>
+    </div>
+
+    <!-- 🏢 Office Info -->
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label>Unit No.</label>
+        <input type="text" class="form-control" value="<%= booking.office_id?.office_number %>" readonly>
+      </div>
+      <div class="col-md-3">
+        <label>Branch</label>
+        <input type="text" class="form-control" value="<%= booking.office_id?.branch_id?.name %>" readonly>
+      </div>
+      <div class="col-md-6">
+        <label>Location</label>
+        <input type="text" class="form-control" value="<%= booking.office_id?.branch_id?.location %>" readonly>
+      </div>
+    </div>
+
+    <!-- 📅 Period -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label>Start Date</label>
+        <input type="date" class="form-control" value="<%= booking.start_date.toISOString().split('T')[0] %>" readonly>
+      </div>
+      <div class="col-md-4">
+        <label>End Date</label>
+        <input type="date" class="form-control" value="<%= booking.end_date.toISOString().split('T')[0] %>" readonly>
+      </div>
+      <div class="col-md-4">
+        <label>Invoice Date</label>
+<input type="date" name="invoice_date" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>">
+      </div>
+    </div>
+
+    <!-- 💰 Editable Totals -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <label>Total Price</label>
+        <input type="number" step="0.01" name="total_price" class="form-control" value="<%= booking.total_price %>">
+      </div>
+      <div class="col-md-3">
+        <label>Admin Fee</label>
+        <input type="number" step="0.01" name="admin_fee" class="form-control" value="<%= booking.admin_fee %>">
+      </div>
+      <div class="col-md-3">
+        <label>Commission</label>
+        <input type="number" step="0.01" name="commission" class="form-control" value="<%= booking.commission %>">
+      </div>
+      <div class="col-md-3">
+        <label>Security Deposit</label>
+        <input type="number" step="0.01" name="sec_deposit" class="form-control" value="<%= booking.sec_deposit %>">
+      </div>
+    </div>
+
+    <!-- 🧾 Invoice Line Items -->
+<h5 class="mt-5 mb-3">🧾 Invoice Line Items</h5>
+<table class="table table-bordered" id="itemsTable">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Qty</th>
+            <th>Rate</th>
+                  <th>Taxable Amount</th>
+
+
+      <th>VAT Rate%</th>
+     
+            <th>VAT Amount</th>
+
+       <th>Total (AED)</th>
+      <th>❌</th>
+    </tr>
+  </thead>
+  <tbody id="itemsBody">
+    <tr>
+      <td>
+        <select name="descriptions[]" class="form-control">
+          <option>Booking</option>
+          <option>Advance Payment</option>
+          <option>Monthly Payment Collection</option>
+          <option>Monthly Rent</option>
+          <option>SECURITY DEPOSIT</option>
+        </select>
+      </td>
+      <td><input type="number" name="qtys[]" class="form-control qty" value="1"></td>
+            <td><input type="number" name="rates[]" class="form-control rate" readonly></td>
+      <td><input type="number" class="form-control taxable" readonly></td>
+
+      <td><input type="number" name="vat_rates[]" class="form-control vat-rate" value="5"></td>
+            <td><input type="number" class="form-control vat-amount" readonly></td>
+
+            <td><input type="number" name="totals[]" class="form-control total" step="0.01"></td>
+
+      <td><button type="button" class="btn btn-danger btn-sm remove-row">✖</button></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+    <!-- ✅ Submit -->
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-success btn-lg">🔍 Preview Invoice</button>
+    </div>
+    
+  </form>
+</div>
+
+<script>
+  function recalculateRow(row) {
+    const qty = parseFloat(row.querySelector(".qty").value) || 0;
+    const rate = parseFloat(row.querySelector(".rate").value) || 0;
+    const vatRate = parseFloat(row.querySelector(".vat-rate").value) || 0;
+
+    const taxable = qty * rate;
+    const vatAmount = (taxable * vatRate) / 100;
+    const total = taxable + vatAmount;
+
+    row.querySelector(".taxable").value = taxable.toFixed(2);
+    row.querySelector(".vat-amount").value = vatAmount.toFixed(2);
+    row.querySelector(".total").value = total.toFixed(2);
+  }
+
+  document.querySelectorAll("#itemsTable").forEach(table => {
+    table.addEventListener("input", function (e) {
+      const row = e.target.closest("tr");
+      recalculateRow(row);
+    });
+  });
+
+  document.getElementById("addRowBtn").addEventListener("click", function () {
+    const tbody = document.getElementById("itemsBody");
+    const row = tbody.rows[0].cloneNode(true);
+
+    row.querySelectorAll("input").forEach(input => {
+      if (!input.readOnly) input.value = "";
+    });
+
+    tbody.appendChild(row);
+  });
+
+  document.getElementById("itemsBody").addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-row")) {
+      const row = e.target.closest("tr");
+      if (document.querySelectorAll("#itemsBody tr").length > 1) row.remove();
+    }
+  });
+</script>
+<script>
+  function recalculateRow(row) {
+    const qty = parseFloat(row.querySelector(".qty").value) || 0;
+    const vatRate = parseFloat(row.querySelector(".vat-rate").value) || 0;
+    const total = parseFloat(row.querySelector(".total").value) || 0;
+
+    // حساب Taxable
+    const taxable = total / (1 + vatRate / 100);
+    const vatAmount = total - taxable;
+    const rate = qty !== 0 ? taxable / qty : 0;
+
+    row.querySelector(".taxable").value = taxable.toFixed(2);
+    row.querySelector(".vat-amount").value = vatAmount.toFixed(2);
+    row.querySelector(".rate").value = rate.toFixed(2);
+  }
+
+  // مراقبة التغييرات في كل صف
+  document.querySelectorAll("#itemsTable").forEach(table => {
+    table.addEventListener("input", function (e) {
+      const row = e.target.closest("tr");
+      recalculateRow(row);
+    });
+  });
+
+  // زرار إضافة صف
+  document.getElementById("addRowBtn").addEventListener("click", function () {
+    const tbody = document.getElementById("itemsBody");
+    const row = tbody.rows[0].cloneNode(true);
+
+    row.querySelectorAll("input").forEach(input => {
+      if (!input.readOnly) input.value = "";
+    });
+
+    tbody.appendChild(row);
+  });
+
+  // حذف صف
+  document.getElementById("itemsBody").addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-row")) {
+      const row = e.target.closest("tr");
+      if (document.querySelectorAll("#itemsBody tr").length > 1) row.remove();
+    }
+  });
+</script>
+<script>
+  function handleDescriptionChange(selectElement) {
+    const row = selectElement.closest("tr");
+    const vatRateInput = row.querySelector(".vat-rate");
+
+    if (selectElement.value === "SECURITY DEPOSIT") {
+      vatRateInput.value = "0";
+    } else {
+      vatRateInput.value = "5";
+    }
+
+    recalculateRow(row);
+  }
+
+  // لما المستخدم يغير قيمة الـ Description
+  document.getElementById("itemsBody").addEventListener("change", function (e) {
+    if (e.target.name === "descriptions[]") {
+      handleDescriptionChange(e.target);
+    }
+  });
+
+  // تأكد إنك تضيف event بعد إضافة صف جديد
+  document.getElementById("addRowBtn").addEventListener("click", function () {
+    const tbody = document.getElementById("itemsBody");
+    const newRow = tbody.rows[0].cloneNode(true);
+
+    newRow.querySelectorAll("input").forEach(input => {
+      if (!input.readOnly) input.value = "";
+    });
+
+    tbody.appendChild(newRow);
+    recalculateRow(newRow);
+  });
+</script>
+
+<%- include('../partials/footer') %>
