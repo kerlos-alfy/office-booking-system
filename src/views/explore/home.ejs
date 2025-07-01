@@ -1,103 +1,124 @@
 <%- include('../partials/explore-header') %>
 
 <!-- Hero Section -->
-<section class="py-5 text-center" style="background: #fff; border-bottom: 2px solid #eee;">
-  <div class="container">
-    <h1 class="display-4 fw-bold text-dark">Welcome to <span style="color: #c0392b">Your Own</span> Business Center</h1>
-    <p class="lead text-muted mt-3 mb-4">
-      Find your ideal workspace across <span style="color: #27ae60">Dubai</span> – ready, elegant, and efficient.
-    </p>
-    <a href="/client/branches" class="btn btn-danger btn-lg px-4 py-2 shadow-sm">🔍 Explore Offices</a>
+<section class="py-5 text-center text-white" style="
+  background: url('https://server.myoffice.ae/wp-content/uploads/2021/08/serviced-top-3.jpg') center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+">
+  <div style="background-color: rgba(0,0,0,0.6); position: absolute; inset: 0;"></div>
+  <div class="container position-relative">
+    <h1 class="display-4 fw-bold" style="color: rgb(255, 255, 255);">Discover Premium Office Spaces in Dubai</h1>
+    <p class="lead mt-3 mb-4">Flexible workspaces, meeting rooms, and serviced offices tailored for your business needs.</p>
+    <a href="/client/branches" class="btn btn-danger btn-lg px-4 py-2 shadow">🏢 View Available Properties</a>
   </div>
 </section>
 
-<!-- Modern Branches Section -->
-<section class="py-5" style="background: linear-gradient(to bottom, #ffffff, #f2f2f2);">
+<!-- Branches Section -->
+<section class="py-5" style="background: #f8f9fa;">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5" style="color: #c0392b;">🏢 Our Branches in Dubai</h2>
+    <h2 class="text-center fw-bold mb-5" style="color: #c0392b;">🏙️ Our Office Branches</h2>
 
     <div class="row g-4 justify-content-center">
-
       <% const branches = [
-        { name: "Al Garhoud Branch", map: "https://www.google.com/maps/place/Your+Own+Business+Center" },
-        { name: "A Mizhar Aswaaq Mall", map: "https://www.google.com/maps/place/aswaaq+Community+Mall+-+Al+Mizhar/" },
-        { name: "Naif Branch", map: "https://www.google.com/maps/dir/25.2696146,55.3033635/7893%2BR8V" },
-        { name: "Al Karama Branch", map: "https://www.google.com/maps/place/Al+Maskan+,+Karama" },
-        { name: "Al Qusais Branch", map: "https://www.google.com/maps/place/Zulekha+Colonnade+-+Beirut+St" }
+        { name: "Al Garhoud Branch", map: "https://www.google.com/maps/place/Your+Own+Business+Center", img: "https://images.bayut.com/thumbnails/778744415-400x300.jpeg" },
+        { name: "A Mizhar Aswaaq Mall", map: "https://www.google.com/maps/place/aswaaq+Community+Mall+-+Al+Mizhar/", img: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/60/c6/f3/almizharcn-largejpg.jpg?w=400&h=400&s=1" },
+        { name: "Naif Branch", map: "https://www.google.com/maps/dir/25.2696146,55.3033635/7893%2BR8V", img: "https://wl-img-prd.s3-accelerate.amazonaws.com/b9cda5bb-eb89-471d-86a2-3044bf9dbd4e-h.png" },
+        { name: "Al Karama Branch", map: "https://www.google.com/maps/place/Al+Maskan+,+Karama", img: "https://www.propertyfinder.ae/property/b861642bb6bf424b8c7e5fe7eba812fd/668/452/MODE/71d8e1/14154989-3f97do.jpg?ctr=ae" },
+        { name: "Al Qusais Branch", map: "https://www.google.com/maps/place/Zulekha+Colonnade+-+Beirut+St", img: "https://images.bayut.com/thumbnails/771831500-400x300.jpeg" }
       ]; %>
 
       <% branches.forEach(branch => { %>
         <div class="col-md-4">
-          <div class="card border-0 shadow-lg h-100 text-center branch-card p-4">
-            <div class="mb-3">
-              <i class="fas fa-map-marker-alt fa-3x text-danger"></i>
+          <div class="card border-0 shadow-lg h-100 text-center branch-card">
+            <img src="<%= branch.img %>" alt="<%= branch.name %>" class="card-img-top" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3"><%= branch.name %></h5>
+              <a href="<%= branch.map %>" target="_blank" class="btn btn-outline-danger px-4 rounded-pill">📍 View on Map</a>
             </div>
-            <h5 class="fw-bold text-dark mb-3"><%= branch.name %></h5>
-            <a href="<%= branch.map %>" target="_blank" class="btn btn-outline-danger px-4 rounded-pill">📍 View on Map</a>
           </div>
         </div>
       <% }) %>
-
     </div>
   </div>
 </section>
 
 <style>
   .branch-card {
-    border-radius: 16px;
-    background-color: #fff;
+    border-radius: 12px;
     transition: all 0.3s ease-in-out;
+    overflow: hidden;
   }
 
   .branch-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 1rem 2rem rgba(0, 0, 0, -13.825) !important
-  }
-
-  .branch-card i {
-    transition: transform 0.3s ease;
-  }
-
-  .branch-card:hover i {
-    transform: scale(1.2);
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1) !important;
   }
 </style>
 
 <!-- What We Offer -->
 <section class="py-5 bg-light">
   <div class="container">
-    <h2 class="mb-5 text-center fw-bold" style="color: #2c3e50">Why Choose Us?</h2>
+    <h2 class="mb-5 text-center fw-bold" style="color: #2c3e50;">Why Choose Us?</h2>
     <div class="row g-4">
       <div class="col-md-4">
         <div class="card h-100 border-0 shadow text-center p-4">
           <div class="mb-3"><i class="fas fa-map-marker-alt fa-3x text-danger"></i></div>
-          <h5 class="fw-bold">Prime Locations</h5>
-          <p class="text-muted">Strategically located branches to serve your business wherever it needs to be.</p>
+          <h5 class="fw-bold">Strategic Office Locations</h5>
+          <p class="text-muted">We offer prime locations across Dubai to connect your business with opportunities.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card h-100 border-0 shadow text-center p-4">
-          <div class="mb-3"><i class="fas fa-door-open fa-3x text-success"></i></div>
-          <h5 class="fw-bold">Fully-Equipped Offices</h5>
-          <p class="text-muted">All you need in one space – furniture, internet, and peace of mind.</p>
+          <div class="mb-3"><i class="fas fa-building fa-3x text-success"></i></div>
+          <h5 class="fw-bold">Modern Workspaces</h5>
+          <p class="text-muted">Fully serviced offices with flexible layouts and professional facilities.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card h-100 border-0 shadow text-center p-4">
           <div class="mb-3"><i class="fas fa-handshake fa-3x text-warning"></i></div>
-          <h5 class="fw-bold">Tailored Assistance</h5>
-          <p class="text-muted">Our team is here to guide you through every step of the booking process.</p>
+          <h5 class="fw-bold">Expert Real Estate Support</h5>
+          <p class="text-muted">Our team helps you find the perfect space and handles every detail with care.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Testimonials -->
+<!-- <section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="mb-5 text-center fw-bold" style="color: #2c3e50;">What Our Clients Say</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow p-4 text-center">
+          <p>"The best office experience we've had – premium spaces and amazing support!"</p>
+          <h6 class="mt-3 mb-0 fw-bold">- Ahmed S.</h6>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow p-4 text-center">
+          <p>"Perfect location and great value for money. Highly recommend."</p>
+          <h6 class="mt-3 mb-0 fw-bold">- Sarah K.</h6>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow p-4 text-center">
+          <p>"Your Own made finding our new office stress-free and fast!"</p>
+          <h6 class="mt-3 mb-0 fw-bold">- John D.</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
 <!-- Call to Action -->
-<section class="py-5 text-white text-center" style="background-color: #2c3e50">
+<section class="py-5 text-white text-center" style="background-color: #2c3e50;">
   <div class="container">
     <h2 class="fw-bold mb-3">🚀 Ready to Elevate Your Business?</h2>
-    <p class="mb-4">Browse our offices and book the perfect space to grow.</p>
+    <p class="mb-4">Browse our available offices and find your perfect workspace today.</p>
     <a href="/client/offices" class="btn btn-success btn-lg px-4 py-2 shadow">Browse Offices</a>
   </div>
 </section>

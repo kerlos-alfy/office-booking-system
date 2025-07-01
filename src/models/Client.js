@@ -5,19 +5,19 @@ const clientSchema = new mongoose.Schema({
 
     // Company Name
     company_en: { type: String, required: true },
-    company_ar: { type: String, required: true },
+    company_ar: { type: String},
 
     // Registered Owner Name
-    registered_owner_name_en: { type: String, required: true },
-    registered_owner_name_ar: { type: String, required: true },
+    registered_owner_name_en: { type: String },
+    registered_owner_name_ar: { type: String },
 
     // Nationality
-    nationality_en: { type: String, required: true },
-    nationality_ar: { type: String, required: true },
+    nationality_en: { type: String },
+    nationality_ar: { type: String },
 
     // License Info
-    license_number: { type: String, required: true },
-    license_expiry: { type: Date, required: true },
+    license_number: { type: String},
+    license_expiry: { type: Date },
 
     // New Fields
     trn: { type: String }, // الرقم الضريبي
@@ -26,7 +26,7 @@ const clientSchema = new mongoose.Schema({
     emirates_id_status: { type: String, enum: ['OK', 'NOT NEED', 'UNAVAILABLE'], required: true },
     contract_status: { type: String, enum: ['OK', 'NO'], required: true },
     license_status: { type: String, enum: ['OK', 'NO'], required: true },
-    ejari_no: { type: String },
+    ejari_no: { type: Number },
 
     license_file_path: { type: String },
     ejari_file_path: { type: String },

@@ -67,21 +67,21 @@ app.get("/", (req, res) => {
 
 });
 // Routes with prefixes
-app.use("/admin", adminRoutes);
-app.use("/admin/roles", adminRolesRouter);
-app.use("/admin/permissions", adminPermissionsRouter);
-app.use("/admin/logs", adminLogsRouter);
+//app.use("/admin", adminRoutes);
+//app.use("/admin/roles", adminRolesRouter);
+//app.use("/admin/permissions", adminPermissionsRouter);
+//app.use("/admin/logs", adminLogsRouter);
 
-app.use("/branches", branchesRoutes);
-app.use("/offices", officesRoutes);
-app.use("/clients", clientsRoutes);
-app.use("/bookings", bookingsRoutes);
-app.use("/payments", paymentsRoutes);
-app.use("/reports", reportsRoutes);
-app.use("/inspections", inspectionRoutes);
+//app.use("/branches", branchesRoutes);
+//app.use("/offices", officesRoutes);
+//app.use("/clients", clientsRoutes);
+//app.use("/bookings", bookingsRoutes);
+//app.use("/payments", paymentsRoutes);
+//app.use("/reports", reportsRoutes);
+//app.use("/inspections", inspectionRoutes);
 app.use("/client", exploreRoutes);
-app.use(generalRoutes);
-app.use("/", invoiceRoutes);
+//app.use(generalRoutes);
+//app.use("/", invoiceRoutes);
 
 // Homepage Route
 // app.get("/", (req, res) => {
