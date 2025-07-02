@@ -1,0 +1,214 @@
+<%- include('./partials/header') %>
+
+<section class="container py-5">
+  <h1 class="mb-4 text-center fw-bold text-dark">🔍 Manage Offices</h1>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Branch</label>
+      <select id="branchSelect" class="form-select">
+        <option value="">Select Branch</option>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>"><%= branch.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Floor</label>
+      <select id="floorSelect" class="form-select" disabled>
+        <option value="">Select Floor</option>
+      </select>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <button class="btn btn-success w-100 fw-semibold" id="loadBtn">🔎 Show Offices</button>
+    </div>
+  </div>
+
+  <div id="officesList" class="row"></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.getElementById('branchSelect').addEventListener('change', async function() {
+    const branchId = this.value;
+    const floorSelect = document.getElementById('floorSelect');
+
+    floorSelect.innerHTML = '<option value="">Select Floor</option>';
+
+    if (!branchId) {
+      floorSelect.disabled = true;
+      return;
+    }
+
+    // Show loading option
+    floorSelect.innerHTML = '<option>Loading...</option>';
+
+    try {
+      // ✅ استخدم الـ prefix لو عندك Router مربوط
+      const res = await fetch(`/offices/branches/${branchId}/floors`);
+
+      if (!res.ok) {
+        console.error('Error response:', res.status);
+        floorSelect.disabled = true;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Could not load floors for this branch.'
+        });
+
+        return;
+      }
+
+      const floors = await res.json();
+      console.log('Branch selected:', branchId);
+      console.log('Floors returned:', floors);
+
+      floorSelect.innerHTML = '<option value="">Select Floor</option>';
+
+      if (floors.length === 0) {
+        floorSelect.innerHTML = '<option>No Floors Available</option>';
+        floorSelect.disabled = true;
+
+        Swal.fire({
+          icon: 'info',
+          title: 'No Floors Found',
+          text: 'This branch has no floors with offices yet.'
+        });
+
+        return;
+      }
+
+      floors.forEach(floor => {
+        const opt = document.createElement('option');
+        opt.value = floor;
+        opt.textContent = floor;
+        floorSelect.appendChild(opt);
+      });
+
+      floorSelect.disabled = false;
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: `Loaded ${floors.length} floors`,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
+
+    } catch (err) {
+      console.error('Error fetching floors:', err);
+      floorSelect.innerHTML = '<option>Error loading floors</option>';
+      floorSelect.disabled = true;
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong while fetching floors.'
+      });
+    }
+  });
+
+  document.getElementById('loadBtn').addEventListener('click', async function() {
+    const branchId = document.getElementById('branchSelect').value;
+    const floor = document.getElementById('floorSelect').value;
+
+    if (!branchId || !floor) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Required',
+        text: 'Please select both branch and floor.'
+      });
+      return;
+    }
+
+    this.innerHTML = 'Loading...';
+
+    try {
+      const res = await fetch(`/offices/manage/list?branch_id=${branchId}&floor=${floor}`);
+      const data = await res.json();
+      renderOffices(data);
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: `${data.length} offices loaded`,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
+
+    } catch (err) {
+      console.error(err);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to load offices.'
+      });
+    }
+
+    this.innerHTML = '🔎 Show Offices';
+  });
+
+  function renderOffices(data) {
+    const container = document.getElementById('officesList');
+    container.innerHTML = '';
+
+    if (data.length === 0) {
+      container.innerHTML = '<p class="text-danger fw-semibold">❌ No offices found for this floor.</p>';
+
+      Swal.fire({
+        icon: 'info',
+        title: 'No Offices',
+        text: 'No offices found for this floor.'
+      });
+
+      return;
+    }
+
+    data.forEach(office => {
+      const col = document.createElement('div');
+      col.className = 'col-md-3 mb-4';
+
+      col.innerHTML = `
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title fw-bold text-primary">🏢 ${office.office_number}</h5>
+            <p class="card-text mb-2"><strong>Floor:</strong> ${office.floor}</p>
+            <a href="/offices/${office._id}/edit" class="btn btn-outline-primary w-100 fw-semibold">
+              ✏️ Edit Office
+            </a>
+          </div>
+        </div>
+      `;
+      container.appendChild(col);
+    });
+  }
+</script>
+
+
+<style>
+  body {
+    background: #f8f9fa;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  select.form-select {
+    min-height: 45px;
+  }
+  .card {
+    transition: transform 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+  }
+</style>
+<!-- SweetAlert2 CDN -->
+
+<%- include('./partials/footer') %>

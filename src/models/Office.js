@@ -24,7 +24,7 @@ const officeSchema = new mongoose.Schema(
 
     size_category: {
       type: String,
-      enum: ["100-120", "120-150", "150-200", "200-250"],
+      enum: ["100-120", "120-150", "150-200", "200-250", "300-400"],
       required: true,
     },
 

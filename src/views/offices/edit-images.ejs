@@ -109,7 +109,7 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Size Category</label>
         <select name="size_category" class="form-select" required>
-          <% ["100-120", "120-150", "150-200", "200-250"].forEach(size => { %>
+          <% ["100-120", "120-150", "150-200", "200-250", "300-400"].forEach(size => { %>
             <option value="<%= size %>" <%= office.size_category === size ? 'selected' : '' %>><%= size %> sqft</option>
           <% }) %>
         </select>

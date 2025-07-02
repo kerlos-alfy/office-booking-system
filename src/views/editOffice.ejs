@@ -109,7 +109,7 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Size Category</label>
         <select name="size_category" class="form-select" required>
-          <% ["100-120", "120-150", "150-200", "200-250"].forEach(size => { %>
+          <% ["100-120", "120-150", "150-200", "200-250", "300-400"].forEach(size => { %>
             <option value="<%= size %>" <%= office.size_category === size ? 'selected' : '' %>><%= size %> sqft</option>
           <% }) %>
         </select>
@@ -129,9 +129,16 @@
       </button>
     </div>
   </form>
+  <form action="/offices/<%= office._id %>?_method=DELETE" method="POST" onsubmit="return confirm('⚠️ هل أنت متأكد من حذف المكتب؟ لا يمكن التراجع عن هذا الإجراء!');">
+  <button type="submit" class="btn btn-danger px-4 py-2 fw-bold mt-3">
+    🗑️ حذف المكتب
+  </button>
+</form>
+
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 <script>
   const sortable = new Sortable(document.getElementById('gallery-container'), {
     animation: 200,

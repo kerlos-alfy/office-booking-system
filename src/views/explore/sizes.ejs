@@ -9,12 +9,14 @@
 
   <!-- كروت -->
   <div class="row justify-content-center g-4">
-    <% const sizes = [
-      { label: "100 - 120 sq.ft", value: "100-120", icon: "fa-user", description: "Best for 1 person", color: "#1f2f46" },
-      { label: "120 - 150 sq.ft", value: "120-150", icon: "fa-user-group", description: "Ideal for 2–3 people", color: "#4b6584" },
-      { label: "150 - 200 sq.ft", value: "150-200", icon: "fa-people-roof", description: "Comfortable for 3–4 team", color: "#487eb0" },
-      { label: "200 - 250 sq.ft", value: "200-250", icon: "fa-users-gear", description: "Spacious for a small team", color: "#b9975b" },
-    ]; %>
+   <% const sizes = [
+  { label: "100 - 120 sq.ft", value: "100-120", icon: "fa-user", description: "Best for 1 person", color: "#1f2f46" },
+  { label: "120 - 150 sq.ft", value: "120-150", icon: "fa-user-group", description: "Ideal for 2–3 people", color: "#4b6584" },
+  { label: "150 - 200 sq.ft", value: "150-200", icon: "fa-people-roof", description: "Comfortable for 3–4 team", color: "#487eb0" },
+  { label: "200 - 250 sq.ft", value: "200-250", icon: "fa-users-gear", description: "Spacious for a small team", color: "#b9975b" },
+  { label: "300 - 400 sq.ft", value: "300-400", icon: "fa-building", description: "Perfect for a growing team", color: "#2f3640" } // ✅ اضفته هنا
+]; %>
+
 
     <% sizes.forEach(size => { %>
       <div class="col-12 col-sm-6 col-md-4 col-lg-3">

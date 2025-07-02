@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>🏢 Branch Dashboard</h1>
+
+  <h3>👤 Welcome, <%= user.name %></h3>
+
+  <h4>📌 Branch Info:</h4>
+  <ul>
+    <li><strong>ID:</strong> <%= branch._id %></li>
+    <li><strong>Name:</strong> <%= branch.name %></li>
+    <li><strong>Location:</strong> <%= branch.location %></li>
+    <!-- ضيف أي تفاصيل تانية عندك في ال Branch -->
+  </ul>
+
+</div>
+
+<%- include('../partials/footer') %>

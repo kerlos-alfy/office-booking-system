@@ -2,12 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 require("dotenv").config();
-const session = require("express-session");
 const methodOverride = require("method-override");
 const morgan = require("morgan");
+const cookieParser = require('cookie-parser');
 
 // Initialize app
 const app = express();
+app.use(methodOverride('_method'));
+app.use(cookieParser());
 
 // MongoDB Connection
 mongoose
@@ -15,15 +17,10 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-// Session Setup
-app.use(
-  session({
-    secret: "yourSecretKeyHere",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 86400000 }, // 1 day
-  })
-);
+// ✅ مفيش داعي للـ Session خلاص مع JWT
+// شيل دا كله:
+// app.use(session(...));
+
 
 // Middleware
 app.use(express.json());
@@ -33,13 +30,35 @@ app.use(morgan("dev"));
 
 // Static Files
 app.use(express.static(path.join(__dirname, "public")));
-//app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
-
 app.use("/uploads", express.static(path.join(__dirname, "src", "public", "uploads")));
 
 // View Engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "src", "views"));
+
+
+// ✅ Middleware عام لحماية كل المسارات ماعدا المسموحة
+app.use((req, res, next) => {
+  if (
+    req.path.startsWith('/login') ||
+    req.path.startsWith('/logout') ||
+    req.path.startsWith('/client')
+  ) {
+    return next();
+  }
+
+  const token = req.cookies.token;
+
+  console.log('🍪 Global Middleware Cookies:', req.cookies);
+
+  if (!token) {
+    console.log('⛔️ No JWT token found - redirecting to /login');
+    return res.redirect('/login');
+  }
+
+  next();
+});
+
 
 // Import Routes
 const authRoutes = require("./src/routes/auth");
@@ -58,40 +77,35 @@ const inspectionRoutes = require("./src/routes/Inspections");
 const exploreRoutes = require("./src/routes/explore");
 const generalRoutes = require("./src/routes/general");
 const invoiceRoutes = require("./src/routes/invoice");
+const adminBranchRoutes = require('./src/routes/adminBranch');
 
 // Register Routes
-app.use(authRoutes); // مهم يكون في الأول
-//app.use('/admin', adminRoutes);
+app.use(authRoutes);
 app.get("/", (req, res) => {
   res.redirect("/client");
-
 });
+
 // Routes with prefixes
-//app.use("/admin", adminRoutes);
-//app.use("/admin/roles", adminRolesRouter);
-//app.use("/admin/permissions", adminPermissionsRouter);
-//app.use("/admin/logs", adminLogsRouter);
+app.use("/admin", adminRoutes);
+app.use("/admin", adminRolesRouter);
+app.use("/admin", adminPermissionsRouter);
 
-//app.use("/branches", branchesRoutes);
-//app.use("/offices", officesRoutes);
-//app.use("/clients", clientsRoutes);
-//app.use("/bookings", bookingsRoutes);
-//app.use("/payments", paymentsRoutes);
-//app.use("/reports", reportsRoutes);
-//app.use("/inspections", inspectionRoutes);
+app.use("/admin/logs", adminLogsRouter);
+
+app.use("/branches", branchesRoutes);
+app.use("/offices", officesRoutes);
+app.use("/clients", clientsRoutes);
+app.use("/bookings", bookingsRoutes);
+app.use("/payments", paymentsRoutes);
+app.use("/reports", reportsRoutes);
+app.use("/inspections", inspectionRoutes);
 app.use("/client", exploreRoutes);
-//app.use(generalRoutes);
-//app.use("/", invoiceRoutes);
-
-// Homepage Route
-// app.get("/", (req, res) => {
-//   res.render("index", { title: "Office Booking Dashboard" });
-// });
-
+app.use(generalRoutes);
+app.use("/", invoiceRoutes);
+app.use(adminBranchRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-  

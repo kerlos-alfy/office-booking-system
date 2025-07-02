@@ -6,9 +6,12 @@ const Booking = require("../models/Booking");
 
 // ✅ عرض كل الفروع
 router.get("/branches", async (req, res) => {
-	const branches = await Branch.find();
-	res.render("explore/branches", { branches });
+  const branches = await Branch.find().lean(); // 👈 هنا الحل
+  console.log(branches);
+  res.render("explore/branches", { branches });
 });
+
+
 
 // ✅ عرض التصنيفات داخل فرع معين
 router.get("/branches/:branchId/sizes", async (req, res) => {

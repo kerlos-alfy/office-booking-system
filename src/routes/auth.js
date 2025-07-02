@@ -1,32 +1,10 @@
-// const mongoose = require('mongoose');
-
-// const activityLogSchema = new mongoose.Schema({
-//   user: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: 'User',
-//     required: true
-//   },
-//   action: {
-//     type: String,
-//     required: true
-//   },
-//   ip: String,
-//   userAgent: String,
-//   createdAt: {
-//     type: Date,
-//     default: Date.now
-//   }
-// });
-
-// module.exports = mongoose.model('ActivityLog', activityLogSchema);
-
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Role = require('../models/Role');
-const Permission = require('../models/Permission');
-const logActivity = require('../utils/logActivity');
+const Permission = require('../models/Permission'); // ✅ لازم تستدعي Permission
 
 // صفحة تسجيل الدخول
 router.get('/login', (req, res) => {
@@ -37,46 +15,66 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email }).populate({
-      path: 'role',
-      populate: { path: 'permissions', model: 'Permission' }
-    });
+  console.log('👉 Start /login route');
+  console.log('📧 Email:', email);
 
-    if (!user) {
-      return res.render('auth/login', { error: '⚠️ Invalid credentials' });
-    }
+  const user = await User.findOne({ email }).populate({
+    path: 'role',
+    populate: { path: 'permissions' }
+  });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.render('auth/login', { error: '⚠️ Invalid credentials' });
-    }
-
-    // حفظ بيانات الجلسة
-    req.session.user = {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role.name,
-      permissions: user.role.permissions.map(p => p.key),
-    };
-
-    // سجل الدخول في Activity Logs
-    await logActivity(user._id, 'login', 'User logged in');
-
-    res.redirect('/admin/dashboard');
-  } catch (err) {
-    console.error(err);
-    res.render('auth/login', { error: '❌ Something went wrong' });
+  if (!user) {
+    console.log('❌ User not found');
+    return res.render('auth/login', { error: 'Invalid credentials' });
   }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    console.log('❌ Password mismatch');
+    return res.render('auth/login', { error: 'Invalid credentials' });
+  }
+
+  console.log('✅ User authenticated');
+
+  // ✅ هنا الشرط المهم عشان السوبر أدمن ياخد كل الصلاحيات
+  const payload = {
+    id: user._id,
+    name: user.name,
+    role: user.role.name,
+    permissions: []
+  };
+
+  if (user.role.name === 'super_admin') {
+    // هات كل الصلاحيات من الـ DB
+    const allPermissions = await Permission.find();
+    payload.permissions = allPermissions.map(p => p.key);
+  } else {
+    payload.permissions = user.role.permissions.map(p => p.key);
+  }
+
+  if (user.branch) {
+    payload.branch = user.branch; // لو عندك فرع مربوط
+  }
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: '1d'
+  });
+
+  console.log('🟢 JWT Generated:', token);
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false // Local
+  });
+
+  console.log('🍪 JWT Cookie Set!');
+
+  res.redirect('/admin/dashboard');
 });
 
 // تسجيل الخروج
-router.get('/logout', async (req, res) => {
-  if (req.session.user) {
-    await logActivity(req.session.user._id, 'logout', 'User logged out');
-  }
-  req.session.destroy();
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
   res.redirect('/login');
 });
 

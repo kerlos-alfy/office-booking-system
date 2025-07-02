@@ -1,31 +1,61 @@
 <%- include('../../partials/header') %>
 
-<div class="container mt-5">
-  <h2 class="mb-4 text-warning fw-bold">✏️ Edit Admin</h2>
+<div class="container py-5">
+  <h2 class="mb-4 text-primary">✏️ تعديل بيانات المستخدم</h2>
 
-  <form method="POST" action="/admin/users/<%= user._id %>?_method=PUT">
+  <!-- رسالة خطأ لو في -->
+  <% if (typeof error !== 'undefined') { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <form action="/admin/users/<%= user._id %>?_method=PUT" method="POST" class="shadow p-4 bg-white rounded">
 
     <div class="mb-3">
-      <label for="name" class="form-label">👤 Name</label>
-      <input type="text" name="name" id="name" class="form-control" required value="<%= user.name %>">
+      <label class="form-label">الاسم الكامل</label>
+      <input type="text" name="name" class="form-control" required value="<%= user.name %>">
     </div>
 
     <div class="mb-3">
-      <label for="email" class="form-label">📧 Email</label>
-      <input type="email" name="email" id="email" class="form-control" required value="<%= user.email %>">
+      <label class="form-label">البريد الإلكتروني</label>
+      <input type="email" name="email" class="form-control" required value="<%= user.email %>">
     </div>
 
     <div class="mb-3">
-      <label for="role" class="form-label">🛡️ Role</label>
-      <select name="role" id="role" class="form-select" required>
+      <label class="form-label">كلمة المرور الجديدة (اختياري)</label>
+      <input type="password" name="password" class="form-control" placeholder="اتركه فارغ لو مش هتغير الباسورد">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">الدور</label>
+      <select name="role" class="form-select" required>
+        <option value="">-- اختر الدور --</option>
         <% roles.forEach(role => { %>
-          <option value="<%= role._id %>" <%= user.role.equals(role._id) ? 'selected' : '' %>><%= role.name %></option>
+          <option value="<%= role._id %>" <%= user.role?.toString() === role._id.toString() ? 'selected' : '' %>>
+            <%= role.name %>
+          </option>
         <% }) %>
       </select>
     </div>
 
-    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-    <a href="/admin/users" class="btn btn-secondary">↩️ Back</a>
+    <!-- ✅✅✅ جزء اختيار الفرع -->
+    <div class="mb-3">
+      <label class="form-label">الفرع</label>
+      <select name="branch" class="form-select">
+        <option value="">-- بدون فرع --</option>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>" 
+            <%= user.branch?.toString() === branch._id.toString() ? 'selected' : '' %>>
+            <%= branch.name %> | <%= branch.name_ar %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="text-end">
+      <a href="/admin/users" class="btn btn-outline-secondary">رجوع</a>
+      <button type="submit" class="btn btn-primary">💾 حفظ التعديلات</button>
+    </div>
+
   </form>
 </div>
 

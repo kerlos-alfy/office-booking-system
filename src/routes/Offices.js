@@ -187,4 +187,45 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
   }
 });
 
+// routes/offices.js
+// عرض صفحة Manage Offices
+router.get('/manage', async (req, res) => {
+  const branches = await Branch.find();
+  res.render('manageOffices', { branches });
+});
+
+// جلب المكاتب بناءً على الفرع والدور
+router.get('/manage/list', async (req, res) => {
+  const { branch_id, floor } = req.query;
+  let query = {};
+  if (branch_id) query.branch_id = branch_id;
+  if (floor) query.floor = floor;
+
+  const offices = await Office.find(query).populate('branch_id');
+  res.json(offices);
+});
+
+// ✅ جلب الأدوار المتاحة في الفرع
+router.get('/branches/:id/floors', async (req, res) => {
+  const branchId = req.params.id;
+
+  const offices = await Office.find({ branch_id: branchId });
+
+  const floors = [...new Set(offices.map(o => o.floor))].sort((a, b) => a - b);
+
+  res.json(floors);
+});
+router.delete('/:id', async (req, res) => {
+  try {
+    await Office.findByIdAndDelete(req.params.id);
+    req.session.success = 'Office deleted successfully!';
+    res.redirect('/offices');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error deleting office');
+  }
+});
+
+
+
 module.exports = router;
