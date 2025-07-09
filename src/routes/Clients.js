@@ -6,14 +6,36 @@ const nationalities = require("../utils/nationalities");
 const puppeteer = require("puppeteer");
 const path = require("path");
 // View all clients
+// router.get("/", async (req, res) => {
+// 	try {
+// 		const clients = await Client.find();
+// 		res.render("clients", { clients });
+// 	} catch (err) {
+// 		res.status(500).send("Error loading clients");
+// 	}
+// });
+
 router.get("/", async (req, res) => {
-	try {
-		const clients = await Client.find();
-		res.render("clients", { clients });
-	} catch (err) {
-		res.status(500).send("Error loading clients");
-	}
+  try {
+    const limit = 10;
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
+
+    const totalClients = await Client.countDocuments();
+    const totalPages = Math.ceil(totalClients / limit);
+
+    const clients = await Client.find().skip(skip).limit(limit);
+
+    res.render("clients", {
+      clients,
+      currentPage: page,
+      totalPages
+    });
+  } catch (err) {
+    res.status(500).send("Error loading clients");
+  }
 });
+
 
 // New Client Form
 router.get("/new", (req, res) => {

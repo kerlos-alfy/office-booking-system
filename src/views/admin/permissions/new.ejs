@@ -1,17 +1,63 @@
 <%- include('../../partials/header') %>
 
-<h1 class="text-primary">➕ Create New Permission</h1>
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-<form method="POST" action="/admin/permissions">
-  <div class="mb-3">
-    <label for="key">Permission Key (English)</label>
-    <input type="text" id="key" name="key" class="form-control" required>
+<style>
+  body {
+    background-color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .card {
+    border: none;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .form-label {
+    font-weight: 600;
+  }
+
+  .form-control {
+    border-radius: 0.75rem;
+  }
+
+  .btn-primary {
+    border-radius: 50px;
+    background: #6366f1 !important;
+    border: none;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover {
+    background: #4f46e5 !important;
+  }
+</style>
+
+<div class="container py-5">
+  <div class="card p-4 shadow-sm">
+    <h2 class="text-primary mb-4 fw-bold">➕ Create New Permission</h2>
+
+    <form method="POST" action="/admin/permissions">
+      <div class="mb-4">
+        <label for="key" class="form-label">Permission Key</label>
+        <input type="text" id="key" name="key" class="form-control" placeholder="e.g., add_user" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="name" class="form-label">Permission Name</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="e.g., Add User" required>
+      </div>
+
+      <button class="btn btn-primary btn-lg px-4">💾 Save Permission</button>
+    </form>
   </div>
-  <div class="mb-3">
-    <label for="name">Permission Name (Arabic)</label>
-    <input type="text" id="name" name="name" class="form-control" required>
-  </div>
-  <button class="btn btn-primary">💾 Save</button>
-</form>
+</div>
 
 <%- include('../../partials/footer') %>

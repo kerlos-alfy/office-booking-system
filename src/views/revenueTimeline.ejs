@@ -1,102 +1,144 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📈 Revenue Timeline</h1>
+<h1 class="mb-4 text-primary">💰 Monthly Collection & Bookings</h1>
 
-<!-- Form لاختيار الفترة -->
 <form method="GET" action="/reports/timeline" class="mb-4">
-    <div class="row g-3 align-items-center mb-2">
-        <div class="col-auto">
-            <label class="col-form-label">Select Range:</label>
-        </div>
-        <div class="col-auto">
-            <select name="range" class="form-select" id="rangeSelector" onchange="toggleCustomRange()">
-                <option value="3months" <%= range === '3months' ? 'selected' : '' %>>Last 3 Months</option>
-                <option value="6months" <%= range === '6months' ? 'selected' : '' %>>Last 6 Months</option>
-                <option value="12months" <%= range === '12months' ? 'selected' : '' %>>Last 12 Months</option>
-                <option value="custom" <%= range === 'custom' ? 'selected' : '' %>>Custom Range</option>
-            </select>
-        </div>
+  <div class="row g-3 align-items-center mb-2">
+    <div class="col-auto">
+      <label class="col-form-label fw-bold">Select Range:</label>
     </div>
+    <div class="col-auto">
+      <select name="range" class="form-select" id="rangeSelector" onchange="toggleCustomRange()">
+        <option value="3months" <%= range === '3months' ? 'selected' : '' %>>Last 3 Months</option>
+        <option value="6months" <%= range === '6months' ? 'selected' : '' %>>Last 6 Months</option>
+        <option value="9months" <%= range === '9months' ? 'selected' : '' %>>Last 9 Months</option>
+        <option value="12months" <%= range === '12months' ? 'selected' : '' %>>Last 12 Months</option>
+        <option value="custom" <%= range === 'custom' ? 'selected' : '' %>>Custom Range</option>
+      </select>
+    </div>
+  </div>
 
-    <!-- Custom Range -->
-    <div class="row g-3 align-items-center mb-3" id="customRangeSection" style="<%= range === 'custom' ? '' : 'display:none;' %>">
-        <div class="col-auto">
-            <label class="col-form-label">From:</label>
-        </div>
-        <div class="col-auto">
-            <input type="month" name="startMonth" class="form-control" value="<%= startMonth %>">
-        </div>
-        <div class="col-auto">
-            <label class="col-form-label">To:</label>
-        </div>
-        <div class="col-auto">
-            <input type="month" name="endMonth" class="form-control" value="<%= endMonth %>">
-        </div>
+  <div class="row g-3 align-items-center mb-3" id="customRangeSection" style="<%= range === 'custom' ? '' : 'display:none;' %>">
+    <div class="col-auto">
+      <label class="col-form-label">From:</label>
     </div>
+    <div class="col-auto">
+      <input type="month" name="startMonth" class="form-control" value="<%= startMonth %>">
+    </div>
+    <div class="col-auto">
+      <label class="col-form-label">To:</label>
+    </div>
+    <div class="col-auto">
+      <input type="month" name="endMonth" class="form-control" value="<%= endMonth %>">
+    </div>
+  </div>
 
-    <div class="row">
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Generate Timeline</button>
-        </div>
+  <div class="row">
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">🔍 Show Report</button>
     </div>
+  </div>
 </form>
 
 <script>
-    function toggleCustomRange() {
-        const rangeSelector = document.getElementById('rangeSelector');
-        const customRangeSection = document.getElementById('customRangeSection');
-        if (rangeSelector.value === 'custom') {
-            customRangeSection.style.display = '';
-        } else {
-            customRangeSection.style.display = 'none';
-        }
-    }
+  function toggleCustomRange() {
+    const rangeSelector = document.getElementById('rangeSelector');
+    const customRangeSection = document.getElementById('customRangeSection');
+    customRangeSection.style.display = rangeSelector.value === 'custom' ? '' : 'none';
+  }
 </script>
 
-<!-- Timeline Chart -->
-<div class="card shadow mb-5">
-    <div class="card-header bg-primary text-white fw-bold text-center">
-        Revenue Timeline Chart
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card shadow text-center p-3">
+      <h5>Total Collected</h5>
+      <h2 class="text-success">$<%= dataPoints.reduce((s, p) => s + p.paid, 0).toLocaleString() %></h2>
     </div>
-    <div class="card-body">
-        <canvas id="timelineChart" height="100"></canvas>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow text-center p-3">
+      <h5>Total Bookings</h5>
+      <h2 class="text-warning"><%= dataPoints.reduce((s, p) => s + p.bookingsCount, 0) %></h2>
     </div>
+  </div>
+</div>
+
+<div class="card shadow mb-4">
+  <div class="card-header bg-primary text-white fw-bold">📊 Monthly Collection vs Bookings</div>
+  <div class="card-body">
+    <% if (dataPoints.length > 0) { %>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Collected</th>
+            <th>Bookings Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dataPoints.forEach(p => { %>
+            <tr>
+              <td><%= p.label %></td>
+              <td>$<%= p.paid.toLocaleString() %></td>
+              <td><%= p.bookingsCount %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="text-center text-muted">No data for this period.</p>
+    <% } %>
+  </div>
+</div>
+
+<div class="card shadow mb-4">
+  <div class="card-header bg-primary text-white fw-bold text-center">📈 Collected vs Bookings Count</div>
+  <div class="card-body">
+    <% if (dataPoints.length > 0) { %>
+      <canvas id="comparisonChart" height="120"></canvas>
+    <% } else { %>
+      <p class="text-center text-muted">No chart data.</p>
+    <% } %>
+  </div>
 </div>
 
 <script>
-    const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-    const timelineChart = new Chart(timelineCtx, {
-        type: 'line',
-        data: {
-            labels: <%- JSON.stringify(dataPoints.map(p => p.label)) %>,
-            datasets: [
-                {
-                    label: 'Expected Revenue',
-                    data: <%- JSON.stringify(dataPoints.map(p => p.expected)) %>,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                    tension: 0.3
-                },
-                {
-                    label: 'Paid',
-                    data: <%- JSON.stringify(dataPoints.map(p => p.paid)) %>,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: true,
-                    tension: 0.3
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+  <% if (dataPoints.length > 0) { %>
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    const labels = <%- JSON.stringify(dataPoints.map(p => p.label)) %>;
+    const paid = <%- JSON.stringify(dataPoints.map(p => p.paid)) %>;
+    const bookings = <%- JSON.stringify(dataPoints.map(p => p.bookingsCount)) %>;
+
+    new Chart(ctx, {
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Collected',
+            data: paid,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            yAxisID: 'y',
+          },
+          {
+            type: 'line',
+            label: 'Bookings',
+            data: bookings,
+            borderColor: '#f39c12',
+            fill: false,
+            yAxisID: 'y2'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Collected ($)' } },
+          y2: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Bookings Count' } }
         }
+      }
     });
+  <% } %>
 </script>
 
 <%- include('partials/footer') %>

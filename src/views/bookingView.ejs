@@ -24,19 +24,24 @@
         <p><strong>📅 From:</strong> <%= new Date(booking.start_date).toLocaleDateString() %></p>
         <p><strong>📅 To:</strong> <%= new Date(booking.end_date).toLocaleDateString() %></p>
         <p><strong>📄 Page No:</strong> <%= booking.page_no %></p>
-        <p><strong>📌 Status:</strong> <span class="badge <%= booking.status === 'archived' ? 'bg-secondary' : 'bg-success' %>"><%= booking.status === 'archived' ? 'Archived' : 'Active' %></span></p>
-        <p><strong>🧾 Ejari No:</strong> <%= booking.ejari_no %></p>
+        <p><strong>📌 Status:</strong> 
+          <span class="badge <%= booking.status === 'archived' ? 'bg-secondary' : 'bg-success' %>">
+            <%= booking.status === 'archived' ? 'Archived' : 'Active' %>
+          </span>
+        </p>
+        <p><strong>🧾 Ejari Unit No:</strong> <%= booking.ejari_no %></p>
       </div>
     </div>
   </div>
 
-  <!-- 💵 Financial Details -->
+  <!-- 💵 Financial Details + Total Price -->
   <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-light fw-bold text-primary">💵 Financial Details</div>
     <div class="card-body row">
       <div class="col-md-6">
+        <p><strong>💰 Down Payment:</strong> <%= booking.initial_payment?.toFixed(2) %> AED</p>
         <p><strong>🏷️ Rent Amount:</strong> <%= booking.rent_amount?.toFixed(2) %> AED</p>
-        <p><strong>📝 Registration Fee (Ejari):</strong> <%= booking.registration_fee?.toFixed(2) %> AED</p>
+        <p><strong>📝 Registration Fee:</strong> <%= booking.registration_fee?.toFixed(2) %> AED</p>
         <p><strong>💼 Admin Fee:</strong> <%= booking.admin_fee?.toFixed(2) %> AED</p>
       </div>
       <div class="col-md-6">
@@ -44,18 +49,145 @@
         <p><strong>🔐 Security Deposit:</strong> <%= booking.sec_deposit?.toFixed(2) %> AED</p>
         <p><strong>🧾 VAT:</strong> <%= booking.vat?.toFixed(2) %> AED</p>
         <hr>
-        <p><strong>💰 Total Price:</strong> <span class="fw-bold text-success"><%= booking.total_price?.toFixed(2) %> AED</span></p>
+        <% 
+          const totalWithoutDP = 
+            (booking.rent_amount || 0) + 
+            (booking.registration_fee || 0) + 
+            (booking.admin_fee || 0) + 
+            (booking.commission || 0) + 
+            (booking.sec_deposit || 0) + 
+            (booking.vat || 0);
+
+          const formattedTotal = totalWithoutDP.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        %>
+        <p><strong>💰 Total Price:</strong> 
+          <span class="fw-bold text-success"><%= formattedTotal %> AED</span>
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- Buttons -->
+  <!-- 🔗 Buttons -->
   <div class="d-flex flex-wrap gap-2 mb-5">
     <a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success">📄 Contract</a>
-    <a href="/bookings/<%= booking._id %>/tax-invoice" class="btn btn-dark" target="_blank">🧾 Tax Invoice</a>
+   <!-- <a href="/bookings/<%= booking._id %>/tax-invoice" class="btn btn-dark" target="_blank">🧾 Tax Invoicea/a> -->
+   <a href="/bookings/<%= booking._id %>/tax-invoice/edit" class="btn btn-primary">✏️ Generate / Edit Tax Invoice</a>
+
   </div>
 
-  <!-- Inspections -->
+  <!-- ✅ Cheques Installments -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-light">
+      <h5 class="mb-0 text-primary">💳 Cheque Installments</h5>
+    </div>
+    <div class="card-body px-4">
+      <% if (booking.cheques && booking.cheques.length > 0) { %>
+        <% const now = new Date(); %>
+        <div class="table-responsive">
+          <table class="table table-bordered text-center align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Due Date</th>
+                <th>Amount (AED)</th>
+                <th>Status</th>
+                <th>Payments</th>
+                <th>Add Payment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% booking.cheques.forEach((cheque, index) => {
+                const due = new Date(cheque.due_date);
+                let rowClass = "";
+                if (cheque.collected) {
+                  rowClass = "table-success";
+                } else if (due < now) {
+                  rowClass = "table-danger";
+                } else if (due.getMonth() === now.getMonth() && due.getFullYear() === now.getFullYear()) {
+                  rowClass = "table-warning";
+                }
+                const totalPaid = (cheque.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
+                const remaining = cheque.amount - totalPaid;
+              %>
+              <tr class="<%= rowClass %>">
+                <td><%= index + 1 %></td>
+                <td><%= due.toLocaleDateString() %></td>
+                <td><%= cheque.amount.toFixed(2) %></td>
+                <td>
+                  <% if (totalPaid >= cheque.amount) { %>
+                    ✅ Fully Collected
+                  <% } else if (totalPaid > 0) { %>
+                    ⚠️ Partial (<%= totalPaid.toFixed(2) %>)
+                  <% } else { %>
+                    ⏳ Pending
+                  <% } %>
+                </td>
+                <td>
+                  <% if (cheque.payments && cheque.payments.length > 0) { %>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-bordered mb-2">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Paid Amount</th>
+                            <th>Date</th>
+                            <th>Note</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% cheque.payments.forEach((p, i) => { %>
+                            <tr>
+                              <td><%= i + 1 %></td>
+                              <td><%= p.paid_amount.toFixed(2) %></td>
+                              <td><%= new Date(p.paid_date).toLocaleDateString() %></td>
+                              <td><%= p.note || '-' %></td>
+                            </tr>
+                          <% }) %>
+                        </tbody>
+                      </table>
+                    </div>
+                  <% } else { %>
+                    <small class="text-muted">No payments yet.</small>
+                  <% } %>
+                  <div>
+                    <small class="text-success">Total Paid: <%= totalPaid.toFixed(2) %> AED</small><br>
+                    <small class="text-danger">Remaining: <%= remaining.toFixed(2) %> AED</small>
+                  </div>
+                </td>
+                <td>
+                  <% if (totalPaid < cheque.amount) { %>
+                    <form action="/bookings/<%= booking._id %>/cheques/<%= index %>/add-payment" method="POST" class="row g-1">
+                      <div class="col-md-4">
+                        <input type="number" name="paid_amount" step="0.01" placeholder="Amount" class="form-control form-control-sm" required>
+                      </div>
+                      <div class="col-md-4">
+                        <input type="date" name="paid_date" class="form-control form-control-sm" required>
+                      </div>
+                      <div class="col-md-4">
+                        <input type="text" name="note" placeholder="Note" class="form-control form-control-sm">
+                      </div>
+                      <div class="col-12 text-end mt-1">
+                        <button class="btn btn-success btn-sm w-100">➕ Add Payment</button>
+                      </div>
+                    </form>
+                  <% } else { %>
+                    ✅ Fully Paid
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <p class="text-muted">No cheques scheduled for this booking.</p>
+      <% } %>
+    </div>
+  </div>
+    <!-- Inspections -->
   <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
       <h5 class="mb-0 text-primary">🛡️ Inspections</h5>
@@ -144,75 +276,33 @@
       <% } %>
     </div>
   </div>
-
-  <!-- Cheques -->
-  <div class="card shadow-sm mb-5">
-    <div class="card-header bg-light">
-      <h5 class="mb-0 text-primary">💳 Cheque Installments</h5>
-    </div>
-    <div class="card-body px-4">
-      <% if (booking.cheques && booking.cheques.length > 0) { %>
-        <% const now = new Date(); %>
-        <div class="table-responsive">
-          <table class="table table-bordered text-center align-middle">
-            <thead class="table-dark">
-              <tr>
-                <th>#</th>
-                <th>Due Date</th>
-                <th>Amount (AED)</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% booking.cheques.forEach((cheque, index) => {
-                const due = new Date(cheque.due_date);
-                let rowClass = "";
-                if (cheque.collected) {
-                  rowClass = "table-success";
-                } else if (due < now) {
-                  rowClass = "table-danger";
-                } else if (due.getMonth() === now.getMonth() && due.getFullYear() === now.getFullYear()) {
-                  rowClass = "table-warning";
-                }
-              %>
-              <tr class="<%= rowClass %>">
-                <td><%= index + 1 %></td>
-                <td><%= due.toLocaleDateString() %></td>
-                <td><%= cheque.amount.toFixed(2) %></td>
-                <td>
-                  <% if (cheque.collected) { %>
-                    ✅ Collected<br>
-                    <small class="text-muted"><%= cheque.collected_at ? new Date(cheque.collected_at).toLocaleDateString() : '' %></small>
-                    <% if (cheque.note) { %><br><span class="text-info fst-italic"><%= cheque.note %></span><% } %>
-                  <% } else if (due < now) { %>
-                    ⚠️ Overdue
-                  <% } else if (due.getMonth() === now.getMonth() && due.getFullYear() === now.getFullYear()) { %>
-                    ⏳ This Month
-                  <% } else { %>
-                    🗓️ Upcoming
-                  <% } %>
-                </td>
-                <td>
-                  <% if (!cheque.collected) { %>
-                    <form action="/bookings/<%= booking._id %>/cheques/<%= index %>/mark-collected" method="POST" class="d-flex gap-1 flex-wrap">
-                      <input type="text" name="note" class="form-control form-control-sm" placeholder="Add note...">
-                      <button class="btn btn-success btn-sm">✔ Mark as Collected</button>
-                    </form>
-                  <% } else { %>
-                    —
-                  <% } %>
-                </td>
-              </tr>
-              <% }); %>
-            </tbody>
-          </table>
-        </div>
-      <% } else { %>
-        <p class="text-muted">No cheques scheduled for this booking.</p>
-      <% } %>
-    </div>
+<!-- 🗑️ Cancel Booking -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-light">
+    <h5 class="mb-0 text-primary">🗑️ Cancel Booking</h5>
   </div>
+  <div class="card-body">
+    <% if (booking.status !== 'archived') { %>
+      <form action="/bookings/<%= booking._id %>/archive" method="POST" class="row g-2" onsubmit="return confirm('Are you sure you want to archive this booking?');">
+        
+        <!-- 📌 Cancel Reason Input -->
+        <div class="col-md-8">
+          <label for="cancel_reason" class="form-label">Reason for Cancellation</label>
+          <input type="text" id="cancel_reason" name="cancel_reason" class="form-control" placeholder="Write reason..." required>
+        </div>
+
+        <!-- 📦 Archive Button -->
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-danger w-100">🗑️ Archive Booking</button>
+        </div>
+
+      </form>
+    <% } else { %>
+      <span class="badge bg-secondary">This booking is archived ✅</span>
+    <% } %>
+  </div>
+</div>
+
 </div>
 
 <%- include('partials/footer') %>

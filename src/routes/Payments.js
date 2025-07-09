@@ -1,81 +1,148 @@
 const express = require("express");
 const router = express.Router();
 const Booking = require("../models/Booking");
-const Office = require("../models/Office");
-const Client = require("../models/Client");
+const mongoose = require("mongoose");
 
-// ✅ صفحة عامة تعرض اخر 20 دفعة
+// ✅ صفحة شيكات الشهر + المتأخر من الشهور السابقة مع Totals كاملة
 router.get("/", async (req, res) => {
-	try {
-		const latestPayments = await Booking.aggregate([
-			{ $unwind: "$payments" },
-			{ $sort: { "payments.payment_date": -1 } },
-			{ $limit: 20 },
-			{
-				$lookup: {
-					from: "clients",
-					localField: "client_id",
-					foreignField: "_id",
-					as: "client",
-				},
-			},
-			{
-				$lookup: {
-					from: "offices",
-					localField: "office_id",
-					foreignField: "_id",
-					as: "office",
-				},
-			},
-		]);
+  try {
+    const now = new Date();
+    const selectedMonth = req.query.month ? parseInt(req.query.month) : now.getMonth();
+    const selectedYear = req.query.year ? parseInt(req.query.year) : now.getFullYear();
 
-		res.render("latestPayments", { latestPayments });
-	} catch (err) {
-		res.status(500).send("Error loading latest payments");
-	}
-});
+    const monthNames = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December"
+    ];
+    const currentMonthName = `${monthNames[selectedMonth]} ${selectedYear}`;
 
-// ✅ صفحة عرض دفعات Booking معين
-router.get("/booking/:bookingId", async (req, res) => {
-	try {
-		const bookingId = req.params.bookingId;
+    const startOfMonth = new Date(selectedYear, selectedMonth, 1);
+    const endOfMonth = new Date(selectedYear, selectedMonth + 1, 1);
 
-		const booking = await Booking.findById(bookingId).populate("office_id").populate("client_id");
+    console.log("🟢 Selected:", selectedMonth, selectedYear);
+    console.log("🟢 Range:", startOfMonth.toISOString(), "-", endOfMonth.toISOString());
 
-		if (!booking) {
-			return res.status(404).send("Booking not found");
-		}
+    // ✅ شيكات الشهر الحالي
+    const cheques = await Booking.aggregate([
+      { $unwind: "$cheques" },
+      {
+        $match: {
+          "cheques.due_date": { $gte: startOfMonth, $lt: endOfMonth }
+        }
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client_id",
+          foreignField: "_id",
+          as: "client",
+        },
+      },
+      {
+        $lookup: {
+          from: "offices",
+          localField: "office_id",
+          foreignField: "_id",
+          as: "office",
+        },
+      },
+      {
+        $sort: { "cheques.due_date": 1 }
+      }
+    ]);
 
-		res.render("bookingPayments", { booking });
-	} catch (err) {
-		res.status(500).send("Error loading booking payments");
-	}
-});
+    // ✅ الشيكات المتأخرة (قبل بداية الشهر الحالي ولم تتحصل بالكامل)
+    const overdueCheques = await Booking.aggregate([
+      { $unwind: "$cheques" },
+      {
+        $match: {
+          "cheques.due_date": { $lt: startOfMonth },
+          "cheques.collected": false
+        }
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client_id",
+          foreignField: "_id",
+          as: "client",
+        },
+      },
+      {
+        $lookup: {
+          from: "offices",
+          localField: "office_id",
+          foreignField: "_id",
+          as: "office",
+        },
+      },
+      {
+        $sort: { "cheques.due_date": 1 }
+      }
+    ]);
 
-// ✅ اضافة دفعة جديدة
-router.post("/booking/:bookingId/payments", async (req, res) => {
-	try {
-		const bookingId = req.params.bookingId;
-		const { amount, payment_type } = req.body;
+    // ✅ احسب الإجماليات مع الشرط الصح للجزئي
+    let totalChequesAmount = 0;
+    let collectedAmount = 0;
 
-		const booking = await Booking.findById(bookingId);
+    cheques.forEach((c) => {
+      const amount = c.cheques?.amount || 0;
+      totalChequesAmount += amount;
 
-		if (!booking) {
-			return res.status(404).send("Booking not found");
-		}
+      const paidAmount = (c.cheques.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
 
-		booking.payments.push({
-			amount,
-			payment_date: new Date(),
-			payment_type,
-		});
+      // ✅ لو فيه أي مبلغ مدفوع يتحسب حتى لو الشيك Pending
+      if (paidAmount > 0) {
+        collectedAmount += paidAmount;
+      }
+    });
 
-		await booking.save();
+    const remainingAmount = totalChequesAmount - collectedAmount;
 
-		res.redirect(`/payments/booking/${bookingId}`);
-	} catch (err) {
-		res.status(500).send("Error adding payment");
-	}
+    // ✅ المتأخرات بنفس المبدأ
+    let totalOverdueAmount = 0;
+    let overdueCollectedAmount = 0;
+
+    overdueCheques.forEach((c) => {
+      const amount = c.cheques?.amount || 0;
+      totalOverdueAmount += amount;
+
+      const paidAmount = (c.cheques.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
+
+      if (paidAmount > 0) {
+        overdueCollectedAmount += paidAmount;
+      }
+    });
+
+    const overdueRemainingAmount = totalOverdueAmount - overdueCollectedAmount;
+
+    console.log("✅ Total cheques:", cheques.length);
+    console.log("💰 Total amount:", totalChequesAmount);
+    console.log("✅ Collected amount:", collectedAmount);
+    console.log("⏳ Remaining amount:", remainingAmount);
+    console.log("⚠️ Overdue cheques:", overdueCheques.length);
+    console.log("💰 Total overdue amount:", totalOverdueAmount);
+    console.log("✅ Overdue Collected:", overdueCollectedAmount);
+    console.log("⏳ Overdue Remaining:", overdueRemainingAmount);
+
+    res.render("latestPayments", {
+      cheques,
+      overdueCheques,
+      currentMonthName,
+      selectedMonth,
+      selectedYear,
+      totalChequesAmount,
+      collectedAmount,
+      remainingAmount,
+      totalOverdueAmount,
+      overdueCollectedAmount,
+      overdueRemainingAmount
+    });
+
+  } catch (err) {
+    console.error("❌ Error loading cheques:", err);
+    res.status(500).send("Error loading cheques");
+  }
 });
 
 module.exports = router;

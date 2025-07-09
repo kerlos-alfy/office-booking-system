@@ -1,53 +1,112 @@
 <%- include('../../partials/header') %>
 
+<style>
+  body {
+    background-color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .role-card {
+    border: none;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+
+  .role-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+  }
+
+  .badge {
+    border-radius: 50px;
+    font-size: 0.8rem;
+    padding: 0.4em 0.75em;
+  }
+
+  .btn {
+    border-radius: 50px;
+    font-weight: 500;
+  }
+
+  .btn-warning {
+    background: #facc15 !important;
+    color: #000;
+    border: none;
+  }
+
+  .btn-warning:hover {
+    background: #fbbf24 !important;
+  }
+
+  .btn-danger {
+    background: #ef4444 !important;
+    border: none;
+  }
+
+  .btn-danger:hover {
+    background: #dc2626 !important;
+  }
+
+  .btn-primary {
+    background: #6366f1 !important;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: #4f46e5 !important;
+  }
+
+  .no-roles {
+    background: #fffbea;
+    border-left: 5px solid #facc15;
+    border-radius: 0.75rem;
+  }
+</style>
+
 <div class="container py-5">
-	<h2 class="mb-4 text-primary fw-bold">🎭 إدارة الأدوار والصلاحيات</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary fw-bold mb-0">🎭 Roles & Permissions Management</h2>
+    <a href="/admin/roles/new" class="btn btn-primary btn-lg">
+      ➕ Add New Role
+    </a>
+  </div>
 
-	<% if (roles.length === 0) { %>
-		<div class="alert alert-info">لا يوجد أدوار حاليًا.</div>
-	<% } else { %>
-		<div class="table-responsive">
-			<table class="table table-bordered table-hover shadow-sm align-middle">
-				<thead class="table-light text-center">
-					<tr>
-						<th>#</th>
-						<th>🧾 اسم الدور</th>
-						<th>🔐 الصلاحيات</th>
-						<th>⚙️ التحكم</th>
-					</tr>
-				</thead>
-				<tbody>
-					<% roles.forEach((role, index) => { %>
-						<tr>
-							<td class="text-center"><%= index + 1 %></td>
-							<td><span class="badge bg-dark px-3 py-2 fs-6"><%= role.name %></span></td>
-							<td>
-								<% if (role.permissions && role.permissions.length > 0) { %>
-									<div class="d-flex flex-wrap gap-1">
-										<% role.permissions.forEach(p => { %>
-											<span class="badge bg-success text-white"><%= p.key %></span>
-										<% }) %>
-									</div>
-								<% } else { %>
-									<span class="text-muted">لا يوجد صلاحيات</span>
-								<% } %>
-							</td>
-							<td class="text-center">
-								<a href="/admin/roles/<%= role._id %>/edit" class="btn btn-sm btn-warning me-1">✏️ تعديل</a>
-								<form action="/admin/roles/<%= role._id %>?_method=DELETE" method="POST" class="d-inline">
-									<button class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من الحذف؟')">🗑️ حذف</button>
-								</form>
-							</td>
-						</tr>
-					<% }) %>
-				</tbody>
-			</table>
-		</div>
-	<% } %>
-
-	<div class="text-end mt-4">
-		<a href="/admin/roles/new" class="btn btn-primary btn-lg">➕ إضافة دور جديد</a>
-	</div>
+  <% if (roles.length === 0) { %>
+    <div class="alert no-roles shadow-sm p-4">🚫 No roles available yet.</div>
+  <% } else { %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <% roles.forEach((role) => { %>
+        <div class="col">
+          <div class="card role-card h-100">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3">
+                🧾 <span class="badge bg-dark px-3 py-2"><%= role.name %></span>
+              </h5>
+              <div class="mb-3">
+                <% if (role.permissions && role.permissions.length > 0) { %>
+                  <div class="d-flex flex-wrap gap-1">
+                    <% role.permissions.forEach(p => { %>
+                      <span class="badge bg-success text-white"><%= p.key %></span>
+                    <% }) %>
+                  </div>
+                <% } else { %>
+                  <span class="text-muted">🚫 No permissions assigned</span>
+                <% } %>
+              </div>
+              <div class="mt-2">
+                <a href="/admin/roles/<%= role._id %>/edit" class="btn btn-sm btn-warning me-1">✏️ Edit</a>
+                <form action="/admin/roles/<%= role._id %>?_method=DELETE" method="POST" class="d-inline">
+                  <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this role?')">🗑️ Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
 </div>
 
 <%- include('../../partials/footer') %>

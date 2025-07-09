@@ -1,62 +1,93 @@
 <%- include('../../partials/header') %>
 
-<div class="container py-5">
-  <h2 class="mb-4 text-primary">✏️ تعديل بيانات المستخدم</h2>
+<div class="container py-5" style="background: #f8f9fa; border-radius: 16px;">
+  <div class="mb-5 text-center">
+    <h2 class="fw-bold text-dark">
+      ✏️ Update User Information
+    </h2>
+    <p class="text-muted mb-0">Manage user details and access level easily</p>
+    <!-- <hr class="mt-3" style="width: 60px; height: 3px; background: #0d6efd; border: none; border-radius: 50px;"> -->
+  </div>
 
-  <!-- رسالة خطأ لو في -->
+  <!-- Alerts -->
   <% if (typeof error !== 'undefined') { %>
-    <div class="alert alert-danger"><%= error %></div>
+    <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> <%= error %>
+    </div>
+  <% } %>
+  <% if (typeof success !== 'undefined') { %>
+    <div class="alert alert-success d-flex align-items-center shadow-sm" role="alert">
+      <i class="bi bi-check-circle-fill me-2 fs-5"></i> <%= success %>
+    </div>
   <% } %>
 
-  <form action="/admin/users/<%= user._id %>?_method=PUT" method="POST" class="shadow p-4 bg-white rounded">
+  <div class="card border-0 shadow rounded-4 p-4" style="background: linear-gradient(135deg, #ffffff, #0e733b21);">
+    <form action="/admin/users/<%= user._id %>?_method=PUT" method="POST">
 
-    <div class="mb-3">
-      <label class="form-label">الاسم الكامل</label>
-      <input type="text" name="name" class="form-control" required value="<%= user.name %>">
-    </div>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-person-fill me-1"></i> Full Name
+          </label>
+          <input type="text" name="name" class="form-control form-control-lg rounded-pill" required value="<%= user.name %>">
+        </div>
 
-    <div class="mb-3">
-      <label class="form-label">البريد الإلكتروني</label>
-      <input type="email" name="email" class="form-control" required value="<%= user.email %>">
-    </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-envelope-fill me-1"></i> Email Address
+          </label>
+          <input type="email" name="email" class="form-control form-control-lg rounded-pill" required value="<%= user.email %>">
+        </div>
+      </div>
 
-    <div class="mb-3">
-      <label class="form-label">كلمة المرور الجديدة (اختياري)</label>
-      <input type="password" name="password" class="form-control" placeholder="اتركه فارغ لو مش هتغير الباسورد">
-    </div>
+      <div class="mt-4">
+        <label class="form-label fw-semibold">
+          <i class="bi bi-key-fill me-1"></i> New Password <small class="text-muted">(optional)</small>
+        </label>
+        <input type="password" name="password" class="form-control form-control-lg rounded-pill" placeholder="Leave blank to keep current password">
+      </div>
 
-    <div class="mb-3">
-      <label class="form-label">الدور</label>
-      <select name="role" class="form-select" required>
-        <option value="">-- اختر الدور --</option>
-        <% roles.forEach(role => { %>
-          <option value="<%= role._id %>" <%= user.role?.toString() === role._id.toString() ? 'selected' : '' %>>
-            <%= role.name %>
-          </option>
-        <% }) %>
-      </select>
-    </div>
+      <div class="row g-4 mt-1">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-shield-lock-fill me-1"></i> Role
+          </label>
+          <select name="role" class="form-select form-select-lg rounded-pill" required>
+            <option value="">-- Select Role --</option>
+            <% roles.forEach(role => { %>
+              <option value="<%= role._id %>" <%= user.role?.toString() === role._id.toString() ? 'selected' : '' %>>
+                <%= role.name %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
 
-    <!-- ✅✅✅ جزء اختيار الفرع -->
-    <div class="mb-3">
-      <label class="form-label">الفرع</label>
-      <select name="branch" class="form-select">
-        <option value="">-- بدون فرع --</option>
-        <% branches.forEach(branch => { %>
-          <option value="<%= branch._id %>" 
-            <%= user.branch?.toString() === branch._id.toString() ? 'selected' : '' %>>
-            <%= branch.name %> | <%= branch.name_ar %>
-          </option>
-        <% }) %>
-      </select>
-    </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-geo-alt-fill me-1"></i> Branch
+          </label>
+          <select name="branch" class="form-select form-select-lg rounded-pill">
+            <option value="">-- No Branch --</option>
+            <% branches.forEach(branch => { %>
+              <option value="<%= branch._id %>" <%= user.branch?.toString() === branch._id.toString() ? 'selected' : '' %>>
+                <%= branch.name %> | <%= branch.name_ar %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
 
-    <div class="text-end">
-      <a href="/admin/users" class="btn btn-outline-secondary">رجوع</a>
-      <button type="submit" class="btn btn-primary">💾 حفظ التعديلات</button>
-    </div>
+      <div class="text-end mt-5">
+        <a href="/admin/users" class="btn btn-outline-secondary btn-lg rounded-pill me-2 shadow-sm">
+          <i class="bi bi-arrow-left-circle"></i> Back
+        </a>
+        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+          <i class="bi bi-save-fill"></i> Save Changes
+        </button>
+      </div>
 
-  </form>
+    </form>
+  </div>
 </div>
 
 <%- include('../../partials/footer') %>

@@ -1,154 +1,209 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📊 Revenue Report</h1>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- Form لاختيار الشهر والفروع -->
-<form method="GET" action="/reports/revenue" class="mb-4">
-    <div class="row g-3 align-items-center">
+<style>
+  body { background: #f5f6fa; }
+  .kpi-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+  }
+  .kpi-card:hover { transform: translateY(-5px); }
+  .kpi-card .card-body { padding: 2rem; }
+  .kpi-card h2 { font-size: 2rem; margin-bottom: 0.25rem; }
+  .kpi-card .icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .table-modern { border-radius: 0.75rem; overflow: hidden; border: 1px solid #dee2e6; }
+  .table-modern thead { background: #343a40; color: #fff; }
+  .table-modern tbody tr:hover { background-color: #f8f9fa; }
+  .table-modern td, .table-modern th {
+    vertical-align: middle !important; text-align: center; padding: 0.75rem 1rem;
+  }
+  .card-header { border-radius: 0.75rem 0.75rem 0 0; }
+</style>
 
-        <!-- Month -->
-        <div class="col-auto">
-            <label class="col-form-label">Select Month:</label>
-        </div>
-        <div class="col-auto">
-            <input type="month" name="month" class="form-control" value="<%= selectedMonth %>" required>
-        </div>
+<div class="container py-5">
 
-        <!-- Branches -->
-        <div class="col-auto">
-            <label class="col-form-label">Select Branches:</label>
-        </div>
-        <div class="col-auto">
-            <select id="branchSelect" name="branch_ids" class="form-select select2" multiple style="min-width: 250px;">
-                <% branches.forEach(branch => { %>
-                    <option value="<%= branch._id %>" <%= selectedBranchIds.includes(branch._id.toString()) ? 'selected' : '' %>>
-                        <%= branch.name %>
-                    </option>
-                <% }) %>
-            </select>
-            <% if (selectedBranchIds.length > 0) { %>
-                <div class="mt-2">
-                    <span class="badge bg-info text-dark">
-                        Selected Branches: <%= selectedBranchIds.length %>
-                    </span>
-                </div>
-            <% } %>
-        </div>
+  <h1 class="mb-5 fw-bold text-primary display-5 text-center">
+    📊 Revenue Dashboard - <%= selectedMonth || 'Select Month' %>
+  </h1>
 
-        <!-- Buttons -->
-        <div class="col-auto d-flex flex-column gap-2">
-            <button type="submit" class="btn btn-primary">Generate Report</button>
-
-            <!-- Clear Selection button -->
-            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearBranchSelection()">
-                Clear Selection
-            </button>
-        </div>
-
+  <!-- ✅ Filter -->
+  <form method="GET" action="/reports/revenue" class="mb-5">
+    <div class="row g-3 align-items-end justify-content-center">
+      <div class="col-md-3">
+        <label class="form-label fw-bold">Month</label>
+        <input type="month" name="month" class="form-control" value="<%= selectedMonth %>" required>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label fw-bold">Branches</label>
+        <select id="branchSelect" name="branch_ids" class="form-select select2" multiple>
+          <% branches.forEach(branch => { %>
+            <option value="<%= branch._id %>" <%= selectedBranchIds.includes(branch._id.toString()) ? 'selected' : '' %>><%= branch.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-auto d-flex flex-column gap-2">
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearBranchSelection()">Clear</button>
+      </div>
     </div>
-</form>
+  </form>
 
-<!-- إجماليات + Pie Chart جنب بعض -->
-<% if (selectedMonth && reportData.length > 0) { %>
-    <div class="row align-items-start mb-4">
-        <!-- Col 1: الإحصائيات -->
-        <div class="col-md-6 mb-3">
-            <h5>📅 Month: <%= selectedMonth %></h5>
-            <h5>💰 Total Expected Revenue: $<%= totalExpectedRevenue %></h5>
-            <h5>💵 Total Paid: $<%= totalPaid %></h5>
-            <h5>📈 Collection Rate: <%= collectionRate.toFixed(2) %> %</h5>
-        </div>
+  <% if (selectedMonth && reportData.length > 0) { %>
 
-        <!-- Col 2: Pie Chart -->
-        <div class="col-md-6 text-center">
-            <h5>📊 Collection Rate Pie</h5>
-            <div style="max-width: 200px; margin: 0 auto;">
-                <canvas id="collectionPie"></canvas>
-            </div>
+  <!-- ✅ KPI Cards -->
+  <div class="row g-4 mb-5 text-center">
+    <div class="col-md-2">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <i class="bi bi-cash-coin icon text-primary"></i>
+          <h2>AED <%= totalDownPayments %></h2>
+          <small class="text-muted">Down Payments</small>
         </div>
+      </div>
     </div>
+    <div class="col-md-2">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <i class="bi bi-receipt icon text-info"></i>
+          <h2>AED <%= totalChequesAmount %></h2>
+          <small class="text-muted">Cheques</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <i class="bi bi-wallet icon text-dark"></i>
+          <h2>AED <%= totalPrice %></h2>
+          <small class="text-muted">Total Price</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <i class="bi bi-bar-chart-line icon text-warning"></i>
+          <h2>AED <%= totalExpectedRevenue %></h2>
+          <small class="text-muted">Expected Revenue</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <i class="bi bi-check2-circle icon text-success"></i>
+          <h2>AED <%= totalPaid %></h2>
+          <div class="progress mt-2" style="height: 8px;">
+            <div class="progress-bar bg-success" style="width: <%= collectionRate %>%;"></div>
+          </div>
+          <small class="text-muted"><%= collectionRate %>% Collected</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <i class="bi bi-building icon text-secondary"></i>
+          <h2><%= totalBookedOffices %></h2>
+          <small class="text-muted">Offices Booked</small>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Chart Script -->
-    <script>
-        const pieCtx = document.getElementById('collectionPie').getContext('2d');
-        const pieChart = new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Paid', 'Remaining'],
-                datasets: [{
-                    data: [
-                        <%= totalPaid %>,
-                        <%= totalExpectedRevenue - totalPaid %>
-                    ],
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(255, 99, 132, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 99, 132, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    </script>
-<% } %>
-
-<!-- Table -->
-<% if (reportData.length === 0 && selectedMonth) { %>
-    <div class="alert alert-warning">No data found for this month.</div>
-<% } else if (reportData.length > 0) { %>
-    <table class="table table-bordered table-hover bg-white">
-        <thead class="table-dark">
+  <!-- ✅ Bookings Breakdown -->
+  <div class="card shadow mb-5 border-0 rounded-4">
+    <div class="card-header bg-primary text-white fw-bold">🗂️ Bookings Breakdown</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-modern mb-0">
+          <thead>
             <tr>
-                <th>#</th>
-                <th>Office</th>
-                <th>Client</th>
-                <th>Contract Type</th>
-                <th>Expected Revenue</th>
-                <th>Paid So Far</th>
-                <th>Remaining</th>
+              <th>#</th><th>Office</th><th>Branch</th><th>Client</th><th>Type</th>
+              <th>Down Payment</th><th>Cheques</th><th>Expected</th><th>Paid</th><th>Remaining</th>
             </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
             <% reportData.forEach((row, index) => { %>
-                <tr>
-                    <td><%= index + 1 %></td>
-                    <td><%= row.office %></td>
-                    <td><%= row.client %></td>
-                    <td><%= row.contract_type %></td>
-                    <td>$<%= row.expected_revenue %></td>
-                    <td>$<%= row.paid_so_far %></td>
-                    <td>$<%= row.remaining %></td>
-                </tr>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= row.office %></td>
+              <td><%= row.branch %></td>
+              <td><%= row.client %></td>
+              <td><%= row.contract_type %></td>
+              <td>AED <%= row.down_payment.toFixed(2) %></td>
+              <td>AED <%= row.cheques_total.toFixed(2) %></td>
+              <td>AED <%= row.expected_revenue.toFixed(2) %></td>
+              <td class="text-success">AED <%= row.paid_so_far.toFixed(2) %></td>
+              <td class="text-danger">AED <%= row.remaining.toFixed(2) %></td>
+            </tr>
             <% }) %>
-        </tbody>
-    </table>
-<% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-<!-- Select2 Plugin -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <% } %>
 
+  <!-- ✅ Overdue Cheques (Selected Branches) -->
+  <% if (overdueCheques && overdueCheques.length > 0) { %>
+  <div class="card shadow border-0 rounded-4 mb-5">
+    <div class="card-header bg-danger text-light fw-bold">
+      🔍 Overdue Cheques (Selected Branches)
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-modern mb-0">
+          <thead>
+            <tr>
+              <th>#</th><th>Office</th><th>Branch</th><th>Client</th>
+              <th>Amount</th><th>Paid</th><th>Remaining</th><th>Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% overdueCheques.forEach((row, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= row.office %></td>
+              <td><%= row.branch %></td>
+              <td><%= row.client %></td>
+              <td>AED <%= row.cheque_amount.toFixed(2) %></td>
+              <td>AED <%= row.paid_so_far.toFixed(2) %></td>
+              <td>AED <%= row.remaining.toFixed(2) %></td>
+              <td><%= row.due_date ? row.due_date.toISOString().split('T')[0] : 'N/A' %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <% } else { %>
+  <div class="text-center my-4">
+    <i class="bi bi-check-circle-fill text-success display-4"></i>
+    <p class="text-muted mt-2">No overdue cheques in selected branches ✅</p>
+  </div>
+  <% } %>
+
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#branchSelect').select2({
-            placeholder: "Select one or more branches",
-            allowClear: true,
-            width: 'resolve'
-        });
+  $(document).ready(function () {
+    $('#branchSelect').select2({
+      placeholder: "Select branches",
+      width: 'resolve'
     });
-
-    function clearBranchSelection() {
-        $('#branchSelect').val(null).trigger('change');
-        // ✅ يعمل Submit تلقائي
-        $('#branchSelect').closest('form')[0].submit();
-    }
+  });
+  function clearBranchSelection() {
+    $('#branchSelect').val(null).trigger('change');
+    $('#branchSelect').closest('form')[0].submit();
+  }
 </script>
 
 <%- include('partials/footer') %>

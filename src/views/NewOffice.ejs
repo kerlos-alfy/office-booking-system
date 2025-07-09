@@ -4,6 +4,7 @@
   <h1 class="mb-4 text-success">➕ Add New Office</h1>
 
   <form action="/offices/new" method="POST" enctype="multipart/form-data">
+    <!-- بيانات المكتب -->
     <div class="mb-3">
       <label class="form-label">Office Number</label>
       <input type="text" name="office_number" class="form-control" required>
@@ -24,16 +25,6 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Monthly Price (AED)</label>
-      <input type="number" name="monthly_price" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Yearly Price (AED)</label>
-      <input type="number" name="yearly_price" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
       <label class="form-label">Size Category</label>
       <select name="size_category" class="form-select" required>
         <option value="">-- Select --</option>
@@ -47,61 +38,73 @@
 
     <div class="mb-3">
       <label class="form-label">Main Image</label>
-      <!-- ✅ لازم اسم الحقل يكون مطابق لـ "main_image" -->
       <input type="file" name="main_image" class="form-control" accept="image/*" required>
     </div>
 
     <div class="mb-3">
       <label class="form-label">Gallery Images</label>
-      <!-- ✅ لازم اسم الحقل يكون "gallery" لأن multer متوقعه -->
       <input type="file" name="gallery" class="form-control" accept="image/*" multiple>
     </div>
-<hr class="my-4">
 
-<h5 class="fw-bold text-primary">💳 Payment Plans</h5>
+    <hr class="my-4">
 
-<div id="paymentPlansContainer"></div>
+    <!-- ✅ Payment Plans -->
+    <h5 class="fw-bold text-primary">💳 Payment Plans</h5>
 
-<button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addPaymentPlan()">➕ Add Payment Plan</button>
+    <div id="paymentPlansContainer"></div>
 
-<!-- مخفي: لحفظ بيانات أنظمة الدفع على هيئة JSON -->
-<input type="hidden" name="payment_plans_json" id="paymentPlansJson">
+    <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addPaymentPlans()">➕ Add Payment Plan</button>
 
-    <button type="submit" class="btn btn-primary">➕ Save Office</button>
+    <!-- Hidden input for JSON plans -->
+    <input type="hidden" name="payment_plans_json" id="paymentPlansJson">
+
+    <button type="submit" class="btn btn-primary mt-4">➕ Save Office</button>
   </form>
 </div>
+
 <script>
   const container = document.getElementById('paymentPlansContainer');
   const jsonInput = document.getElementById('paymentPlansJson');
 
-  function addPaymentPlan(plan = {}) {
-    const planDiv = document.createElement('div');
-    planDiv.className = 'border p-3 rounded mb-3 bg-light-subtle';
+  function addPaymentPlans() {
+    // امسح القديم عشان يظهر بس واحد كل مرة
+    container.innerHTML = '';
 
-    planDiv.innerHTML = `
-      <div class="mb-2">
-        <label class="form-label">Type</label>
-        <select name="plan_type" class="form-select" onchange="toggleChequeFields(this)">
-          <option value="single" ${plan.type === 'single' ? 'selected' : ''}>One-Time</option>
-          <option value="two-installments" ${plan.type === 'two-installments' ? 'selected' : ''}>Two Installments</option>
-          <option value="cheques" ${plan.type === 'cheques' ? 'selected' : ''}>Cheques</option>
-        </select>
-      </div>
-      <div class="mb-2">
-        <label class="form-label">Total Price (AED)</label>
-        <input type="number" name="plan_price" class="form-control" value="${plan.total_price || ''}">
-      </div>
-      <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
-        <label class="form-label">Down Payment (AED)</label>
-        <input type="number" name="plan_down" class="form-control" value="${plan.down_payment || ''}">
-      </div>
-      <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
-        <label class="form-label">Number of Cheques</label>
-        <input type="number" name="plan_cheques" class="form-control" value="${plan.number_of_cheques || ''}">
-      </div>
-    `;
+    const plans = [
+      { type: 'single', label: 'One-Time' },
+      { type: 'two-installments', label: 'Two Installments' },
+      { type: 'cheques', label: 'Cheques' },
+    ];
 
-    container.appendChild(planDiv);
+    plans.forEach(plan => {
+      const planDiv = document.createElement('div');
+      planDiv.className = 'border p-3 rounded mb-3 bg-light-subtle';
+
+      planDiv.innerHTML = `
+        <div class="mb-2">
+          <label class="form-label">Type</label>
+          <select name="plan_type" class="form-select" onchange="toggleChequeFields(this)">
+            <option value="single" ${plan.type === 'single' ? 'selected' : ''}>One-Time</option>
+            <option value="two-installments" ${plan.type === 'two-installments' ? 'selected' : ''}>Two Installments</option>
+            <option value="cheques" ${plan.type === 'cheques' ? 'selected' : ''}>Cheques</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Total Price (AED)</label>
+          <input type="number" name="plan_price" class="form-control">
+        </div>
+        <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
+          <label class="form-label">Down Payment (AED)</label>
+          <input type="number" name="plan_down" class="form-control">
+        </div>
+        <div class="mb-2 cheque-fields" style="display: ${plan.type === 'cheques' ? 'block' : 'none'}">
+          <label class="form-label">Number of Cheques</label>
+          <input type="number" name="plan_cheques" class="form-control">
+        </div>
+      `;
+
+      container.appendChild(planDiv);
+    });
   }
 
   function toggleChequeFields(select) {
@@ -137,3 +140,4 @@
 </script>
 
 <%- include('partials/footer') %>
+<!-- End of file: src/views/NewOffice.ejs -->

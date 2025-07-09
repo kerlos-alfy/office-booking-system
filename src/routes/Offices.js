@@ -38,7 +38,11 @@ router.get("/", async (req, res) => {
     });
     const bookedOfficeIds = activeBookings.map((b) => b.office_id.toString());
 
-    res.render("offices", { offices, bookedOfficeIds });
+    res.render("offices", { 
+      offices, 
+      bookedOfficeIds,
+      query: req.query // ✅ أضف دي
+    });
   } catch (err) {
     console.error("Error loading offices", err);
     res.status(500).send("Error loading offices");
@@ -58,8 +62,7 @@ router.post("/new", upload.fields([
     const {
       office_number,
       branch_id,
-      monthly_price,
-      yearly_price,
+     
       floor,
       size_category,
       payment_plans_json
@@ -93,8 +96,7 @@ router.post("/new", upload.fields([
     const newOffice = await Office.create({
       office_number,
       branch_id,
-      monthly_price,
-      yearly_price,
+      
       floor,
       size_category,
       status: "available",
@@ -131,8 +133,7 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
     const {
       office_number,
       branch_id,
-      monthly_price,
-      yearly_price,
+     
       floor,
       size_category,
       main_image,
@@ -168,8 +169,7 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
 
     office.office_number = office_number;
     office.branch_id = branch_id;
-    office.monthly_price = monthly_price;
-    office.yearly_price = yearly_price;
+  
     office.floor = floor;
     office.size_category = size_category;
 
@@ -218,14 +218,64 @@ router.get('/branches/:id/floors', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     await Office.findByIdAndDelete(req.params.id);
-    req.session.success = 'Office deleted successfully!';
-    res.redirect('/offices');
+    res.redirect('/offices?success=Office deleted successfully!');
   } catch (err) {
     console.error(err);
     res.status(500).send('Error deleting office');
   }
 });
 
+
+
+router.get('/bulk-price', async (req, res) => {
+  const branches = await Branch.find();
+  res.render('bulkPriceUpdate', { branches });
+});
+
+
+router.get('/branch/:branchId/offices', async (req, res) => {
+  try {
+    const offices = await Office.find({ branch_id: req.params.branchId });
+    res.json(offices);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching offices');
+  }
+});
+
+// ✅ API يرجع الفروع كلها
+router.get('/api/branches', async (req, res) => {
+  try {
+    const branches = await Branch.find().select('_id name');
+    res.json(branches);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching branches');
+  }
+});
+
+
+
+router.post('/bulk-update-price', async (req, res) => {
+  const { officeIds, increaseAmount } = req.body;
+
+  try {
+    const offices = await Office.find({ _id: { $in: officeIds } });
+
+    for (const office of offices) {
+      office.payment_plans = office.payment_plans.map(plan => ({
+        ...plan.toObject(),
+        total_price: plan.total_price + parseFloat(increaseAmount)
+      }));
+      await office.save();
+    }
+
+    res.send('✅ Prices updated successfully!');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('❌ Error updating prices');
+  }
+});
 
 
 module.exports = router;

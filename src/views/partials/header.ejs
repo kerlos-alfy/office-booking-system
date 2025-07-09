@@ -203,7 +203,13 @@
 					font-size: 24px;
 				}
 			}
+
+			.logout:hover  {
+				background-color: #e6101073 !important;
+				color: #ffffff;
+			}
 		</style>
+		
 	</head>
 	<body class="bg-light">
 		<!-- Navbar -->
@@ -234,7 +240,7 @@
 							<a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i>Payments</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="/reports/revenue"><i class="fas fa-chart-line me-2"></i>Revenue Report</a>
+							<a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i>Revenue Report</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i>Revenue Timeline</a>
@@ -246,11 +252,22 @@
 								Manage Offices
 							</a>
 						</li>
+						<li class="nav-item">
+							<a href="/bookings/tax-invoices" class="nav-link">
+								<i class="fa-solid fa-file-invoice-dollar me-2"></i>
+
+								Tax Invoices
+							</a>
+						</li>
+						<li class="nav-item">
+  <a class="nav-link logout " href="/logout">
+    <i class="fas fa-sign-out-alt me-1"></i> Logout
+  </a>
+</li>
+
 					</ul>
 				</div>
 			</div>
 		</nav>
 
-		<div class="container"></div>
-	</body>
-</html>
+		<div class="container">

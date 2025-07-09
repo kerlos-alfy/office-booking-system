@@ -10,19 +10,19 @@
     <% branches.forEach(branch => {
       let total = branch.total_offices !== undefined ? parseInt(branch.total_offices) : 0;
       let available = branch.available_offices !== undefined ? parseInt(branch.available_offices) : 0;
-console.log(`Branch: ${branch.name}, Total: ${total}, Available: ${available}`); // Debugging line
+
       if (isNaN(total)) total = 0;
       if (isNaN(available)) available = 0;
 
       let percentage = 0;
       if (total > 0) {
-        percentage = Math.round((available / total) * 100);
+        percentage = Math.round(((total - available) / total) * 100); // ✅ نسبة المشغول
       }
 
       let circleColor = '#3498db';
-      if (percentage >= 70) circleColor = '#27ae60';
-      else if (percentage >= 40) circleColor = '#f39c12';
-      else circleColor = '#e74c3c';
+      if (percentage >= 70) circleColor = '#e74c3c'; // مزدحم جدًا
+      else if (percentage >= 40) circleColor = '#f39c12'; // متوسط
+      else circleColor = '#27ae60'; // قليل الإشغال
     %>
       <div class="col-md-6 col-lg-4">
         <div class="card border-0 shadow-sm rounded-4 p-4 h-100 branch-card d-flex flex-column justify-content-between">
@@ -35,6 +35,7 @@ console.log(`Branch: ${branch.name}, Total: ${total}, Available: ${available}`);
               <i class="fas fa-location-dot me-2 text-secondary"></i> <%= branch.location %>
             </p>
 
+            <!-- ✅ Progress Circle -->
             <div class="circle-wrapper mx-auto mb-2">
               <svg viewBox="0 0 36 36" class="circular-chart">
                 <path class="circle-bg"
@@ -47,7 +48,9 @@ console.log(`Branch: ${branch.name}, Total: ${total}, Available: ${available}`);
                   d="M18 2.0845
                      a 15.9155 15.9155 0 0 1 0 31.831
                      a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                <text x="18" y="20.35" class="percentage-text"><%= percentage %>%</text>
+                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="percentage-text">
+                  <%= percentage %>%
+                </text>
               </svg>
             </div>
 
@@ -81,21 +84,55 @@ console.log(`Branch: ${branch.name}, Total: ${total}, Available: ${available}`);
 </section>
 
 <style>
-  .branch-card { transition: all 0.3s ease; }
-  .branch-card:hover { transform: translateY(-4px); box-shadow: 0 1rem 2rem rgba(0,0,0,0.1); }
+  .branch-card {
+    transition: all 0.3s ease;
+  }
+  .branch-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,0.1);
+  }
 
   .circle-wrapper {
-    width: 80px; height: 80px; border-radius: 50%; background: #f9f9f9;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
   }
 
-  .circular-chart { max-width: 70px; max-height: 70px; display: block; transform: rotate(-90deg); }
-  .circle-bg { fill: none; stroke: #eee; stroke-width: 3.8; }
-  .circle { fill: none; stroke-width: 3.8; stroke-linecap: round; animation: progress 1.2s ease-out forwards; transform-origin: center; }
-  .percentage-text { fill: #333; font-size: 0.45em; text-anchor: middle; transform: rotate(90deg); transform-origin: center; font-weight: bold; }
+  .circular-chart {
+    max-width: 70px;
+    max-height: 70px;
+    display: block;
+    transform: rotate(-90deg);
+  }
 
-  @keyframes progress { 0% { stroke-dasharray: 0 100; } }
+  .circle-bg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 3.8;
+  }
+
+  .circle {
+    fill: none;
+    stroke-width: 3.8;
+    stroke-linecap: round;
+    animation: progress 1.2s ease-out forwards;
+    transform-origin: center;
+  }
+
+  .percentage-text {
+    fill: #333;
+    font-size: 0.35em;
+    font-weight: bold;
+  }
+
+  @keyframes progress {
+    0% { stroke-dasharray: 0 100; }
+  }
+
+  .circle-wrapper{
+    transform: rotate(90deg);
+  }
 </style>
 
 <%- include('../partials/explore-footer') %>

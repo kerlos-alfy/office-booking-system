@@ -1,28 +1,72 @@
 <%- include('../../partials/header') %>
 
+<!-- Optional: Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    background-color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .card {
+    border: none;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+
+  .form-check-label {
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    border-radius: 50px;
+    background: #6366f1 !important;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: #4f46e5 !important;
+  }
+
+  .form-control {
+    border-radius: 0.75rem;
+  }
+</style>
+
 <div class="container py-5">
-  <h2 class="text-primary mb-4 fw-bold">✏️ تعديل الدور: <%= role.name %></h2>
+  <div class="card p-4 shadow-sm">
+    <h2 class="text-primary mb-4 fw-bold">✏️ Edit Role: <span class="badge bg-dark"><%= role.name %></span></h2>
 
- <form method="POST" action="/admin/roles/<%= role._id %>?_method=PUT">
-  <div class="mb-3">
-    <label>Role Name</label>
-    <input type="text" name="name" class="form-control" value="<%= role.name %>" required>
-  </div>
-
-  <div class="mb-3">
-    <label>Permissions</label>
-    <% permissions.forEach(p => { %>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="permissions" value="<%= p._id %>" 
-          <%= role.permissions.includes(p._id.toString()) ? 'checked' : '' %>>
-        <label class="form-check-label"><%= p.name %> (<%= p.key %>)</label>
+    <form method="POST" action="/admin/roles/<%= role._id %>?_method=PUT">
+      <div class="mb-4">
+        <label class="form-label fw-bold mb-2">Role Name</label>
+        <input type="text" name="name" class="form-control" value="<%= role.name %>" required placeholder="Enter role name">
       </div>
-    <% }) %>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold mb-2">Permissions</label>
+        <div class="row">
+          <% permissions.forEach(p => { %>
+            <div class="col-md-4">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="permissions" value="<%= p._id %>"
+                  <%= role.permissions.includes(p._id.toString()) ? 'checked' : '' %>>
+                <label class="form-check-label"><%= p.name %> (<%= p.key %>)</label>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg px-4">💾 Save Changes</button>
+    </form>
   </div>
-
-  <button class="btn btn-primary">💾 Save</button>
-</form>
-
 </div>
 
 <%- include('../../partials/footer') %>

@@ -1,99 +1,195 @@
 <%- include('partials/header') %>
+<style>
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.8em;
+  }
+  table tbody tr:hover {
+    background-color: #eef6fb !important;
+    transition: all 0.2s ease-in-out;
+  }
+</style>
 
-<h1 class="mb-4 text-primary">📦 Archived Booking Details</h1>
+<div class="container-lg py-4">
 
-<!-- UX Actions -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-	<a href="/bookings/archive" class="btn btn-outline-secondary">🔙 Back to Archive</a>
-	<button class="btn btn-outline-primary" onclick="window.print()">🖨️ Print Page</button>
+  <!-- ✅ Header & Actions -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-primary mb-4">
+  📦 Office <span style="color: red;"><%= booking.office_id?.office_number || 'N/A' %></span> Archived
+  for Client <span style="color: red;"><%= booking.client_id?.registered_owner_name_en || booking.client_id?.company_en || 'N/A' %></span>
+</h1>
+
+    <div>
+      <a href="/bookings/archive" class="btn btn-outline-secondary me-2 rounded-pill shadow-sm">🔙 Back</a>
+      <button onclick="window.print()" class="btn btn-outline-primary rounded-pill shadow-sm">🖨️ Print</button>
+    </div>
+  </div>
+
+  <!-- ✅ Contract & Client Info -->
+  <div class="card shadow-sm mb-4 border-0 rounded-4">
+    <div class="card-header text-white fw-bold rounded-top-4"
+         style="background: linear-gradient(135deg, #212529, #343a40);">
+      📄 Contract & Client Info
+    </div>
+    <div class="card-body row gy-2">
+      <div class="col-md-6">
+        <p class="mb-2"><strong>🏢 Office:</strong> <%= booking.office_id?.office_number %></p>
+        <p class="mb-2"><strong>📍 Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
+        <p class="mb-2"><strong>👤 Client:</strong> <%= booking.client_id?.registered_owner_name_en || booking.client_id?.company_en || 'N/A' %></p>
+      </div>
+      <div class="col-md-6">
+        <p class="mb-2"><strong>📅 Start Date:</strong> <%= new Date(booking.start_date).toLocaleDateString() %></p>
+        <p class="mb-2"><strong>📅 End Date:</strong> <%= new Date(booking.end_date).toLocaleDateString() %></p>
+        <p class="mb-2"><strong>📄 Page No:</strong> <%= booking.page_no %></p>
+        <p class="mb-2"><strong>🧾 Ejari No:</strong> <%= booking.ejari_no || 'N/A' %></p>
+        <p class="mb-2"><strong>📌 Status:</strong>
+          <span class="badge bg-secondary rounded-pill shadow-sm">Archived</span>
+        </p>
+        <p class="mb-2 text-danger"><strong>❌ Cancel Reason:</strong> <%= booking.cancel_reason || 'غير محدد' %></p>
+        <p class="mb-0"><strong>📅 Cancelled Date:</strong>
+          <%= booking.cancel_date ? new Date(booking.cancel_date).toLocaleDateString() : 'غير محدد' %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Financial Details -->
+  <div class="card shadow-sm mb-4 border-0 rounded-4">
+    <div class="card-header fw-bold text-white rounded-top-4"
+         style="background: linear-gradient(135deg, #0d6efd, #0a58ca);">
+      💵 Financial Details
+    </div>
+    <div class="card-body row gy-2">
+      <div class="col-md-6">
+        <p><strong>💰 Down Payment:</strong> <span class="text-success fw-bold"><%= booking.initial_payment?.toFixed(2) %> AED</span></p>
+        <p><strong>🔐 Security Deposit:</strong> <%= booking.sec_deposit?.toFixed(2) %> AED</p>
+        <p><strong>🧾 VAT:</strong> <%= booking.vat?.toFixed(2) %> AED</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>💼 Admin Fee:</strong> <%= booking.admin_fee?.toFixed(2) %> AED</p>
+        <p><strong>💸 Commission:</strong> <%= booking.commission?.toFixed(2) %> AED</p>
+        <hr>
+        <p><strong>💰 Total Price:</strong>
+          <span class="fw-bold text-success"><%= booking.total_price?.toFixed(2) %> AED</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Cheques Table -->
+<!-- 📝 Cheques -->
+<div class="card shadow-sm mb-4 border-0 rounded-4">
+  <div class="card-header fw-bold text-white rounded-top-4"
+       style="background: linear-gradient(135deg, #0d6efd, #0a58ca);">
+    📝 Cheques
+  </div>
+  <div class="card-body p-0">
+    <% if (booking.cheques && booking.cheques.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center mb-0"
+               style="border-radius: 0 0 0.5rem 0.5rem; overflow: hidden;">
+          <thead style="background: #0d6efd; color: #fff;">
+            <tr>
+              <th style="width: 5%;">#</th>
+              <th style="width: 20%;">Amount (AED)</th>
+              <th style="width: 25%;">Due Date</th>
+              <th style="width: 20%;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% booking.cheques.forEach((cheque, index) => {
+              const rowClass = cheque.collected ? 'table-success' : 'table-light';
+            %>
+              <tr class="<%= rowClass %>">
+                <td class="fw-bold"><%= index + 1 %></td>
+                <td class="text-end fw-bold text-dark">
+                  <%= cheque.amount?.toFixed(2) %>
+                </td>
+                <td><%= new Date(cheque.due_date).toLocaleDateString() %></td>
+                <td>
+                  <% if (cheque.collected) { %>
+                    <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">✅ Collected</span>
+                  <% } else { %>
+                    <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm">❌ Uncollected</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="p-3">
+        <p class="text-muted mb-0">No cheques for this booking.</p>
+      </div>
+    <% } %>
+  </div>
 </div>
 
-<div class="card shadow mb-4">
-	<div class="card-header bg-secondary text-white fw-bold">Archived Booking Info</div>
-	<div class="card-body">
-		<!-- Office & Client Info -->
-		<p class="mb-2"><strong>Office:</strong> <%= booking.office_id?.office_number %></p>
-		<p class="mb-2"><strong>Branch:</strong> <%= booking.office_id?.branch_id?.name %></p>
-		<p class="mb-2"><strong>Client:</strong> <%= booking.client_id?.registered_owner_name_en || booking.client_id?.name || 'N/A' %></p>
 
-		<!-- Dates -->
-		<p class="mb-2"><strong>Start Date:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
-		<p class="mb-2"><strong>End Date:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
 
-		<!-- Contract Info -->
-		<p class="mb-2"><strong>Contract Page No:</strong> <%= booking.page_no %></p>
-		<p class="mb-2"><strong>Ejari No:</strong> <%= booking.ejari_no %></p>
-		<p class="mb-2"><strong>Status:</strong> <span class="badge bg-secondary">Archived</span></p>
+  <!-- ✅ Payments Table -->
+  <div class="card shadow-sm mb-5 border-0 rounded-4">
+    <div class="card-header fw-bold text-white rounded-top-4"
+         style="background: linear-gradient(135deg, #212529, #343a40);">
+      💳 Payments
+    </div>
+    <div class="card-body">
+      <% if (booking.payments && booking.payments.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle text-center mb-0">
+            <thead style="background: linear-gradient(135deg, #212529, #343a40); color: #fff;">
+              <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 20%;">Amount (AED)</th>
+                <th style="width: 25%;">Date</th>
+                <th style="width: 20%;">Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% booking.payments.forEach((payment, index) => { %>
+                <tr class="table-light">
+                  <td class="fw-bold"><%= index + 1 %></td>
+                  <td class="text-end" style="font-family: monospace;"><%= payment.amount?.toFixed(2) %></td>
+                  <td><%= new Date(payment.payment_date).toLocaleDateString() %></td>
+                  <td>
+                    <% if (payment.payment_type === 'initial') { %>
+                      <span class="badge bg-primary rounded-pill px-3 py-2">Down Payment</span>
+                    <% } else if (payment.payment_type === 'installment') { %>
+                      <span class="badge bg-info text-dark rounded-pill px-3 py-2">Installment</span>
+                    <% } else { %>
+                      <span class="badge bg-secondary rounded-pill px-3 py-2">Other</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <p class="text-muted mb-0">No payments recorded for this booking.</p>
+      <% } %>
+    </div>
+  </div>
 
-		<hr />
-		<div class="alert alert-warning"><strong>❌ Cancelled Reason:</strong> <%= booking.cancel_reason || 'غير محدد' %></div>
-
-		<!-- Financial Info -->
-		<hr />
-		<h5 class="text-primary fw-bold mb-3">💰 Financial Details</h5>
-		<p class="mb-2"><strong>Total Price:</strong> $<%= booking.total_price %></p>
-		<p class="mb-2"><strong>Down Payment:</strong> $<%= booking.initial_payment %></p>
-		<p class="mb-2"><strong>VAT:</strong> $<%= booking.vat %></p>
-		<p class="mb-2"><strong>Security Deposit:</strong> $<%= booking.sec_deposit %></p>
-		<p class="mb-2"><strong>Admin Fee:</strong> $<%= booking.admin_fee %></p>
-		<p class="mb-2"><strong>Commission:</strong> $<%= booking.commission %></p>
-
-		<!-- Cheques -->
-		<hr />
-		<h5 class="text-primary fw-bold mb-3">📝 Cheques</h5>
-		<% if (booking.cheques && booking.cheques.length > 0) { %>
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Amount</th>
-					<th>Due Date</th>
-					<th>Status</th>
-				</tr>
-			</thead>
-			<tbody>
-				<% booking.cheques.forEach((cheque, index) => { %>
-				<tr>
-					<td><%= index + 1 %></td>
-					<td>$<%= cheque.amount %></td>
-					<td><%= new Date(cheque.due_date).toISOString().split('T')[0] %></td>
-					<td><%= cheque.collected ? '✅ Collected' : '❌ Uncollected' %></td>
-				</tr>
-				<% }); %>
-			</tbody>
-		</table>
-		<% } else { %>
-		<p>No cheques.</p>
-		<% } %>
-
-		<!-- Payments -->
-		<hr />
-		<h5 class="text-primary fw-bold mb-3">💳 Payments</h5>
-		<% if (booking.payments && booking.payments.length > 0) { %>
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Amount</th>
-					<th>Date</th>
-					<th>Type</th>
-				</tr>
-			</thead>
-			<tbody>
-				<% booking.payments.forEach((payment, index) => { %>
-				<tr>
-					<td><%= index + 1 %></td>
-					<td>$<%= payment.amount %></td>
-					<td><%= new Date(payment.payment_date).toISOString().split('T')[0] %></td>
-					<td><%= payment.payment_type %></td>
-				</tr>
-				<% }); %>
-			</tbody>
-		</table>
-		<% } else { %>
-		<p>No payments recorded.</p>
-		<% } %>
-	</div>
 </div>
+
+<!-- ✅ لمسات CSS -->
+<style>
+  body {
+    background: #f8f9fc;
+  }
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.8em;
+  }
+  table tbody tr:hover {
+    background-color: #f1f3f5;
+    transition: all 0.2s ease-in-out;
+  }
+  .table-responsive {
+    border-radius: 8px;
+  }
+</style>
 
 <%- include('partials/footer') %>

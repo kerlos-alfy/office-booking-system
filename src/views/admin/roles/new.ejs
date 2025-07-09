@@ -1,69 +1,127 @@
 <%- include('../../partials/header') %>
 
+<!-- Inter Font (اختياري) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    background-color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .card {
+    border: none;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .form-check-label {
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    border-radius: 50px;
+    background: #6366f1 !important;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: #4f46e5 !important;
+  }
+
+  .form-control {
+    border-radius: 0.75rem;
+  }
+
+  .badge {
+    border-radius: 50px;
+  }
+
+  .table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  .table thead th {
+    vertical-align: middle;
+  }
+
+  .alert {
+    border-radius: 0.75rem;
+  }
+</style>
+
 <div class="container py-5">
-  <h2 class="mb-4 text-primary">➕ إنشاء دور جديد</h2>
+  <div class="card p-4 mb-5">
+    <h2 class="mb-4 text-primary fw-bold">➕ Create New Role</h2>
 
-  <!-- رسالة خطأ لو في -->
-  <% if (typeof error !== 'undefined') { %>
-    <div class="alert alert-danger"><%= error %></div>
-  <% } %>
+    <!-- Error Message -->
+    <% if (typeof error !== 'undefined') { %>
+      <div class="alert alert-danger shadow-sm"><%= error %></div>
+    <% } %>
 
-  <!-- فورم إنشاء الدور -->
-  <form method="POST" action="/admin/roles">
-    <div class="mb-3">
-      <label class="form-label">اسم الدور</label>
-      <input type="text" name="name" class="form-control" placeholder="مثلاً: مشرف - مدير النظام" required>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">الصلاحيات</label>
-      <div class="row">
-        <% permissions.forEach(permission => { %>
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="permissions" value="<%= permission._id %>" id="perm_<%= permission._id %>">
-              <label class="form-check-label" for="perm_<%= permission._id %>">
-                <%= permission.key %>
-              </label>
-            </div>
-          </div>
-        <% }) %>
+    <!-- Create Role Form -->
+    <form method="POST" action="/admin/roles">
+      <div class="mb-4">
+        <label class="form-label fw-bold">Role Name</label>
+        <input type="text" name="name" class="form-control" placeholder="e.g., Admin, Super Admin" required>
       </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold">Permissions</label>
+        <div class="row">
+          <% permissions.forEach(permission => { %>
+            <div class="col-md-4">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="permissions" value="<%= permission._id %>" id="perm_<%= permission._id %>">
+                <label class="form-check-label" for="perm_<%= permission._id %>">
+                  <%= permission.key %>
+                </label>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg px-4">💾 Save Role</button>
+    </form>
+  </div>
+
+  <!-- Current Roles Table -->
+  <div class="card p-4">
+    <h3 class="text-secondary mb-3 fw-bold">🧾 Current Roles</h3>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-light text-center">
+          <tr>
+            <th>#</th>
+            <th>Role Name</th>
+            <th>Permissions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% roles.forEach((role, index) => { %>
+            <tr>
+              <td class="text-center"><%= index + 1 %></td>
+              <td>
+                <span class="badge bg-dark text-white px-3 py-2"><%= role.name %></span>
+              </td>
+              <td>
+                <% if (role.permissions?.length) { %>
+                  <% role.permissions.forEach(p => { %>
+                    <span class="badge bg-info text-dark mb-1"><%= p.key %></span>
+                  <% }) %>
+                <% } else { %>
+                  <span class="text-muted">No permissions</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
     </div>
-
-    <button type="submit" class="btn btn-primary">💾 حفظ الدور</button>
-  </form>
-
-  <hr class="my-5" />
-
-  <!-- جدول عرض الأدوار الموجودة -->
-  <h3 class="text-secondary mb-3">🧾 الأدوار الحالية</h3>
-  <table class="table table-bordered bg-white shadow-sm">
-    <thead class="table-light">
-      <tr>
-        <th>#</th>
-        <th>الاسم</th>
-        <th>الصلاحيات</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% roles.forEach((role, index) => { %>
-        <tr>
-          <td><%= index + 1 %></td>
-          <td><span class="badge bg-dark text-white"><%= role.name %></span></td>
-          <td>
-            <% if (role.permissions?.length) { %>
-              <% role.permissions.forEach(p => { %>
-                <span class="badge bg-info text-dark mb-1"><%= p.key %></span>
-              <% }) %>
-            <% } else { %>
-              <span class="text-muted">لا يوجد صلاحيات</span>
-            <% } %>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+  </div>
 </div>
 
 <%- include('../../partials/footer') %>

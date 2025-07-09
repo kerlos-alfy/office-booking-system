@@ -115,12 +115,26 @@ router.put('/users/:id',
 
 
 // حذف المستخدم
+// router.delete('/users/:id',
+//   authenticateJWT,
+//   hasPermission('add_admins'),
+//   async (req, res) => {
+//     await User.findByIdAndDelete(req.params.id);
+//     res.redirect('/admin/users');
+//   }
+// );
+
 router.delete('/users/:id',
   authenticateJWT,
   hasPermission('add_admins'),
   async (req, res) => {
-    await User.findByIdAndDelete(req.params.id);
-    res.redirect('/admin/users');
+    try {
+      await User.findByIdAndDelete(req.params.id);
+      res.status(200).json({ success: true, message: 'User deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
   }
 );
 

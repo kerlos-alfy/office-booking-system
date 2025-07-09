@@ -390,10 +390,11 @@
     </table>
 <!-- ✅ حسابات الدفع -->
 <%
-  const downPayment = typeof initial_payment === 'number' ? initial_payment : 0;
-  const extraPayments = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-  const chequeTotal = cheques?.reduce((sum, c) => sum + (c.amount || 0), 0) || 0;
-  const grandTotal = downPayment + extraPayments + chequeTotal;
+ const downPayment = typeof initial_payment === 'number' ? initial_payment : 0;
+// احذف الـ extraPayments خالص
+const chequeTotal = cheques?.reduce((sum, c) => sum + (c.amount || 0), 0) || 0;
+const grandTotal = downPayment + chequeTotal;
+
 %>
 
 <!-- ✅ جدول الدفعات -->
@@ -410,12 +411,12 @@
     </tr>
   </thead>
   <tbody>
-    <!-- ✅ Down Payment & Extra Payments Row -->
-    <% if (downPayment + extraPayments > 0) { %>
+    <!-- ✅ Down Payment Row -->
+    <% if (downPayment > 0) { %>
       <tr>
         <td class="payment-left">DP</td>
         <td class="payment-left">—</td>
-        <td class="payment-left"><%= (downPayment + extraPayments).toFixed(2) %> AED</td>
+        <td class="payment-left"><%= downPayment.toFixed(2) %> AED</td>
         <td class="payment-empty"></td>
         <td class="payment-empty"></td>
         <td class="payment-empty"></td>
@@ -423,15 +424,19 @@
     <% } %>
 
     <!-- ✅ Cheques Rows (2 per row) -->
-    <% for (let i = 0; i < cheques.length; i += 2) { %>
+    <% 
+      // احذف أي شيك تاريخه نفس تاريخ بداية الحجز
+      const validCheques = cheques.filter(c => c.date !== start_date); 
+      for (let i = 0; i < validCheques.length; i += 2) { 
+    %>
       <tr>
-        <% const chq1 = cheques[i]; %>
+        <% const chq1 = validCheques[i]; %>
         <td class="payment-left"><%= i + 1 %></td>
         <td class="payment-left"><%= chq1.date || '—' %></td>
         <td class="payment-left"><%= chq1.amount?.toFixed(2) %> AED</td>
 
-        <% if (cheques[i + 1]) { 
-             const chq2 = cheques[i + 1]; %>
+        <% if (validCheques[i + 1]) { 
+             const chq2 = validCheques[i + 1]; %>
           <td class="payment-left"><%= i + 2 %></td>
           <td class="payment-left"><%= chq2.date || '—' %></td>
           <td class="payment-left"><%= chq2.amount?.toFixed(2) %> AED</td>
@@ -446,11 +451,12 @@
     <!-- ✅ Total Row -->
     <tr>
       <td colspan="6" class="text-center fw-bold payment-total">
-        Total: <%= grandTotal.toFixed(2) %> AED
+        Total: <%= total_price.toFixed(2) %> AED
       </td>
     </tr>
   </tbody>
 </table>
+
 
     <!-- Details Section -->
     <div class="section-header">تفاصيل العقد/details</div>
@@ -486,7 +492,7 @@
     </table>
 
     <!-- Terms -->
-    <div style="line-height: 20px;" class="terms">
+    <div style="line-height: 18px;" class="terms">
         <div class="terms-arabic">
             يحق للمستأجر موقف مجاني له وآخر مجاني لأحد موظفيه / عملائه، عدا ذلك يكون مدفوع.
             يلتزم المستأجر بدفع 5%تأمين عن المنقولات بالإضافة إلى رسوم تسجيل الإيجاري ويضاف 5% ضريبة.

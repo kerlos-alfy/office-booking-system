@@ -1,62 +1,191 @@
 <%- include('../partials/header') %>
 
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f9fafb;
+  }
+
+  .card {
+    border: none;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .card-body {
+    padding: 2rem;
+    text-align: left;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .divider {
+    width: 30px;
+    border: 1px solid #e5e7eb;
+    opacity: 0.5;
+    margin: 1rem 0;
+  }
+
+  .card-text {
+    color: #6b7280; /* Gray 500 */
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Accent Colors */
+  .users-card { border-top: 4px solid #6366f1; }
+  .roles-card { border-top: 4px solid #10b981; }
+  .permissions-card { border-top: 4px solid #fbbf24; }
+
+  .users-icon { color: #6366f1; }
+  .roles-icon { color: #10b981; }
+  .permissions-icon { color: #fbbf24; }
+
+  .btn-users {
+    background: #6366f1;
+  }
+  .btn-users:hover {
+    background: #4f46e5;
+  }
+
+  .btn-roles {
+    background: #10b981;
+  }
+  .btn-roles:hover {
+    background: #059669;
+  }
+
+  .btn-permissions {
+    background: #fbbf24;
+    color: #000;
+  }
+  .btn-permissions:hover {
+    background: #f59e0b;
+    color: #000;
+  }
+
+  /* Buttons General */
+  .btn-accent {
+    color: #fff;
+    border: none;
+    border-radius: 50px; /* Capsule */
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    text-decoration: none;
+  }
+
+  .btn-outline-danger {
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-outline-danger:hover {
+    background: #dc3545;
+    color: #fff;
+  }
+</style>
+
+<style>
+.card {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+</style>
+
+
 <div class="container py-5">
-	<div class="text-center mb-5">
-		<h1 class="display-6 fw-bold text-dark">✨ Admin Dashboard</h1>
-		<p class="text-muted">مرحبًا <strong><%= user.name %></strong>، تحكم بكل الصلاحيات من مكان واحد</p>
-	</div>
+  <div class="text-center mb-5">
+    <h1 class="display-6 fw-bold text-dark">✨ Admin Dashboard</h1>
+    <p  class="text-muted">Welcome, <strong style="color: red !important;"><%= user.name %></strong> — manage everything easily.</p>
+  </div>
 
-	<div class="row g-4">
-		<!-- المستخدمين -->
-		<div class="col-md-4">
-			<div class="card border-0 shadow h-100">
-				<div class="card-body text-center">
-					<div class="fs-2 text-primary mb-3">
-						<i class="fas fa-users"></i>
-					</div>
-					<h5 class="card-title">المستخدمين</h5>
-					<p class="text-muted">إدارة المشرفين والصلاحيات</p>
-					<a href="/admin/users" class="btn btn-primary btn-sm">👤 عرض المستخدمين</a>
-				</div>
-			</div>
-		</div>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <!-- Users -->
+    <div class="col">
+      <div class="card users-card h-100">
+        <div class="card-body">
+          <h5 class="card-title users-icon">
+            <i class="fas fa-users"></i> Users
+          </h5>
+          <div class="divider"></div>
+          <p class="card-text">Manage admins and team members easily.</p>
+          <a href="/admin/users" class="btn-accent btn-users">
+            <i class="fas fa-user"></i> View Users
+          </a>
+        </div>
+      </div>
+    </div>
 
-		<!-- الأدوار -->
-		<div class="col-md-4">
-			<div class="card border-0 shadow h-100">
-				<div class="card-body text-center">
-					<div class="fs-2 text-success mb-3">
-						<i class="fas fa-user-shield"></i>
-					</div>
-					<h5 class="card-title">الأدوار</h5>
-					<p class="text-muted">إضافة وتعديل الأدوار</p>
-					<a href="/admin/roles" class="btn btn-success btn-sm">🛡️ إدارة الأدوار</a>
-				</div>
-			</div>
-		</div>
+    <!-- Roles -->
+    <div class="col">
+      <div class="card roles-card h-100">
+        <div class="card-body">
+          <h5 class="card-title roles-icon">
+            <i class="fas fa-user-shield"></i> Roles
+          </h5>
+          <div class="divider"></div>
+          <p class="card-text">Add, edit and manage roles as needed.</p>
+          <a href="/admin/roles" class="btn-accent btn-roles">
+            <i class="fas fa-shield-alt"></i> Manage Roles
+          </a>
+        </div>
+      </div>
+    </div>
 
-		<!-- الصلاحيات -->
-		<div class="col-md-4">
-			<div class="card border-0 shadow h-100">
-				<div class="card-body text-center">
-					<div class="fs-2 text-warning mb-3">
-						<i class="fas fa-cogs"></i>
-					</div>
-					<h5 class="card-title">الصلاحيات</h5>
-					<p class="text-muted">تحكم كامل في صلاحيات النظام</p>
-					<a href="/admin/permissions" class="btn btn-warning btn-sm">🔧 تعديل الصلاحيات</a>
-				</div>
-			</div>
-		</div>
-	</div>
+    <!-- Permissions -->
+    <div class="col">
+      <div class="card permissions-card h-100">
+        <div class="card-body">
+          <h5 class="card-title permissions-icon">
+            <i class="fas fa-cogs"></i> Permissions
+          </h5>
+          <div class="divider"></div>
+          <p class="card-text">Full control over system permissions.</p>
+          <a href="/admin/permissions" class="btn-accent btn-permissions">
+            <i class="fas fa-tools"></i> Edit Permissions
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<hr class="my-5">
+  <hr class="my-5">
 
-	<div class="text-center">
-		<a href="/logout" class="btn btn-outline-danger btn-sm">
-			<i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-		</a>
-	</div>
+  <div class="text-center">
+    <a href="/logout" class="btn btn-outline-danger btn-sm px-4 shadow-sm">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </div>
 </div>
 
 <%- include('../partials/footer') %>

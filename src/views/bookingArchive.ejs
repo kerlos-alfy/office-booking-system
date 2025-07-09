@@ -1,82 +1,171 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📦 Booking Archive</h1>
+<div class="container py-5">
+  <h1 class="mb-4 text-primary fw-bold">📦 Booking Archive</h1>
 
-<!-- Back Button -->
-<a href="/bookings" class="btn btn-secondary mb-3">⬅️ Back to Bookings</a>
+  <!-- ✅ Search -->
+  <div class="mb-4">
+    <input id="bookingSearch" type="text" placeholder="🔍 Search bookings..."
+      class="form-control w-100 w-md-50 shadow-sm border-0"
+      style="border-radius: 30px; padding: 0.75rem 1.25rem;">
+  </div>
 
-<!-- Filter Client -->
-<form method="GET" action="/bookings/archive" class="mb-3">
-	<div class="row g-2 align-items-center">
-		<div class="col-auto">
-			<input type="text" name="client" placeholder="Search by Client Name" class="form-control" value="<%= typeof client !== 'undefined' ? client : '' %>" />
-		</div>
-		<div class="col-auto">
-			<button type="submit" class="btn btn-primary">Filter</button>
-			<a href="/bookings/archive" class="btn btn-secondary">Clear</a>
-		</div>
-	</div>
-</form>
+  <% if (archivedBookings.length === 0) { %>
+    <div class="alert alert-info shadow-sm">No archived bookings found.</div>
+  <% } else { %>
+    <div class="table-responsive shadow-sm rounded-4">
+      <table class="table table-bordered table-hover bg-white">
+        <thead style="background: linear-gradient(90deg, #0d6efd, #0b5ed7); color: #fff;">
+          <tr style="font-size: 14px;">
+            <th>#</th>
+            <th>Office</th>
+            <th>Branch</th>
+            <th>Client</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Cancelled Date</th>
+            <th>Page No</th>
+            <th>Cancel Reason</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTableBody">
+          <% archivedBookings.forEach((booking, index) => { %>
+            <tr>
+              <td><%= (currentPage - 1) * limit + index + 1 %></td>
+              <td><%= booking.office_id?.office_number %></td>
+              <td>
+                <span class="badge bg-info text-dark rounded-pill px-3">
+                  <%= booking.office_id?.branch_id?.name || 'N/A' %>
+                </span>
+              </td>
+              <td class="text-truncate" style="max-width: 180px;">
+                <%= booking.client_id?.registered_owner_name_en || booking.client_id?.company_en || 'N/A' %>
+              </td>
+              <td><%= new Date(booking.start_date).toISOString().split('T')[0] %></td>
+              <td><%= new Date(booking.end_date).toISOString().split('T')[0] %></td>
+              <td>
+                <% if (booking.cancel_date) { %>
+                  <span class="badge bg-danger text-white rounded-pill px-3">
+                    <%= new Date(booking.cancel_date).toISOString().split('T')[0] %>
+                  </span>
+                <% } else { %>
+                  <span class="text-muted">—</span>
+                <% } %>
+              </td>
+              <td><%= booking.page_no %></td>
+              <td>
+                <% if (booking.cancel_reason) { %>
+                  <span class="badge bg-danger text-white rounded-pill px-3">
+                    <%= booking.cancel_reason %>
+                  </span>
+                <% } else { %>
+                  <span class="text-muted">—</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/bookings/archive/<%= booking._id %>" class="btn btn-sm btn-outline-info rounded-pill shadow-sm">
+                  View
+                </a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
 
-<% if (archivedBookings.length === 0) { %>
-<div class="alert alert-info">No archived bookings found.</div>
-<% } else { %>
-<table class="table table-bordered table-hover table-striped bg-white">
-	<thead class="table-dark">
-		<tr>
-			<th>#</th>
-			<th>Office</th>
-			<th>Client</th>
-			<th>Start Date</th>
-			<th>End Date</th>
-			<th>Page No</th>
-			<th>Status</th>
-			<th>Cancel Reason</th>
-			<th>View Office</th>
-		</tr>
-	</thead>
-	<tbody>
-		<% archivedBookings.forEach((booking, index) => { %>
-		<tr>
-			<td><%= index + 1 %></td>
-			<td><%= booking.office_id?.office_number %></td>
-			<td><%= booking.client_id?.registered_owner_name_en || booking.client_id?.company_en || 'N/A' %></td>
-			<td><%= new Date(booking.start_date).toISOString().split('T')[0] %></td>
-			<td><%= new Date(booking.end_date).toISOString().split('T')[0] %></td>
-			<td><%= booking.page_no %></td>
-			<td><span class="badge bg-secondary">Archived</span></td>
-			<td><%= booking.cancel_reason || '—' %></td>
-			<td>
-				<% if (booking.office_id) { %>
-				<a href="/bookings/archive/<%= booking._id %>" class="btn btn-sm btn-outline-info">Details</a>
-				<% } else { %>
-				<span class="text-muted">N/A</span>
-				<% } %>
-			</td>
-		</tr>
-		<% }); %>
-	</tbody>
-</table>
-<% } %>
+    <!-- ✅ Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav aria-label="Booking archive pagination">
+        <ul class="pagination justify-content-center mt-4">
+          <% if (currentPage > 1) { %>
+            <li class="page-item">
+              <a class="page-link rounded-pill shadow-sm" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+            </li>
+          <% } else { %>
+            <li class="page-item disabled">
+              <span class="page-link rounded-pill shadow-sm">&laquo; Prev</span>
+            </li>
+          <% } %>
 
-<!-- Page Fade In -->
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+              <a class="page-link rounded-pill shadow-sm" href="?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+
+          <% if (currentPage < totalPages) { %>
+            <li class="page-item">
+              <a class="page-link rounded-pill shadow-sm" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+            </li>
+          <% } else { %>
+            <li class="page-item disabled">
+              <span class="page-link rounded-pill shadow-sm">Next &raquo;</span>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    <% } %>
+  <% } %>
+</div>
+
+<!-- ✅ Animations + Styling -->
 <style>
-	body {
-		animation: fadeIn 0.5s ease-in;
-	}
+  body {
+    animation: fadeIn 0.5s ease-in;
+    background-color: #f8f9fc;
+  }
 
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-	table tr:hover {
-		background-color: #f8f9fa;
-	}
+  .table thead th {
+    border: none;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+  }
+
+  .pagination .page-link {
+    border-radius: 50px !important;
+    margin: 0 4px;
+    color: #007bff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+    transition: all 0.3s ease-in-out;
+  }
 </style>
+
+<!-- ✅ jQuery + Search -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#bookingSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#bookingTableBody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  });
+</script>
 
 <%- include('partials/footer') %>

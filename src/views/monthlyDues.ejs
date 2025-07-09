@@ -1,0 +1,235 @@
+<%- include('partials/header') %>
+
+<div class="container py-5">
+
+  <!-- ✅ العنوان -->
+  <h1 class="mb-4 fw-bold text-center text-primary display-5">
+    📆 Monthly Dues - <%= currentMonthName %> <%= selectedYear %>
+    <% if (branchName) { %>
+      <br>🏢 Branch: <%= branchName %>
+    <% } %>
+  </h1>
+
+  <!-- ✅ Dashboard صغيرة -->
+  <div class="row mb-5">
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm border-0 rounded-4 p-3">
+        <h6 class="fw-bold text-primary">💰 Total Dues</h6>
+        <p class="fs-5 fw-bold">AED <%= totalDues.toFixed(2) %></p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm border-0 rounded-4 p-3">
+        <h6 class="fw-bold text-success">✅ Collected</h6>
+        <p class="fs-5 fw-bold">AED <%= totalPaid.toFixed(2) %></p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm border-0 rounded-4 p-3">
+        <h6 class="fw-bold text-warning">⏳ Remaining</h6>
+        <p class="fs-5 fw-bold">AED <%= (totalDues - totalPaid).toFixed(2) %></p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm border-0 rounded-4 p-3">
+        <h6 class="fw-bold text-danger">⚠️ Overdue</h6>
+        <p class="fs-5 fw-bold">AED <%= totalOverdue.toFixed(2) %></p>
+      </div>
+    </div>
+  </div>
+
+ <!-- ✅ فلتر الشهر والسنة -->
+<div class="card shadow-sm rounded-4 mb-5 border-0">
+  <div class="card-body">
+    <h5 class="fw-bold mb-4 text-primary">
+      📅 Filter Monthly Dues
+    </h5>
+    <form method="GET" action="/reports/monthly-dues" class="row gy-3 gx-4 align-items-end">
+      <% 
+        const months = [
+          "January","February","March","April","May","June",
+          "July","August","September","October","November","December"
+        ];
+        const currentYear = new Date().getFullYear();
+      %>
+
+      <!-- ✅ Month -->
+      <div class="col-md-5">
+        <label class="form-label fw-semibold text-secondary">📆 Month</label>
+        <select name="month" class="form-select rounded-pill shadow-sm px-3 py-2">
+          <% for (let i = 0; i < months.length; i++) { %>
+            <option value="<%= i %>" <%= i === selectedMonth ? 'selected' : '' %>><%= months[i] %></option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- ✅ Year -->
+      <div class="col-md-5">
+        <label class="form-label fw-semibold text-secondary">📅 Year</label>
+        <select name="year" class="form-select rounded-pill shadow-sm px-3 py-2">
+          <% for (let y = currentYear - 1; y <= currentYear + 1; y++) { %>
+            <option value="<%= y %>" <%= y === selectedYear ? 'selected' : '' %>><%= y %></option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- ✅ Submit Button -->
+      <div class="col-md-2 text-end">
+        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 shadow fw-bold">
+          🔍 Apply Filter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  <!-- ✅ جدول المستحقات الشهرية -->
+  <% if (dues.length === 0) { %>
+    <div class="alert alert-info shadow-sm p-4 rounded-4 text-center">
+      🚫 No dues found for this month.
+    </div>
+  <% } else { %>
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+      <div class="card-body p-0">
+        <h5 class="p-3 fw-bold mb-0">📑 Dues for Selected Month</h5>
+        <table class="table table-bordered text-center align-middle mb-0">
+          <thead class="table-primary">
+            <tr>
+              <th>#</th>
+              <th>Office</th>
+              <th>Client</th>
+              <th>Branch</th>
+              <th>Amount</th>
+              <th>Paid</th>
+              <th>Remaining</th>
+              <th>Due Date</th>
+              <th>Paid Date</th>
+              <th>Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% dues.forEach((due, index) => {
+              let rowClass = due.paid >= due.amount ? 'table-success' : (due.paid > 0 ? 'table-info' : 'table-warning');
+            %>
+            <tr class="<%= rowClass %>">
+              <td><%= index + 1 %></td>
+              <td><%= due.officeNumber %></td>
+              <td><%= due.clientName %></td>
+              <td><%= due.branchName %></td>
+              <td>AED <%= due.amount.toFixed(2) %></td>
+              <td>AED <%= due.paid.toFixed(2) %></td>
+              <td>AED <%= (due.amount - due.paid).toFixed(2) %></td>
+              <td><%= new Date(due.dueDate).toISOString().split('T')[0] %></td>
+              <td>
+                <% if (due.paidDate) { %>
+                  <%= new Date(due.paidDate).toISOString().split('T')[0] %>
+                <% } else { %>
+                  -
+                <% } %>
+              </td>
+              <td>
+                <span class="badge <%= due.type === 'Down Payment' ? 'bg-primary' : 'bg-warning text-dark' %>">
+                  <%= due.type === 'Down Payment' ? '🏦 Down Payment' : '💵 Cheque' %>
+                </span>
+              </td>
+              <td>
+                <% if (due.canceled) { %>
+                  <span class="badge bg-danger">❌ Canceled</span>
+                <% } else if (due.paid > 0 && due.paid < due.amount) { %>
+                  <span class="badge bg-info text-dark">💲 Partially Paid</span>
+                <% } else if (due.paid >= due.amount) { %>
+                  <span class="badge bg-success">✅ Paid</span>
+                <% } else { %>
+                  <span class="badge bg-warning text-dark">⏳ Unpaid</span>
+                <% } %>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+<!-- ✅ جدول الشيكات المتأخرة -->
+<% if (overdueDues && overdueDues.length > 0) { %>
+  <div class="card shadow-sm rounded-4 border-0 mt-5 mb-4">
+    <div class="card-body p-0">
+      <h5 class="p-3 fw-bold mb-0 text-danger">⚠️ Overdue Cheques from Previous Months</h5>
+      <table class="table table-bordered text-center align-middle mb-0">
+        <thead class="table-danger">
+          <tr>
+            <th>#</th>
+            <th>Office</th>
+            <th>Client</th>
+            <th>Branch</th>
+            <th>Amount</th>
+            <th>Paid</th>
+            <th>Remaining</th>
+            <th>Due Date</th>
+            <th>Paid Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% overdueDues.forEach((due, index) => {
+            let rowClass = due.paid >= due.amount ? 'table-success' : (due.paid > 0 ? 'table-warning' : 'table-danger');
+          %>
+          <tr class="<%= rowClass %>">
+            <td><%= index + 1 %></td>
+            <td><%= due.officeNumber %></td>
+            <td><%= due.clientName %></td>
+            <td><%= due.branchName %></td>
+            <td>AED <%= due.amount.toFixed(2) %></td>
+            <td>AED <%= due.paid.toFixed(2) %></td>
+            <td>AED <%= (due.amount - due.paid).toFixed(2) %></td>
+            <td><%= new Date(due.dueDate).toISOString().split('T')[0] %></td>
+            <td>
+              <% if (due.paidDate) { %>
+                <%= new Date(due.paidDate).toISOString().split('T')[0] %>
+              <% } else { %>
+                -
+              <% } %>
+            </td>
+            <td>
+              <% if (due.paid >= due.amount) { %>
+                <span class="badge bg-success">✅ Paid</span>
+              <% } else if (due.paid > 0) { %>
+                <span class="badge bg-warning text-dark">💲 Partially Paid</span>
+              <% } else { %>
+                <span class="badge bg-danger">⏳ Overdue</span>
+              <% } %>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ✅ Totals تحت جدول الشيكات المتأخرة -->
+  <div class="d-flex flex-wrap justify-content-center bg-light rounded-4 p-3 mt-3 shadow-sm">
+    <div class="mx-3 text-center">
+      <div class="fs-4 mb-1">💰</div>
+      <div class="fw-bold text-primary">AED <%= totalOverdue.toFixed(2) %></div>
+      <div class="text-muted small">Total Overdue</div>
+    </div>
+    <div class="mx-3 text-center border-start px-3">
+      <div class="fs-4 mb-1">✅</div>
+      <div class="fw-bold text-success">AED <%= overdueCollected.toFixed(2) %></div>
+      <div class="text-muted small">Collected</div>
+    </div>
+    <div class="mx-3 text-center border-start px-3">
+      <div class="fs-4 mb-1">⏳</div>
+      <div class="fw-bold text-danger">AED <%= (totalOverdue - overdueCollected).toFixed(2) %></div>
+      <div class="text-muted small">Remaining</div>
+    </div>
+  </div>
+<% } %>
+
+
+</div>
+
+<%- include('partials/footer') %>

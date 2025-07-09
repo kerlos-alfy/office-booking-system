@@ -9,86 +9,88 @@
 
   <input type="hidden" name="office_id" value="<%= office._id %>" />
 
-  <!-- 🎯 Section 1: Client & Period -->
+  <!-- 🎯 Client & Booking Period -->
   <h5 class="mb-3 text-secondary fw-bold">🎯 Client & Booking Period</h5>
   <div class="row mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <label class="form-label">Client</label>
       <select class="form-select js-select2" name="client_id" id="client_id" required>
         <option value="">Select Client</option>
         <% clients.forEach(client => { %>
-        <option value="<%= client._id %>"><%= client.registered_owner_name_en %> — <%= client.company_en %></option>
+          <option value="<%= client._id %>"><%= client.registered_owner_name_en %> — <%= client.company_en %></option>
         <% }) %>
       </select>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <label class="form-label">Page Number</label>
       <input type="text" name="page_no" class="form-control" required />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Ejari Unit NO.</label>
+      <input type="text" name="ejari_no" class="form-control" required />
     </div>
   </div>
 
   <div class="row mb-4">
     <div class="col-md-6">
       <label class="form-label">Start Date</label>
-<input type="date" id="start_date" name="start_date" class="form-control" required />
+      <input type="date" id="start_date" name="start_date" class="form-control" required />
     </div>
     <div class="col-md-6">
       <label class="form-label">End Date</label>
-<input type="date" id="end_date" name="end_date" class="form-control" required />
+      <input type="date" id="end_date" name="end_date" class="form-control" required />
     </div>
   </div>
 
-  <!-- 💰 Section 2: Main Rent & Fees -->
-  <h5 class="mb-3 text-secondary fw-bold">💰 Rent & Basic Fees</h5>
+  <!-- 💰 Fees -->
+  <h5 class="mb-3 text-secondary fw-bold">💰 Fees</h5>
   <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Rent Amount (AED)</label>
-      <input type="number" name="rent_amount" step="0.01" class="form-control" required />
+      <input type="number" name="rent_amount" id="rent_amount" step="1" class="form-control calc-trigger" />
     </div>
     <div class="col-md-6">
-      <label class="form-label">Registration Fee (Ejari) (AED)</label>
-      <input type="number" name="registration_fee" step="0.01" class="form-control" required />
+      <label class="form-label">Registration Fee (AED)</label>
+      <input type="number" name="registration_fee" id="registration_fee" step="1" class="form-control calc-trigger" />
     </div>
   </div>
 
   <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Admin Fee (AED)</label>
-      <input type="number" name="admin_fee" step="0.01" class="form-control" required />
+      <input type="number" name="admin_fee" id="admin_fee" step="1" class="form-control calc-trigger" />
     </div>
-    <div class="col-md-6">
-      <label class="form-label">Commission (AED)</label>
-      <input type="number" name="commission" step="0.01" class="form-control" required />
-    </div>
-  </div>
-
-  <!-- 🧮 Section 3: Totals -->
-  <h5 class="mb-3 text-secondary fw-bold">🧮 Totals</h5>
-  <div class="row mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Total Price (AED)</label>
-      <input type="number" name="total_price" step="0.01" class="form-control" required />
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">VAT (AED)</label>
-      <input type="number" name="vat" step="0.01" class="form-control" required />
-    </div>
-  </div>
-
-  <!-- 💼 Section 4: Other Payments -->
-  <h5 class="mb-3 text-secondary fw-bold">💼 Other Payments</h5>
-  <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Security Deposit (AED)</label>
-      <input type="number" name="sec_deposit" step="0.01" class="form-control" required />
+      <input type="number" name="sec_deposit" id="sec_deposit" step="1" class="form-control calc-trigger" />
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Commission (AED)</label>
+      <input type="number" name="commission" id="commission" step="1" class="form-control calc-trigger" />
     </div>
     <div class="col-md-6">
       <label class="form-label">Down Payment (AED)</label>
-      <input type="number" name="down_payment" step="0.01" class="form-control" required />
+      <input type="number" name="down_payment" id="down_payment" step="1" class="form-control" />
     </div>
   </div>
 
-  <!-- 🧾 Section 5: Cheques -->
+  <!-- ✅ VAT -->
+  <h5 class="mb-3 text-secondary fw-bold">💵 VAT</h5>
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label class="form-label">VAT (AED)</label>
+      <input type="number" name="vat" id="vat" step="1" class="form-control calc-trigger" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Total Price (Incl. VAT)</label>
+      <input type="text" name="total_price" id="total_price" class="form-control" readonly />
+    </div>
+  </div>
+
+  <!-- 🧾 Cheques -->
   <h5 class="mb-3 text-secondary fw-bold">🧾 Cheques</h5>
   <div class="mb-3">
     <label class="form-label">Number of Cheques</label>
@@ -96,42 +98,91 @@
   </div>
   <div id="cheques_fields"></div>
 
-  <!-- 📄 Section 6: Contract Info -->
-  <h5 class="mb-3 text-secondary fw-bold">📄 Contract Information</h5>
-  <div class="mb-3">
-    <label class="form-label">Ejari Number</label>
-    <input type="text" name="ejari" class="form-control" required />
-  </div>
-
-  <!-- ✅ Submit -->
   <div class="text-end">
     <button type="submit" class="btn btn-success px-5">✅ Submit Booking</button>
   </div>
 </form>
 
-<!-- ✅ JS -->
+<!-- ✅ Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-	document.addEventListener("DOMContentLoaded", function () {
-		$(".js-select2").select2({
-			width: "100%",
-			placeholder: "Select a client",
-			allowClear: true,
-		});
-	});
+  document.addEventListener("DOMContentLoaded", function () {
+    $(".js-select2").select2({
+      width: "100%",
+      placeholder: "Select a client",
+      allowClear: true,
+    });
 
-	function generateChequeFields() {
-		const count = parseInt(document.getElementById("cheques_count").value) || 0;
-		const container = document.getElementById("cheques_fields");
-		container.innerHTML = "";
+    const rent = document.getElementById("rent_amount");
+    const reg = document.getElementById("registration_fee");
+    const admin = document.getElementById("admin_fee");
+    const sec = document.getElementById("sec_deposit");
+    const comm = document.getElementById("commission");
+    const vat = document.getElementById("vat");
+    const totalInput = document.getElementById("total_price");
 
-		for (let i = 1; i <= count; i++) {
-			container.innerHTML += `
+    const startInput = document.getElementById("start_date");
+    const endInput = document.getElementById("end_date");
+
+    const validateDates = () => {
+      const start = new Date(startInput.value);
+      const end = new Date(endInput.value);
+
+      const warningId = "date-warning-msg";
+      let existing = document.getElementById(warningId);
+
+      if (startInput.value && endInput.value) {
+        if (start >= end) {
+          if (!existing) {
+            const warning = document.createElement("div");
+            warning.id = warningId;
+            warning.className = "text-danger fw-bold mt-1";
+            warning.innerText = "❌ Start Date must be before End Date";
+            endInput.parentElement.appendChild(warning);
+          }
+        } else {
+          if (existing) existing.remove();
+        }
+      }
+    };
+
+    startInput.addEventListener("input", validateDates);
+    endInput.addEventListener("input", validateDates);
+
+    const calcTotal = () => {
+      const rentTotal = parseFloat(rent.value) || 0;
+
+      const total =
+        rentTotal +
+        (parseFloat(reg.value) || 0) +
+        (parseFloat(admin.value) || 0) +
+        (parseFloat(sec.value) || 0) +
+        (parseFloat(comm.value) || 0) +
+        (parseFloat(vat.value) || 0);
+
+      totalInput.value = total.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      });
+    };
+
+    document.querySelectorAll(".calc-trigger").forEach(input => {
+      input.addEventListener("input", calcTotal);
+    });
+  });
+
+  function generateChequeFields() {
+    const count = parseInt(document.getElementById("cheques_count").value) || 0;
+    const container = document.getElementById("cheques_fields");
+    container.innerHTML = "";
+
+    for (let i = 1; i <= count; i++) {
+      container.innerHTML += `
         <div class="border rounded p-3 mb-3 bg-light-subtle">
           <h6 class="text-muted">Cheque ${i}</h6>
           <div class="mb-2">
             <label class="form-label">Amount (AED)</label>
-            <input type="number" name="cheques[${i - 1}][amount]" step="0.01" class="form-control" required>
+            <input type="number" name="cheques[${i - 1}][amount]" step="1" class="form-control" required>
           </div>
           <div>
             <label class="form-label">Due Date</label>
@@ -139,38 +190,8 @@
           </div>
         </div>
       `;
-		}
-	}
-</script>
-<script>
-  const startInput = document.getElementById("start_date");
-  const endInput = document.getElementById("end_date");
-
-  const validateDates = () => {
-    const start = new Date(startInput.value);
-    const end = new Date(endInput.value);
-
-    const warningId = "date-warning-msg";
-    let existing = document.getElementById(warningId);
-
-    // لو الاتنين متعبين
-    if (startInput.value && endInput.value) {
-      if (start >= end) {
-        if (!existing) {
-          const warning = document.createElement("div");
-          warning.id = warningId;
-          warning.className = "text-danger fw-bold mt-1";
-          warning.innerText = "❌ Start Date must be before End Date";
-          endInput.parentElement.appendChild(warning);
-        }
-      } else {
-        if (existing) existing.remove();
-      }
     }
-  };
-
-  startInput.addEventListener("input", validateDates);
-  endInput.addEventListener("input", validateDates);
+  }
 </script>
 
 <%- include('partials/footer') %>

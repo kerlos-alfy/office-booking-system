@@ -1,104 +1,189 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">👥 Clients</h1>
-
-<a href="/clients/new" class="btn btn-success mb-4">+ Add New Client</a>
-
-<% if (clients.length === 0) { %>
-<div class="alert alert-info">No clients found.</div>
-<% } else { %>
-<table class="table table-bordered table-hover bg-white">
-	<thead class="table-dark">
-		<tr style="font-size: 14px">
-			<th>#</th>
-			<th>Mobile</th>
-			<th>Company</th>
-			<th>Owner Name</th>
-			<th>Nationality</th>
-			<th>Emirates ID Status</th>
-			<th>Contract Status</th>
-			<th>License Status</th>
-			<th>Ejari No</th>
-			<th>Documents</th>
-			<th>Details</th>
-			<th>Edit</th>
-		</tr>
-	</thead>
-	<tbody>
-		<% clients.forEach((client, index) => { %>
-		<tr>
-			<td><%= index + 1 %></td>
-			<td><%= client.mobile %></td>
-			<td><%= client.company_en %></td>
-			<td><%= client.registered_owner_name_en %></td>
-			<td><%= client.nationality_en %></td>
-			<td>
-				<% if (client.emirates_id_status === 'OK') { %>
-				<span class="badge bg-success">OK</span>
-				<% } else if (client.emirates_id_status === 'NOT NEED') { %>
-				<span class="badge bg-secondary">NOT NEED</span>
-				<% } else { %>
-				<span class="badge bg-danger">Unavailable</span>
-				<% } %>
-			</td>
-			<td>
-				<% if (client.contract_status === 'OK') { %>
-				<span class="badge bg-success">OK</span>
-				<% } else { %>
-				<span class="badge bg-danger">Not OK</span>
-				<% } %>
-			</td>
-			<td>
-				<% if (client.license_status === 'OK') { %>
-				<span class="badge bg-success">OK</span>
-				<% } else { %>
-				<span class="badge bg-danger">Not OK</span>
-				<% } %>
-			</td>
-			<td><%= client.ejari_no || 'N/A' %></td>
-			<td>
-				<a href="/clients/<%= client._id %>/upload" class="btn btn-sm btn-outline-primary">Upload Files</a>
-			</td>
-			<td>
-				<a href="/clients/<%= client._id %>/view" class="btn btn-sm btn-outline-info">View Details</a>
-			</td>
-			<td>
-				<a style="font-size: 12px" href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold"> ✏️ Edit Client </a>
-			</td>
-		</tr>
-		<% }) %>
-	</tbody>
-</table>
-<% } %>
-
-<!-- Fade In -->
 <style>
-	body {
-		animation: fadeIn 0.5s ease-in;
-	}
-
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-
-	.badge {
-		font-size: 0.9rem;
-		padding: 6px 10px;
-	}
+  .rounded-pill {
+    border-radius: 8px !important;
+  }
 </style>
 
+<div class="container py-5">
+  <h1 class="mb-4 text-primary fw-bold">👥 Clients</h1>
+
+  <!-- زر إضافة عميل جديد -->
+  <a href="/clients/new" class="btn btn-success rounded-pill mb-4 shadow-sm">
+    + Add New Client
+  </a>
+
+  <!-- ✅ Search Input -->
+  <div class="mb-4">
+    <input id="clientSearch" type="text" placeholder="🔍 Search clients..." class="form-control w-100 w-md-50 shadow-sm border-0" style="border-radius: 50px; padding: 0.75rem 1.25rem;">
+  </div>
+
+  <% if (clients.length === 0) { %>
+    <div class="alert alert-info shadow-sm">No clients found.</div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover bg-white shadow-sm rounded">
+        <thead class="bg-primary text-white">
+          <tr style="font-size: 14px">
+            <th>#</th>
+            <th>Mobile</th>
+            <th>Company</th>
+            <th>Owner Name</th>
+            <th>Nationality</th>
+            <th>Emirates ID</th>
+            <th>Contract</th>
+            <th>License</th>
+            <th>Ejari No</th>
+            <th>Documents</th>
+            <th>Details</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody id="clientTableBody">
+          <% clients.forEach((client, index) => { %>
+            <tr>
+              <td><%= (currentPage - 1) * 10 + index + 1 %></td>
+              <td><%= client.mobile %></td>
+              <td><%= client.company_en %></td>
+              <td><%= client.registered_owner_name_en %></td>
+              <td><%= client.nationality_en %></td>
+              <td>
+                <% if (client.emirates_id_status === 'OK') { %>
+                  <span class="badge bg-success">OK</span>
+                <% } else if (client.emirates_id_status === 'NOT NEED') { %>
+                  <span class="badge bg-secondary">NOT NEED</span>
+                <% } else { %>
+                  <span class="badge bg-danger">Unavailable</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (client.contract_status === 'OK') { %>
+                  <span class="badge bg-success">OK</span>
+                <% } else { %>
+                  <span class="badge bg-danger">Not OK</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (client.license_status === 'OK') { %>
+                  <span class="badge bg-success">OK</span>
+                <% } else { %>
+                  <span class="badge bg-danger">Not OK</span>
+                <% } %>
+              </td>
+              <td><%= client.ejari_no || 'N/A' %></td>
+              <td>
+                <a href="/clients/<%= client._id %>/upload" class="btn btn-sm btn-outline-primary rounded-pill">Upload</a>
+              </td>
+              <td>
+                <a href="/clients/<%= client._id %>/view" class="btn btn-sm btn-outline-info rounded-pill">View</a>
+              </td>
+              <td>
+                <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold rounded-pill btn-sm">✏️ Edit</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <!-- ✅ Pagination -->
+  <% if (totalPages > 1) { %>
+    <nav aria-label="Clients pagination">
+      <ul class="pagination justify-content-center mt-4">
+        <!-- Previous Page -->
+        <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+          </li>
+        <% } else { %>
+          <li class="page-item disabled">
+            <span class="page-link">&laquo; Prev</span>
+          </li>
+        <% } %>
+
+        <!-- Page Numbers -->
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+          </li>
+        <% } %>
+
+        <!-- Next Page -->
+        <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+          </li>
+        <% } else { %>
+          <li class="page-item disabled">
+            <span class="page-link">Next &raquo;</span>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+  <% } %>
+</div>
+
+<!-- ✅ التنسيقات الجمالية -->
+<style>
+  body {
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    border-radius: 50px;
+    padding: 5px 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s ease-in-out;
+  }
+
+  tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+  }
+
+  table, .btn {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+  }
+
+  .pagination .page-link {
+    border-radius: 50px !important;
+    margin: 0 4px;
+    color: #007bff;
+    transition: all 0.3s ease;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+  }
+</style>
+
+<!-- ✅ jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- ✅ Live Search Script -->
 <script>
-	$(document).ready(function () {
-		$(".js-select2").select2({
-			width: "100%",
-			placeholder: "اختر الجنسية",
-			allowClear: true,
-		});
-	});
+  $(document).ready(function() {
+    $("#clientSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#clientTableBody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  });
 </script>
+
 <%- include('partials/footer') %>

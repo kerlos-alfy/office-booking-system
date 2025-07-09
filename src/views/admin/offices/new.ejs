@@ -1,0 +1,98 @@
+<%- include('../../partials/header') %>
+
+<div class="container py-5" style="max-width: 950px;">
+  <h1 class="mb-4 text-success fw-bold">➕ Add New Office</h1>
+
+  <form action="/offices/manage" method="POST" enctype="multipart/form-data">
+
+    <!-- Office Info -->
+    <div class="mb-4 p-4 border rounded bg-white shadow-sm">
+      <h5 class="fw-bold text-primary mb-3">🏢 Office Info</h5>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Office Number</label>
+          <input type="text" name="office_number" class="form-control" required>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Branch</label>
+          <select name="branch_id" class="form-select" required>
+            <% branches.forEach(branch => { %>
+              <option value="<%= branch._id %>">
+                <%= branch.name %> | <%= branch.name_ar %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Floor</label>
+          <input type="text" name="floor" class="form-control" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Size Category</label>
+          <select name="size_category" class="form-select" required>
+            <option value="">-- Select --</option>
+            <option value="100-120">100 - 120 sqft</option>
+            <option value="120-150">120 - 150 sqft</option>
+            <option value="150-200">150 - 200 sqft</option>
+            <option value="200-250">200 - 250 sqft</option>
+            <option value="300-400">300 - 400 sqft</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Main Image</label>
+          <input type="file" name="main_image" class="form-control" accept="image/*" required>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label fw-semibold">Gallery Images</label>
+          <input type="file" name="gallery" class="form-control" accept="image/*" multiple>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Plans Card -->
+    <div class="p-4 border rounded bg-white shadow-sm mb-4">
+      <h5 class="fw-bold text-primary mb-3">💳 Payment Plans</h5>
+
+      <!-- 1st Option -->
+      <div class="mb-4">
+        <h6 class="fw-semibold text-dark mb-2">1️⃣ 1st Option - One Payment</h6>
+        <input type="number" name="payment_plans[0][total_price]" class="form-control" placeholder="Total Price (AED)">
+      </div>
+
+      <!-- 2nd Option -->
+      <div class="mb-4 border-top pt-3">
+        <h6 class="fw-semibold text-dark mb-2">2️⃣ 2nd Option - 50% First Month + 50% Second Month</h6>
+        <input type="number" name="payment_plans[1][total_price]" class="form-control" placeholder="Total Price (AED)">
+      </div>
+
+      <!-- 3rd Option -->
+      <div class="mb-4 border-top pt-3">
+        <h6 class="fw-semibold text-dark mb-2">3️⃣ 3rd Option - Down Payment + Cheques</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <input type="number" name="payment_plans[2][total_price]" class="form-control" placeholder="Total Price (AED)">
+          </div>
+          <div class="col-md-4">
+            <input type="number" name="payment_plans[2][down_payment]" class="form-control" placeholder="Down Payment (AED)">
+          </div>
+          <div class="col-md-4">
+            <input type="number" name="payment_plans[2][number_of_cheques]" class="form-control" placeholder="Number of Cheques">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary px-4 fw-bold">
+      💾 Save Office
+    </button>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>
+    

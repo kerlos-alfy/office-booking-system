@@ -18,8 +18,8 @@ const officeSchema = new mongoose.Schema(
   {
     branch_id: { type: mongoose.Schema.Types.ObjectId, ref: "Branch", required: true },
     office_number: { type: String, required: true },
-    monthly_price: { type: Number, required: true },
-    yearly_price: { type: Number, required: true },
+    // monthly_price: { type: Number, required: true },
+    // yearly_price: { type: Number, required: true },
     floor: { type: String, required: true },
 
     size_category: {

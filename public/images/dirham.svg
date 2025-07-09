@@ -1,0 +1,9 @@
+<!-- رمز الدرهم الجديد كـ SVG Inline -->
+<svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 100 100">
+  <!-- ارسم الرمز هنا D مع الخطين -->
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+    font-size="80" font-family="Arial">D</text>
+  <!-- أضف الخطين الأفقيين -->
+  <line x1="20" y1="40" x2="80" y2="40" stroke="black" stroke-width="5"/>
+  <line x1="20" y1="60" x2="80" y2="60" stroke="black" stroke-width="5"/>
+</svg>

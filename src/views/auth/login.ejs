@@ -1,36 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Login</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <title>Login - Your Own Business Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #eef2f3, #8e9eab);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+    }
+    .login-card {
+      background: #ffffff;
+      border-radius: 1rem;
+      padding: 3rem 2rem;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .login-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+    }
+    .login-card h2 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #003366;
+    }
+    .login-card p {
+      color: #666;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+    .input-group-text {
+      background: transparent;
+      border: none;
+    }
+    .form-control {
+      border-radius: 50px;
+      padding-left: 45px;
+    }
+    .input-group {
+      position: relative;
+    }
+    .input-group .fa {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #003366;
+    }
+    .btn-login {
+      background: linear-gradient(135deg, #003366, #0055a5);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 50px;
+      border: none;
+      padding: 0.75rem;
+      transition: all 0.3s ease;
+    }
+    .btn-login:hover {
+      opacity: 0.9;
+    }
+    .footer-text {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #333;
+    }
+  </style>
 </head>
-<body class="bg-light">
-	<div class="container py-5">
-		<div class="row justify-content-center">
-			<div class="col-md-4">
-				<div class="card shadow">
-					<div class="card-header text-center fw-bold bg-primary text-white">🔐 Admin Login</div>
-					<div class="card-body">
-						<% if (typeof error !== 'undefined') { %>
-							<div class="alert alert-danger"><%= error %></div>
-						<% } %>
-						<form action="/login" method="POST">
-							<div class="mb-3">
-								<label class="form-label">Email</label>
-								<input type="email" name="email" class="form-control" required>
-							</div>
-							<div class="mb-3">
-								<label class="form-label">Password</label>
-								<input type="password" name="password" class="form-control" required>
-							</div>
-							<button class="btn btn-primary w-100" type="submit">Login</button>
-						</form>
-					</div>
-				</div>
-				<p class="text-center text-muted mt-3">Your Own Business Center</p>
-			</div>
-		</div>
-	</div>
+<body>
+  <div class="login-card">
+    <!-- لو عندك لوجو حطه هنا -->
+    <img src="/images/logo.svg" alt="Logo" />
+    <h2>🔒 Welcome Back!</h2>
+    <p>Login to manage your business center</p>
+    <% if (typeof error !== 'undefined') { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <form action="/login" method="POST">
+      <div class="mb-3 input-group">
+        <i class="fa fa-envelope"></i>
+        <input type="email" name="email" class="form-control" placeholder="Email" required />
+      </div>
+      <div class="mb-3 input-group">
+        <i class="fa fa-lock"></i>
+        <input type="password" name="password" class="form-control" placeholder="Password" required />
+      </div>
+      <button type="submit" class="btn btn-login w-100">Login</button>
+    </form>
+    <p class="footer-text">© 2025 Your Own Business Center</p>
+  </div>
 </body>
 </html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Tax Invoice</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      font-size: 12px;
+    }
+
+    header {
+      background: #0069d9;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .logo img {
+      height: 50px;
+      vertical-align: middle;
+    }
+
+    .container {
+      background: #fff;
+      margin: 30px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .title {
+      text-align: center;
+      font-weight: 700;
+      font-size: 20px;
+      text-transform: uppercase;
+      margin: 20px 0;
+      color: #0069d9;
+      border-bottom: 2px solid #0069d9;
+      padding-bottom: 10px;
+    }
+
+    .details-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .details-box {
+      flex: 1 1 45%;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .details-box table {
+      width: 100%;
+    }
+
+    .details-box td {
+      padding: 8px;
+    }
+
+    .details-box td:first-child {
+      font-weight: 600;
+      width: 40%;
+      color: #555;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      border-bottom: 1px solid #bbb;
+      padding: 2px 4px;
+    }
+
+    /* ✅ جدول الفاتورة كامل */
+    table.invoice {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table.invoice thead {
+      background: #343a40; /* رمادي غامق */
+      color: #fff;
+    }
+
+    table.invoice th {
+      padding: 12px 10px;
+      text-align: center;
+      font-weight: 600;
+      border-right: 1px solid #555;
+    }
+
+    table.invoice th:last-child {
+      border-right: none;
+    }
+
+    table.invoice tbody tr {
+      transition: background 0.2s ease-in-out;
+    }
+
+    table.invoice tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    table.invoice tbody tr:hover {
+      background: #f1f3f5;
+    }
+
+    table.invoice td {
+      padding: 8px;
+      text-align: center;
+      border-right: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+    }
+
+    table.invoice td:last-child {
+      border-right: none;
+    }
+
+    table.invoice tfoot td {
+      background: #f8f9fa;
+      font-weight: 700;
+      border-top: 2px solid #343a40;
+    }
+
+    table.invoice tfoot input {
+      background: transparent;
+      font-weight: bold;
+      border: none;
+      text-align: center;
+    }
+
+    table.invoice td input,
+    table.invoice td select {
+      width: 100%;
+      box-sizing: border-box;
+      display: block;
+      padding: 6px 8px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    table.invoice td input:focus,
+    table.invoice td select:focus {
+      border-color: #0069d9;
+      box-shadow: 0 0 0 2px rgba(0,105,217,0.2);
+      outline: none;
+    }
+
+    table.invoice td input[readonly] {
+      background: #f1f3f5;
+      color: #555;
+      cursor: not-allowed;
+      border: 1px solid #ddd;
+    }
+
+    table.invoice td select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: #fff;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 16px;
+      padding-right: 28px;
+    }
+
+    table.invoice td button {
+      border: none;
+      background: #dc3545;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s ease-in-out;
+    }
+
+    table.invoice td button:hover {
+      background: #b02a37;
+    }
+
+    .terms {
+      margin-top: 30px;
+      font-size: 11px;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .footer {
+      text-align: center;
+      color: #888;
+      font-size: 11px;
+      margin-top: 50px;
+      padding: 20px 0;
+      border-top: 1px solid #ddd;
+    }
+
+    button {
+      background: #0069d9;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    #add-row-btn {
+      background: #28a745;
+      margin-left: 10px;
+    }
+
+    @media(max-width: 768px) {
+      .details-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ✅ HEADER -->
+  <header>
+    <div class="logo">
+      <img src="/images/logo.png" alt="Your Logo" />
+    </div>
+    <h1>Your Own Business Center</h1>
+  </header>
+  <form method="POST" action="/bookings/<%= bookingId %>/tax-invoice/update">
+    <div class="container">
+
+      <div class="title">Edit Tax Invoice</div>
+
+      <!-- ✅ DETAILS -->
+      <div class="details-section">
+        <div class="details-box">
+          <table>
+            <tr><td>Lessee Name:</td><td><input name="client_name" value="<%= client.name %>"></td></tr>
+            <tr><td>Lessee TRN:</td><td><input name="client_trn" value="<%= client.trn %>"></td></tr>
+            <tr><td>Phone:</td><td><input name="client_phone" value="<%= client.phone %>"></td></tr>
+            <tr><td>Email:</td><td><input name="client_email" value="<%= client.email %>"></td></tr>
+            <tr><td>Contract Period:</td><td><input name="contract_period" value="<%= contract.period %>"></td></tr>
+          </table>
+        </div>
+        <div class="details-box">
+          <table>
+            <tr><td>Invoice Number:</td><td><input name="invoice_number" value="<%= invoice.number %>"></td></tr>
+            <tr><td>Invoice Date:</td><td><input name="invoice_date" value="<%= invoice.date %>"></td></tr>
+            <tr><td>Unit No.:</td><td><input name="office_unit" value="<%= office.unit_number %>"></td></tr>
+            <tr><td>Location:</td><td><input name="office_location" value="<%= office.location %>"></td></tr>
+            <tr><td>Currency:</td><td>AED</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ✅ INVOICE TABLE -->
+      <table class="invoice">
+        <thead>
+          <tr>
+            <th>Description</th><th>Qty</th><th>Rate</th>
+            <th>Taxable</th><th>VAT%</th><th>VAT Amt</th><th>Total</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="items-body">
+          <% invoice.items.forEach((item, index) => { %>
+          <tr>
+<td>
+  <select name="items[<%= index %>][description]">
+    <option value="Booking" <%= item.description === 'Booking' ? 'selected' : '' %>>Booking</option>
+    <option value="Advance Payment" <%= item.description === 'Advance Payment' ? 'selected' : '' %>>Advance Payment</option>
+    <option value="Monthly Payment Collection" <%= item.description === 'Monthly Payment Collection' ? 'selected' : '' %>>Monthly Payment Collection</option>
+    <option value="Monthly Rent" <%= item.description === 'Monthly Rent' ? 'selected' : '' %>>Monthly Rent</option>
+  </select>
+</td>
+
+
+            <td><input type="number" class="qty" name="items[<%= index %>][qty]" value="<%= item.qty %>"></td>
+            <td><input type="number" class="rate" name="items[<%= index %>][rate]" value="<%= item.rate %>"></td>
+            <td><input type="number" class="taxable" name="items[<%= index %>][taxable]" value="<%= item.taxable %>" readonly></td>
+            <td><input class="vat_rate" name="items[<%= index %>][vat_rate]" value="<%= item.vat_rate %>"></td>
+            <td><input type="number" class="vat_amount" name="items[<%= index %>][vat_amount]" value="<%= item.vat_amount %>" readonly></td>
+            <td><input type="number" class="total" name="items[<%= index %>][total]" value="<%= item.total %>" readonly></td>
+            <td><button type="button" class="remove-row-btn">❌</button></td>
+          </tr>
+          <% }) %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">Total</td>
+            <td><input type="number" name="invoice_taxable_amount" value="<%= invoice.taxable_amount %>" readonly></td>
+            <td>-</td>
+            <td><input type="number" name="invoice_vat_amount" value="<%= invoice.vat_amount %>" readonly></td>
+            <td><input type="number" name="invoice_total" value="<%= invoice.total %>" readonly></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <button type="button" id="add-row-btn">➕ Add Row</button>
+
+      <!-- ✅ TERMS -->
+      <div class="terms">
+        <strong>Amount in words (AED):</strong>
+        <textarea name="invoice_total_in_words"><%= invoice.total_in_words %></textarea><br><br>
+        <strong>Terms & Conditions:</strong><br>
+        Please issue cheque payable to <input name="company_name_terms" value="<%= company.name %>">.
+        <br><strong>Bank Name:</strong> <input name="company_bank_name" value="<%= company.bank_name %>">
+        <br><strong>Account No.:</strong> <input name="company_account_number" value="<%= company.account_number %>">
+        <br><strong>IBAN:</strong> <input name="company_iban" value="<%= company.iban %>">
+        <br><strong>SWIFT:</strong> <input name="company_swift" value="<%= company.swift %>">
+      </div>
+
+      <button type="submit">💾 Save & Generate PDF</button>
+    </div>
+  </form>
+
+  <!-- ✅ FOOTER -->
+  <div class="footer">© <%= new Date().getFullYear() %> Your Own Business Center. All Rights Reserved.</div>
+
+  <script>
+    const tbody = document.getElementById('items-body');
+    const addRowBtn = document.getElementById('add-row-btn');
+
+    addRowBtn.addEventListener('click', () => {
+      const index = tbody.querySelectorAll('tr').length;
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td><select name="items[${index}][description]"><option value="Booking">Booking</option></select></td>
+        <td><input type="number" class="qty" name="items[${index}][qty]" value="1"></td>
+        <td><input type="number" class="rate" name="items[${index}][rate]" value="0"></td>
+        <td><input type="number" class="taxable" name="items[${index}][taxable]" value="0" readonly></td>
+        <td><input class="vat_rate" name="items[${index}][vat_rate]" value="5%"></td>
+        <td><input type="number" class="vat_amount" name="items[${index}][vat_amount]" value="0" readonly></td>
+        <td><input type="number" class="total" name="items[${index}][total]" value="0" readonly></td>
+        <td><button type="button" class="remove-row-btn">❌</button></td>
+      `;
+      tbody.appendChild(newRow);
+    });
+
+    function recalculateRow(row) {
+      const qty = parseFloat(row.querySelector('.qty').value) || 0;
+      const rate = parseFloat(row.querySelector('.rate').value) || 0;
+      const vatRateStr = row.querySelector('.vat_rate').value || "0%";
+      const vatRate = parseFloat(vatRateStr.replace("%", "")) / 100;
+
+      const taxable = qty * rate;
+      const vatAmount = taxable * vatRate;
+      const total = taxable + vatAmount;
+
+      row.querySelector('.taxable').value = taxable.toFixed(2);
+      row.querySelector('.vat_amount').value = vatAmount.toFixed(2);
+      row.querySelector('.total').value = total.toFixed(2);
+
+      updateInvoiceTotals();
+    }
+
+    function updateInvoiceTotals() {
+      let totalTaxable = 0, totalVat = 0, grandTotal = 0;
+      tbody.querySelectorAll('tr').forEach(row => {
+        totalTaxable += parseFloat(row.querySelector('.taxable').value) || 0;
+        totalVat += parseFloat(row.querySelector('.vat_amount').value) || 0;
+        grandTotal += parseFloat(row.querySelector('.total').value) || 0;
+      });
+      document.querySelector('input[name="invoice_taxable_amount"]').value = totalTaxable.toFixed(2);
+      document.querySelector('input[name="invoice_vat_amount"]').value = totalVat.toFixed(2);
+      document.querySelector('input[name="invoice_total"]').value = grandTotal.toFixed(2);
+    }
+
+    tbody.addEventListener('input', e => {
+      const row = e.target.closest('tr');
+      if (row) recalculateRow(row);
+    });
+
+    tbody.addEventListener('click', e => {
+      if (e.target.classList.contains('remove-row-btn')) {
+        const row = e.target.closest('tr');
+        if (row) {
+          row.remove();
+          updateInvoiceTotals();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

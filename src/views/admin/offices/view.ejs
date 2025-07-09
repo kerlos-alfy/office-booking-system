@@ -1,0 +1,42 @@
+<%- include('../../partials/header.ejs') %>
+
+<div class="container py-5">
+  <h2 class="mb-4 text-success">➕ Add New Office</h2>
+
+  <form action="/offices/manage" method="POST" class="shadow p-4 bg-white rounded">
+
+    <div class="mb-3">
+      <label class="form-label">Office Number</label>
+      <input type="text" name="office_number" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Branch</label>
+      <select name="branch_id" class="form-select" required>
+        <option value="">-- Select Branch --</option>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>">
+            <%= branch.name %> | <%= branch.name_ar %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Floor</label>
+      <input type="text" name="floor" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Size Category</label>
+      <input type="text" name="size_category" class="form-control">
+    </div>
+
+    <div class="text-end">
+      <a href="/offices/manage" class="btn btn-outline-secondary">Back</a>
+      <button type="submit" class="btn btn-success">💾 Save Office</button>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>
