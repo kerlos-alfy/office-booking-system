@@ -2,7 +2,7 @@
 
 <div class="container-lg py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="text-primary">📋 Booking Overview</h1>
+    <h1 class="text-primary">📋 Rental Overview</h1>
     <div>
       <a href="/bookings" class="btn btn-outline-secondary me-2">🔙 Back</a>
       <button class="btn btn-outline-primary" onclick="window.print()">🖨️ Print</button>
@@ -74,7 +74,27 @@
   <div class="d-flex flex-wrap gap-2 mb-5">
     <a href="/bookings/<%= booking._id %>/generate-contract" class="btn btn-success">📄 Contract</a>
    <!-- <a href="/bookings/<%= booking._id %>/tax-invoice" class="btn btn-dark" target="_blank">🧾 Tax Invoicea/a> -->
-   <a href="/bookings/<%= booking._id %>/tax-invoice/edit" class="btn btn-primary">✏️ Generate / Edit Tax Invoice</a>
+   
+  <!-- Loop لعرض كل الفواتير الخاصة بالحجز -->
+<!-- ✅ يظهر فقط لو عنده صلاحية الحسابات -->
+<% if (user && user.permissions.includes('accounting.view')) { %>
+  <!-- Loop لعرض كل الفواتير الخاصة بالحجز -->
+  <% invoices.forEach(inv => { %>
+    <a href="/bookings/<%= booking._id %>/tax-invoice/<%= inv.invoice_number %>/view" class="btn btn-dark">
+      🧾 View <%= inv.invoice_number %>
+    </a>
+    <a href="/bookings/<%= booking._id %>/tax-invoice/<%= inv.invoice_number %>/edit" class="btn btn-primary">
+      ✏️ Edit <%= inv.invoice_number %>
+    </a>
+  <% }) %>
+
+  <!-- زرار New Tax Invoice -->
+  <a href="/bookings/<%= booking._id %>/tax-invoice/new" class="btn btn-success">
+    ➕ New Tax Invoice
+  </a>
+<% } %>
+
+
 
   </div>
 
@@ -183,7 +203,7 @@
           </table>
         </div>
       <% } else { %>
-        <p class="text-muted">No cheques scheduled for this booking.</p>
+        <p class="text-muted">No cheques scheduled for this rental.</p>
       <% } %>
     </div>
   </div>
@@ -276,10 +296,10 @@
       <% } %>
     </div>
   </div>
-<!-- 🗑️ Cancel Booking -->
+<!-- 🗑️ Cancel Rental -->
 <div class="card shadow-sm mb-4">
   <div class="card-header bg-light">
-    <h5 class="mb-0 text-primary">🗑️ Cancel Booking</h5>
+    <h5 class="mb-0 text-primary">🗑️ Cancel rental</h5>
   </div>
   <div class="card-body">
     <% if (booking.status !== 'archived') { %>
@@ -293,12 +313,12 @@
 
         <!-- 📦 Archive Button -->
         <div class="col-md-4 d-flex align-items-end">
-          <button type="submit" class="btn btn-danger w-100">🗑️ Archive Booking</button>
+          <button type="submit" class="btn btn-danger w-100">🗑️ Archive Rental</button>
         </div>
 
       </form>
     <% } else { %>
-      <span class="badge bg-secondary">This booking is archived ✅</span>
+      <span class="badge bg-secondary">This rental is archived ✅</span>
     <% } %>
   </div>
 </div>

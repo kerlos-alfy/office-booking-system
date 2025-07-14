@@ -1,0 +1,122 @@
+<%- include('partials/header') %>
+
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-dark fw-bold">
+      <i class="fas fa-user-circle me-2 text-primary"></i> Client Details
+    </h1>
+    <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold">✏️ Edit</a>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-dark text-white fw-bold">🧾 Basic Info</div>
+        <div class="card-body">
+          <p><strong>Company:</strong> <span class="text-muted"><%= client.company_en %> (<%= client.company_ar %>)</span></p>
+          <p><strong>Owner:</strong> <span class="text-muted"><%= client.registered_owner_name_en %> (<%= client.registered_owner_name_ar %>)</span></p>
+          <p><strong>Mobile:</strong> <span class="text-muted"><%= client.mobile %></span></p>
+          <p><strong>Nationality:</strong> <span class="text-muted"><%= client.nationality_en %> (<%= client.nationality_ar %>)</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-success text-white fw-bold">📌 Status & License</div>
+        <div class="card-body">
+          <p><strong>Emirates ID:</strong> <span class="badge bg-info text-dark"><%= client.emirates_id_status %></span></p>
+          <p><strong>Contract:</strong> <span class="badge bg-success"><%= client.contract_status %></span></p>
+          <p><strong>License:</strong> <span class="badge bg-secondary"><%= client.license_status %></span></p>
+          <p><strong>License No:</strong> <span class="text-muted"><%= client.license_number %></span></p>
+          <p><strong>Expiry:</strong> 
+            <span class="text-muted">
+            <% if (client.license_expiry) {
+              const expDate = new Date(client.license_expiry);
+              const isExpired = expDate < new Date();
+            %>
+              <%= expDate.toISOString().split('T')[0] %>
+              <% if (isExpired) { %>
+                <span class="badge bg-danger ms-2">Expired</span>
+              <% } %>
+            <% } else { %> Not Provided <% } %>
+            </span>
+          </p>
+          <p><strong>Ejari No:</strong> <span class="text-muted"><%= client.ejari_no %></span></p>
+          <a href="/clients/<%= client._id %>/invoice/download" class="btn btn-outline-success btn-sm mt-2">💾 Download Invoice</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Client Tax Invoices Quick Actions -->
+  <h3 class="fw-bold text-secondary mt-5 mb-3">
+    <i class="fas fa-file-invoice-dollar me-2"></i> Client Tax Invoices
+  </h3>
+
+  <% if (invoices.length > 0) { %>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <% invoices.forEach(inv => { %>
+        <a href="/bookings/<%= inv.booking_id %>/tax-invoice/<%= inv.invoice_number %>/view" target="_blank" class="btn btn-outline-dark">
+          🧾 View <%= inv.invoice_number %>
+        </a>
+        <a href="/bookings/<%= inv.booking_id %>/tax-invoice/<%= inv.invoice_number %>/edit" class="btn btn-outline-primary">
+          ✏️ Edit <%= inv.invoice_number %>
+        </a>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p class="text-muted">No tax invoices available for this client yet.</p>
+  <% } %>
+
+  <!-- ✅ Files Section -->
+  <h3 class="fw-bold text-secondary mt-4 mb-3">
+    <i class="fas fa-folder-open me-2"></i> Client Files
+  </h3>
+  <p class="text-muted">
+    Total Files: <%= [client.license_file_path, client.ejari_file_path, client.emirates_id_file_path, client.passport_file_path, client.contract_file_path].filter(f => f).length + (client.additional_files?.length || 0) %>
+  </p>
+
+  <div class="row g-3">
+    <% const files = [
+      { label: 'License', path: client.license_file_path },
+      { label: 'Ejari', path: client.ejari_file_path },
+      { label: 'Emirates ID', path: client.emirates_id_file_path },
+      { label: 'Passport', path: client.passport_file_path },
+      { label: 'Contract', path: client.contract_file_path }
+    ]; %>
+    <% files.forEach(file => { if (file.path) { %>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 text-center">
+          <div class="card-body">
+            <h6 class="fw-bold text-primary">📄 <%= file.label %></h6>
+            <a href="<%= file.path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              📥 View <%= file.label %> File
+            </a>
+          </div>
+        </div>
+      </div>
+    <% }}); %>
+
+    <% if (client.additional_files && client.additional_files.length > 0) { %>
+      <div class="col-12 mt-3">
+        <h5 class="fw-bold text-primary">📎 Additional Files</h5>
+        <div class="list-group">
+          <% client.additional_files.forEach((file, index) => { %>
+            <a href="<%= file %>" target="_blank" class="list-group-item list-group-item-action">
+              📄 View Additional File <%= index + 1 %>
+            </a>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="col-12 mt-4 text-end">
+      <a href="/clients/<%= client._id %>/upload" class="btn btn-outline-secondary">
+        📤 Upload More Files
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

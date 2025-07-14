@@ -49,10 +49,13 @@
                 <%= new Date(invoice.created_at).toLocaleDateString() %>
               </td>
               <td>
-                <a href="/bookings/<%= invoice.booking_id?._id %>/tax-invoice/view" class="btn btn-sm btn-outline-primary me-1">
+                <!-- ✅ روابط View & Edit صح -->
+                <a href="/bookings/<%= invoice.booking_id?._id %>/tax-invoice/<%= invoice.invoice_number %>/view" 
+                   class="btn btn-sm btn-outline-primary me-1" title="View PDF">
                   <i class="bi bi-file-earmark-pdf"></i>
                 </a>
-                <a href="/bookings/<%= invoice.booking_id?._id %>/tax-invoice/edit" class="btn btn-sm btn-outline-secondary">
+                <a href="/bookings/<%= invoice.booking_id?._id %>/tax-invoice/<%= invoice.invoice_number %>/edit" 
+                   class="btn btn-sm btn-outline-secondary" title="Edit">
                   <i class="bi bi-pencil-square"></i>
                 </a>
               </td>

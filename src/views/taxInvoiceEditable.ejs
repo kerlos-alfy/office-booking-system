@@ -3,6 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <title>Edit Tax Invoice</title>
+  <!-- SEO Meta -->
+<meta name="description" content="Your Own Business Center | Manage branches, offices, clients, bookings, and more in a professional way.">
+<meta name="author" content="YYour Own Business Center">
+
+<!-- Open Graph Meta -->
+<meta property="og:title" content="Your Own Business Center">
+<meta property="og:description" content="Manage your branches, offices, clients and bookings seamlessly with Your Own Business Center.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yourownb.com/">
+<meta property="og:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+<meta property="og:site_name" content="Your Own Business Center">
+
+<!-- Twitter Card Meta -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your Own Business Center">
+<meta name="twitter:description" content="Manage your branches, offices, clients and bookings seamlessly with Your Own Business Center.">
+<meta name="twitter:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+
+<!-- Favicon & Apple Touch Icon -->
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="apple-touch-icon" href="/images/logo.png">
   <style>
     body {
       margin: 0;
@@ -12,24 +33,20 @@
       color: #333;
       font-size: 12px;
     }
-
     header {
       background: #0069d9;
       color: #fff;
       padding: 20px;
       text-align: center;
     }
-
     header h1 {
       margin: 0;
       font-size: 22px;
     }
-
     .logo img {
       height: 50px;
       vertical-align: middle;
     }
-
     .container {
       background: #fff;
       margin: 30px auto;
@@ -37,7 +54,6 @@
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
     }
-
     .title {
       text-align: center;
       font-weight: 700;
@@ -48,14 +64,12 @@
       border-bottom: 2px solid #0069d9;
       padding-bottom: 10px;
     }
-
     .details-section {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       gap: 20px;
     }
-
     .details-box {
       flex: 1 1 45%;
       background: #f8f9fa;
@@ -63,21 +77,17 @@
       border-radius: 8px;
       border: 1px solid #ddd;
     }
-
     .details-box table {
       width: 100%;
     }
-
     .details-box td {
       padding: 8px;
     }
-
     .details-box td:first-child {
       font-weight: 600;
       width: 40%;
       color: #555;
     }
-
     input, select, textarea {
       width: 100%;
       border: none;
@@ -86,8 +96,6 @@
       border-bottom: 1px solid #bbb;
       padding: 2px 4px;
     }
-
-    /* ✅ جدول الفاتورة كامل */
     table.invoice {
       width: 100%;
       border-collapse: collapse;
@@ -97,114 +105,29 @@
       border-radius: 8px;
       overflow: hidden;
     }
-
     table.invoice thead {
-      background: #343a40; /* رمادي غامق */
+      background: #343a40;
       color: #fff;
     }
-
-    table.invoice th {
-      padding: 12px 10px;
-      text-align: center;
-      font-weight: 600;
-      border-right: 1px solid #555;
-    }
-
-    table.invoice th:last-child {
-      border-right: none;
-    }
-
-    table.invoice tbody tr {
-      transition: background 0.2s ease-in-out;
-    }
-
-    table.invoice tbody tr:nth-child(even) {
-      background: #f8f9fa;
-    }
-
-    table.invoice tbody tr:hover {
-      background: #f1f3f5;
-    }
-
-    table.invoice td {
+    table.invoice th, table.invoice td {
       padding: 8px;
       text-align: center;
-      border-right: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-      vertical-align: middle;
+      border: 1px solid #ddd;
     }
-
-    table.invoice td:last-child {
-      border-right: none;
-    }
-
     table.invoice tfoot td {
-      background: #f8f9fa;
       font-weight: 700;
-      border-top: 2px solid #343a40;
+      background: #f8f9fa;
     }
-
-    table.invoice tfoot input {
-      background: transparent;
-      font-weight: bold;
-      border: none;
-      text-align: center;
-    }
-
     table.invoice td input,
     table.invoice td select {
       width: 100%;
       box-sizing: border-box;
-      display: block;
       padding: 6px 8px;
       font-size: 12px;
       border: 1px solid #ccc;
       border-radius: 4px;
       background: #fff;
-      transition: border 0.2s, box-shadow 0.2s;
     }
-
-    table.invoice td input:focus,
-    table.invoice td select:focus {
-      border-color: #0069d9;
-      box-shadow: 0 0 0 2px rgba(0,105,217,0.2);
-      outline: none;
-    }
-
-    table.invoice td input[readonly] {
-      background: #f1f3f5;
-      color: #555;
-      cursor: not-allowed;
-      border: 1px solid #ddd;
-    }
-
-    table.invoice td select {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-color: #fff;
-      background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      background-size: 16px;
-      padding-right: 28px;
-    }
-
-    table.invoice td button {
-      border: none;
-      background: #dc3545;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: background 0.2s ease-in-out;
-    }
-
-    table.invoice td button:hover {
-      background: #b02a37;
-    }
-
     .terms {
       margin-top: 30px;
       font-size: 11px;
@@ -213,16 +136,6 @@
       border-radius: 8px;
       border: 1px solid #ddd;
     }
-
-    .footer {
-      text-align: center;
-      color: #888;
-      font-size: 11px;
-      margin-top: 50px;
-      padding: 20px 0;
-      border-top: 1px solid #ddd;
-    }
-
     button {
       background: #0069d9;
       color: #fff;
@@ -232,23 +145,25 @@
       margin-top: 20px;
       border-radius: 4px;
       font-size: 13px;
-      transition: 0.2s;
     }
-
-    button:hover {
-      opacity: 0.95;
-    }
-
     #add-row-btn {
       background: #28a745;
       margin-left: 10px;
     }
+    input[readonly],
+textarea[readonly] {
+  background: #f1f3f5;
+  color: #555;
+  cursor: not-allowed;
+  border: 1px solid #ddd;
+}
+table.invoice td input[readonly] {
+  background: #f1f3f5 !important;
+  color: #555 !important;
+  cursor: not-allowed;
+  border: 1px solid #ddd;
+}
 
-    @media(max-width: 768px) {
-      .details-section {
-        flex-direction: column;
-      }
-    }
   </style>
 </head>
 <body>
@@ -259,12 +174,16 @@
     </div>
     <h1>Your Own Business Center</h1>
   </header>
-  <form method="POST" action="/bookings/<%= bookingId %>/tax-invoice/update">
-    <div class="container">
 
+  <!-- ✅ FORM -->
+  <form method="POST" action="/bookings/<%= bookingId %>/tax-invoice/update">
+    <!-- ✅ مهم جداً: Hidden input للـ invoice_number -->
+    
+
+    <div class="container">
       <div class="title">Edit Tax Invoice</div>
 
-      <!-- ✅ DETAILS -->
+      <!-- ✅ DETAILS SECTION -->
       <div class="details-section">
         <div class="details-box">
           <table>
@@ -277,7 +196,18 @@
         </div>
         <div class="details-box">
           <table>
-            <tr><td>Invoice Number:</td><td><input name="invoice_number" value="<%= invoice.number %>"></td></tr>
+<tr>
+  <td>Invoice Number:</td>
+  <td>
+    <input 
+      type="text" 
+      name="invoice_number" 
+      value="<%= invoice.number %>" 
+      placeholder="مثلاً: INV-001" 
+      required
+    >
+  </td>
+</tr>
             <tr><td>Invoice Date:</td><td><input name="invoice_date" value="<%= invoice.date %>"></td></tr>
             <tr><td>Unit No.:</td><td><input name="office_unit" value="<%= office.unit_number %>"></td></tr>
             <tr><td>Location:</td><td><input name="office_location" value="<%= office.location %>"></td></tr>
@@ -296,32 +226,31 @@
         </thead>
         <tbody id="items-body">
           <% invoice.items.forEach((item, index) => { %>
-          <tr>
-<td>
-  <select name="items[<%= index %>][description]">
-    <option value="Booking" <%= item.description === 'Booking' ? 'selected' : '' %>>Booking</option>
-    <option value="Advance Payment" <%= item.description === 'Advance Payment' ? 'selected' : '' %>>Advance Payment</option>
-    <option value="Monthly Payment Collection" <%= item.description === 'Monthly Payment Collection' ? 'selected' : '' %>>Monthly Payment Collection</option>
-    <option value="Monthly Rent" <%= item.description === 'Monthly Rent' ? 'selected' : '' %>>Monthly Rent</option>
-  </select>
-</td>
-
-
-            <td><input type="number" class="qty" name="items[<%= index %>][qty]" value="<%= item.qty %>"></td>
-            <td><input type="number" class="rate" name="items[<%= index %>][rate]" value="<%= item.rate %>"></td>
-            <td><input type="number" class="taxable" name="items[<%= index %>][taxable]" value="<%= item.taxable %>" readonly></td>
-            <td><input class="vat_rate" name="items[<%= index %>][vat_rate]" value="<%= item.vat_rate %>"></td>
-            <td><input type="number" class="vat_amount" name="items[<%= index %>][vat_amount]" value="<%= item.vat_amount %>" readonly></td>
-            <td><input type="number" class="total" name="items[<%= index %>][total]" value="<%= item.total %>" readonly></td>
-            <td><button type="button" class="remove-row-btn">❌</button></td>
-          </tr>
+            <tr>
+              <td>
+                <select name="items[<%= index %>][description]">
+                  <option value="Booking" <%= item.description === 'Booking' ? 'selected' : '' %>>Rental</option>
+                  <option value="Advance Payment" <%= item.description === 'Advance Payment' ? 'selected' : '' %>>Advance Payment</option>
+                  <option value="Monthly Payment Collection" <%= item.description === 'Monthly Payment Collection' ? 'selected' : '' %>>Monthly Payment Collection</option>
+                  <option value="Monthly Rent" <%= item.description === 'Monthly Rent' ? 'selected' : '' %>>Monthly Rent</option>
+                </select>
+              </td>
+              <td><input type="number" class="qty" name="items[<%= index %>][qty]" value="<%= item.qty %>"></td>
+              <td><input type="number" class="rate" name="items[<%= index %>][rate]" value="<%= item.rate %>"></td>
+              <td><input type="number" class="taxable" name="items[<%= index %>][taxable]" value="<%= item.taxable %>" readonly></td>
+              <td><input class="vat_rate" name="items[<%= index %>][vat_rate]" value="<%= item.vat_rate %>" readonly></td>
+              <td><input type="number" class="vat_amount" name="items[<%= index %>][vat_amount]" value="<%= item.vat_amount %>" readonly></td>
+              <td><input type="number" class="total" name="items[<%= index %>][total]" value="<%= item.total %>" readonly></td>
+              <td><button type="button" class="remove-row-btn">❌</button></td>
+            </tr>
           <% }) %>
         </tbody>
         <tfoot>
           <tr>
             <td colspan="3">Total</td>
             <td><input type="number" name="invoice_taxable_amount" value="<%= invoice.taxable_amount %>" readonly></td>
-            <td>-</td>
+                          <td><input type="number" value="5%" placeholder="5%" readonly> </td>
+
             <td><input type="number" name="invoice_vat_amount" value="<%= invoice.vat_amount %>" readonly></td>
             <td><input type="number" name="invoice_total" value="<%= invoice.total %>" readonly></td>
             <td></td>
@@ -347,18 +276,28 @@
     </div>
   </form>
 
-  <!-- ✅ FOOTER -->
-  <div class="footer">© <%= new Date().getFullYear() %> Your Own Business Center. All Rights Reserved.</div>
-
+  <!-- ✅ SCRIPT FULL ✅ -->
   <script>
     const tbody = document.getElementById('items-body');
     const addRowBtn = document.getElementById('add-row-btn');
+
+    // ✅ نفس الخيارات للقائمة المنسدلة
+    const descriptionOptions = `
+      <option value="Booking">Booking</option>
+      <option value="Advance Payment">Advance Payment</option>
+      <option value="Monthly Payment Collection">Monthly Payment Collection</option>
+      <option value="Monthly Rent">Monthly Rent</option>
+    `;
 
     addRowBtn.addEventListener('click', () => {
       const index = tbody.querySelectorAll('tr').length;
       const newRow = document.createElement('tr');
       newRow.innerHTML = `
-        <td><select name="items[${index}][description]"><option value="Booking">Booking</option></select></td>
+        <td>
+          <select name="items[${index}][description]">
+            ${descriptionOptions}
+          </select>
+        </td>
         <td><input type="number" class="qty" name="items[${index}][qty]" value="1"></td>
         <td><input type="number" class="rate" name="items[${index}][rate]" value="0"></td>
         <td><input type="number" class="taxable" name="items[${index}][taxable]" value="0" readonly></td>

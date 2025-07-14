@@ -1,41 +1,69 @@
-<%- include('partials/header') %>
-
-<style>
-  .unauthorized-box {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 40px;
-    max-width: 600px;
-    margin: 80px auto;
-    text-align: center;
-  }
-
-  .unauthorized-box h1 {
-    font-size: 2.5rem;
-    color: #dc3545;
-    margin-bottom: 20px;
-  }
-
-  .unauthorized-box p {
-    font-size: 1.2rem;
-    color: #6c757d;
-  }
-
-  .unauthorized-box i {
-    font-size: 4rem;
-    color: #dc3545;
-    margin-bottom: 15px;
-  }
-</style>
-
-<div class="unauthorized-box">
-  <i class="fas fa-ban"></i>
-  <h1>🚫 Access Denied</h1>
-  <p>You do not have permission to access this page or section of the system.</p>
-  <a href="/admin/dashboard" class="btn btn-outline-secondary mt-4">
-    🔙 Back to Dashboard
-  </a>
-</div>
-
-<%- include('partials/footer') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Access Denied</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 40px;
+      max-width: 500px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .card h1 {
+      font-size: 2.5rem;
+      color: #dc3545;
+      margin-bottom: 20px;
+    }
+    .card p {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .back-btn {
+      margin-top: 30px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+    .back-btn:hover {
+      background: #4f46e5;
+    }
+    .icon {
+      font-size: 4rem;
+      color: #dc3545;
+      margin-bottom: 20px;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🚫</div>
+    <h1>Access Denied<% if (user && user.name) { %>, <%= user.name.split(' ')[0] %><% } %>!</h1>
+    <p>Sorry<% if (user && user.name) { %> <%= user.name.split(' ')[0] %><% } %>! You do not have permission to access this page.</p>
+    <p>Please contact the administration if you believe this is a mistake.</p>
+    <button onclick="history.back()" class="back-btn">🔙 Go Back</button>
+  </div>
+</body>
+</html>

@@ -54,10 +54,13 @@
               </svg>
             </div>
 
-            <% if (available < 10) { %>
-              <p class="text-danger fw-bold mb-0">🔥 Last <%= available %> Offices!</p>
+            <% if (available === 0) { %>
+              <p class="text-danger fw-bold mb-0">⛔ Currently Fully Rented</p>
+              <p class="text-muted small mb-0">We’re sorry! Please contact our team to be added to the priority list.</p>
+            <% } else if (available < 10) { %>
+              <p class="text-danger fw-bold mb-0">🔥 Only <%= available %> Offices Left — Rent Fast!</p>
             <% } else { %>
-              <p class="text-muted small mb-0"><%= available %> Available</p>
+              <p class="text-muted small mb-0">✅ <%= available %> Offices Available</p>
             <% } %>
           </div>
 

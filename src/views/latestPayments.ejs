@@ -3,93 +3,109 @@
 <div class="container py-5">
 
   <!-- ✅ العنوان -->
-  <h1 class="mb-5 fw-bold text-center text-primary display-5">
+  <h1 class="mb-2 fw-bold text-center text-primary display-5">
     💵 Cheques - <%= currentMonthName %>
   </h1>
+  
 
   <!-- ✅ الفلتر -->
-  <div class="card shadow-sm rounded-4 mb-5 border-0">
-    <div class="card-body">
-      <h5 class="fw-bold mb-4">📅 Filter Cheques</h5>
-      <form method="GET" action="/payments" class="row gy-3 gx-4 align-items-end">
-        <% 
-          const months = [
-            "January","February","March","April","May","June",
-            "July","August","September","October","November","December"
-          ];
-          const currentYear = new Date().getFullYear();
-        %>
-        <div class="col-md-5">
-          <label class="form-label">Month</label>
-          <select name="month" class="form-select rounded-pill shadow-sm">
-            <% for (let i = 0; i < months.length; i++) { %>
-              <option value="<%= i %>" <%= typeof selectedMonth !== 'undefined' && i === selectedMonth ? 'selected' : '' %>>
-                <%= months[i] %>
-              </option>
-            <% } %>
-          </select>
-        </div>
+ <div class="card shadow-sm rounded-4 mb-5 border-0">
+  <div class="card-body">
+    <h5 class="fw-bold mb-4">📅 Filter Cheques</h5>
+    <form method="GET" action="/payments" class="row gy-3 gx-4 align-items-end">
+      <% 
+        const months = [
+          "January","February","March","April","May","June",
+          "July","August","September","October","November","December"
+        ];
+        const currentYear = new Date().getFullYear();
+      %>
 
-        <div class="col-md-5">
-          <label class="form-label">Year</label>
-          <select name="year" class="form-select rounded-pill shadow-sm">
-            <% for (let y = currentYear - 1; y <= currentYear + 1; y++) { %>
-              <option value="<%= y %>" <%= typeof selectedYear !== 'undefined' && y === selectedYear ? 'selected' : '' %>>
-                <%= y %>
-              </option>
-            <% } %>
-          </select>
-        </div>
+      <!-- ✅ اختيار الفرع -->
+      <div class="col-md-4">
+        <label class="form-label">Branch</label>
+        <select name="branch" class="form-select rounded-pill shadow-sm">
+          <option value="">All Branches</option>
+          <% branches.forEach(branch => { %>
+            <option value="<%= branch._id %>" <%= branch._id.toString() === selectedBranch ? 'selected' : '' %>><%= branch.name %></option>
+          <% }); %>
+        </select>
+      </div>
 
-        <div class="col-md-2 text-end">
-          <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
-            🔍 Filter
-          </button>
-        </div>
-      </form>
-    </div>
+      <!-- ✅ الشهر -->
+      <div class="col-md-4">
+        <label class="form-label">Month</label>
+        <select name="month" class="form-select rounded-pill shadow-sm">
+          <% for (let i = 0; i < months.length; i++) { %>
+            <option value="<%= i %>" <%= typeof selectedMonth !== 'undefined' && i === selectedMonth ? 'selected' : '' %>>
+              <%= months[i] %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- ✅ السنة -->
+      <div class="col-md-3">
+        <label class="form-label">Year</label>
+        <select name="year" class="form-select rounded-pill shadow-sm">
+          <% for (let y = currentYear - 1; y <= currentYear + 1; y++) { %>
+            <option value="<%= y %>" <%= typeof selectedYear !== 'undefined' && y === selectedYear ? 'selected' : '' %>>
+              <%= y %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- ✅ زر الفلتر -->
+      <div class="col-md-1 text-end">
+        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+          🔍 Filter
+        </button>
+      </div>
+    </form>
   </div>
+</div>
+
 
   <!-- ✅ progress circle -->
-  <!-- ✅ Collection Progress Circle -->
-<% if (totalChequesAmount > 0) { %>
-  <div class="card shadow-sm rounded-4 mb-5 border-0 text-center">
-    <div class="card-body">
-      <h5 class="fw-bold mb-4">💰 Collection Progress</h5>
-      <svg width="160" height="160" class="mb-3">
-        <circle r="70" cx="80" cy="80" fill="transparent" stroke="#eee" stroke-width="15"></circle>
-        <circle
-          r="70"
-          cx="80" cy="80"
-          fill="transparent"
-          stroke="url(#gradient)"
-          stroke-width="15"
-          stroke-dasharray="440"
-          stroke-dashoffset="<%= totalChequesAmount > 0 ? 440 - ((collectedAmount / totalChequesAmount) * 440) : 440 %>"
-          transform="rotate(-90 80 80)"
-          style="transition: stroke-dashoffset 1s ease;">
-        </circle>
-        <defs>
-          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#00b894"/>
-            <stop offset="100%" stop-color="#0984e3"/>
-          </linearGradient>
-        </defs>
-        <text
-          x="50%" y="50%"
-          text-anchor="middle" dominant-baseline="middle"
-          font-size="22" fill="#333" class="fw-bold">
-          <%= (totalChequesAmount > 0 && collectedAmount > 0)
-            ? ((collectedAmount / totalChequesAmount) * 100).toFixed(2)
-            : '0' %>%
-        </text>
-      </svg>
-      <p class="text-muted mb-0">
-        Collected: <strong> AED <%= collectedAmount.toFixed(2) %></strong> / AED <%= totalChequesAmount.toFixed(2) %>
-      </p>
+  <% if (totalChequesAmount > 0) { %>
+    <div class="card shadow-sm rounded-4 mb-5 border-0 text-center">
+      <div class="card-body">
+        <h5 class="fw-bold mb-4">💰 Collection Progress</h5>
+        <svg width="160" height="160" class="mb-3">
+          <circle r="70" cx="80" cy="80" fill="transparent" stroke="#eee" stroke-width="15"></circle>
+          <circle
+            r="70"
+            cx="80" cy="80"
+            fill="transparent"
+            stroke="url(#gradient)"
+            stroke-width="15"
+            stroke-dasharray="440"
+            stroke-dashoffset="<%= totalChequesAmount > 0 ? 440 - ((collectedAmount / totalChequesAmount) * 440) : 440 %>"
+            transform="rotate(-90 80 80)"
+            style="transition: stroke-dashoffset 1s ease;">
+          </circle>
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00b894"/>
+              <stop offset="100%" stop-color="#0984e3"/>
+            </linearGradient>
+          </defs>
+          <text
+            x="50%" y="50%"
+            text-anchor="middle" dominant-baseline="middle"
+            font-size="22" fill="#333" class="fw-bold">
+            <%= (totalChequesAmount > 0 && collectedAmount > 0)
+              ? ((collectedAmount / totalChequesAmount) * 100).toFixed(2)
+              : '0' %>% 
+          </text>
+        </svg>
+        <p class="text-muted mb-0">
+          Collected: <strong> AED <%= collectedAmount.toFixed(2) %></strong> / AED <%= totalChequesAmount.toFixed(2) %>
+        </p>
+      </div>
     </div>
-  </div>
-<% } %>
+  <% } %>
 
   <!-- ✅ جدول الشيكات الحالية -->
   <% if (cheques.length === 0) { %>
@@ -104,6 +120,7 @@
             <tr>
               <th>#</th>
               <th>Office</th>
+              <th>Branch</th> <!-- ✅ الجديد -->
               <th>Company Name</th>
               <th>Amount</th>
               <th>Collected</th>
@@ -116,7 +133,6 @@
             <% cheques.forEach((cheque, index) => {
               const amount = cheque.cheques?.amount || 0;
 
-              // ✅ هنا الشرط الصحيح: لو collected true يبقى المبلغ بالكامل
               const safeCollectedAmount = cheque.cheques.collected
                 ? amount
                 : (cheque.cheques.payments || []).reduce(
@@ -131,7 +147,8 @@
             %>
             <tr class="<%= rowClass %>">
               <td><%= index + 1 %></td>
-              <td><%= cheque.office?.[0]?.office_number || 'N/A' %></td>
+              <td><%= cheque.office?.office_number || 'N/A' %></td>
+              <td><%= cheque.branch?.[0]?.name || 'N/A' %></td> <!-- ✅ الجديد -->
               <td><%= cheque.client?.[0]?.company_en || cheque.client?.[0]?.company_name || 'N/A' %></td>
               <td> AED <%= amount.toFixed(2) %></td>
               <td> AED <%= safeCollectedAmount.toFixed(2) %></td>
@@ -179,96 +196,93 @@
     </div>
   <% } %>
 
- <!-- ✅ جدول الشيكات المتأخرة -->
-<% if (overdueCheques && overdueCheques.length > 0) { %>
-  <div class="card shadow-sm rounded-4 border-0 mt-5 mb-4">
-    <div class="card-body p-0">
-      <h5 class="p-3 fw-bold mb-0 text-danger">⚠️ Overdue Cheques from Previous Months</h5>
-      <table class="table table-bordered text-center align-middle mb-0">
-        <thead class="table-danger">
-          <tr>
-            <th>#</th>
-            <th>Office</th>
-            <th>Company Name</th>
-            <th>Amount</th>
-            <th>Collected</th>
-            <th>Due Date</th>
-            <th>Collected Date</th> <!-- ✅ العمود الجديد -->
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% overdueCheques.forEach((cheque, index) => {
-            let rowClass = 'table-danger';
-            const amount = cheque.cheques.amount || 0;
+  <!-- ✅ جدول الشيكات المتأخرة -->
+  <% if (overdueCheques && overdueCheques.length > 0) { %>
+    <div class="card shadow-sm rounded-4 border-0 mt-5 mb-4">
+      <div class="card-body p-0">
+        <h5 class="p-3 fw-bold mb-0 text-danger">⚠️ Overdue Cheques from Previous Months</h5>
+        <table class="table table-bordered text-center align-middle mb-0">
+          <thead class="table-danger">
+            <tr>
+              <th>#</th>
+              <th>Office</th>
+              <th>Branch</th> <!-- ✅ الجديد -->
+              <th>Company Name</th>
+              <th>Amount</th>
+              <th>Collected</th>
+              <th>Due Date</th>
+              <th>Collected Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% overdueCheques.forEach((cheque, index) => {
+              let rowClass = 'table-danger';
+              const amount = cheque.cheques.amount || 0;
 
-            const safeCollectedAmount = cheque.cheques.collected
-              ? amount
-              : (cheque.cheques.payments || []).reduce(
-                  (sum, p) => sum + (p.paid_amount || 0), 0);
+              const safeCollectedAmount = cheque.cheques.collected
+                ? amount
+                : (cheque.cheques.payments || []).reduce(
+                    (sum, p) => sum + (p.paid_amount || 0), 0);
 
-            if (safeCollectedAmount > 0 && safeCollectedAmount < amount) {
-              rowClass = 'table-warning';
-            } else if (safeCollectedAmount >= amount) {
-              rowClass = 'table-success';
-            }
-          %>
-          <tr class="<%= rowClass %>">
-            <td><%= index + 1 %></td>
-            <td><%= cheque.office?.[0]?.office_number || 'N/A' %></td>
-            <td><%= cheque.client?.[0]?.company_en || cheque.client?.[0]?.company_name || 'N/A' %></td>
-            <td> AED <%= amount.toFixed(2) %></td>
-            <td> AED <%= safeCollectedAmount.toFixed(2) %></td>
-            <td><%= cheque.cheques.due_date ? new Date(cheque.cheques.due_date).toISOString().split('T')[0] : '-' %></td>
+              if (safeCollectedAmount > 0 && safeCollectedAmount < amount) {
+                rowClass = 'table-warning';
+              } else if (safeCollectedAmount >= amount) {
+                rowClass = 'table-success';
+              }
+            %>
+            <tr class="<%= rowClass %>">
+              <td><%= index + 1 %></td>
+              <td><%= cheque.office?.office_number || 'N/A' %></td>
+              <td><%= cheque.branch?.[0]?.name || 'N/A' %></td> <!-- ✅ الجديد -->
+              <td><%= cheque.client?.[0]?.company_en || cheque.client?.[0]?.company_name || 'N/A' %></td>
+              <td> AED <%= amount.toFixed(2) %></td>
+              <td> AED <%= safeCollectedAmount.toFixed(2) %></td>
+              <td><%= cheque.cheques.due_date ? new Date(cheque.cheques.due_date).toISOString().split('T')[0] : '-' %></td>
+              <td>
+                <% if (safeCollectedAmount >= amount && cheque.cheques.collected_at) { %>
+                  <%= new Date(cheque.cheques.collected_at).toISOString().split('T')[0] %>
+                <% } else if (cheque.cheques.payments && cheque.cheques.payments.length > 0) { %>
+                  <%= new Date(cheque.cheques.payments[cheque.cheques.payments.length - 1].paid_date).toISOString().split('T')[0] %>
+                <% } else { %>
+                  —
+                <% } %>
+              </td>
+              <td>
+                <% if (safeCollectedAmount > 0 && safeCollectedAmount < amount) { %>
+                  <span class="badge bg-warning text-dark">💲 Partially Collected</span>
+                <% } else if (safeCollectedAmount >= amount) { %>
+                  <span class="badge bg-success">✅ Collected</span>
+                <% } else { %>
+                  <span class="badge bg-danger">⏳ Overdue</span>
+                <% } %>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
 
-            <!-- ✅ التاريخ هنا -->
-          <td>
-  <% if (safeCollectedAmount >= amount && cheque.cheques.collected_at) { %>
-    <%= new Date(cheque.cheques.collected_at).toISOString().split('T')[0] %>
-  <% } else if (cheque.cheques.payments && cheque.cheques.payments.length > 0) { %>
-    <%= new Date(cheque.cheques.payments[cheque.cheques.payments.length - 1].paid_date).toISOString().split('T')[0] %>
-  <% } else { %>
-    —
-  <% } %>
-</td>
-
-
-            <td>
-              <% if (safeCollectedAmount > 0 && safeCollectedAmount < amount) { %>
-                <span class="badge bg-warning text-dark">💲 Partially Collected</span>
-              <% } else if (safeCollectedAmount >= amount) { %>
-                <span class="badge bg-success">✅ Collected</span>
-              <% } else { %>
-                <span class="badge bg-danger">⏳ Overdue</span>
-              <% } %>
-            </td>
-          </tr>
-          <% }); %>
-        </tbody>
-      </table>
-
-      <!-- ✅ Totals overdue -->
-      <div class="d-flex flex-wrap justify-content-center bg-light rounded-4 p-3 mt-3 shadow-sm">
-        <div class="mx-3 text-center">
-          <div class="fs-4 mb-1">💰</div>
-          <div class="fw-bold text-primary"> AED <%= totalOverdueAmount.toFixed(2) %></div>
-          <div class="text-muted small">Total Overdue</div>
-        </div>
-        <div class="mx-3 text-center border-start px-3">
-          <div class="fs-4 mb-1">✅</div>
-          <div class="fw-bold text-success"> AED <%= overdueCollectedAmount.toFixed(2) %></div>
-          <div class="text-muted small">Collected</div>
-        </div>
-        <div class="mx-3 text-center border-start px-3">
-          <div class="fs-4 mb-1">⏳</div>
-          <div class="fw-bold text-danger"> AED <%= overdueRemainingAmount.toFixed(2) %></div>
-          <div class="text-muted small">Remaining</div>
+        <!-- ✅ Totals overdue -->
+        <div class="d-flex flex-wrap justify-content-center bg-light rounded-4 p-3 mt-3 shadow-sm">
+          <div class="mx-3 text-center">
+            <div class="fs-4 mb-1">💰</div>
+            <div class="fw-bold text-primary"> AED <%= totalOverdueAmount.toFixed(2) %></div>
+            <div class="text-muted small">Total Overdue</div>
+          </div>
+          <div class="mx-3 text-center border-start px-3">
+            <div class="fs-4 mb-1">✅</div>
+            <div class="fw-bold text-success"> AED <%= overdueCollectedAmount.toFixed(2) %></div>
+            <div class="text-muted small">Collected</div>
+          </div>
+          <div class="mx-3 text-center border-start px-3">
+            <div class="fs-4 mb-1">⏳</div>
+            <div class="fw-bold text-danger"> AED <%= overdueRemainingAmount.toFixed(2) %></div>
+            <div class="text-muted small">Remaining</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-<% } %>
-
+  <% } %>
 
   <div class="text-center">
     <a href="/" class="btn btn-outline-secondary rounded-pill mt-4 shadow-sm">

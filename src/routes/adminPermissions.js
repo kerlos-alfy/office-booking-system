@@ -13,7 +13,7 @@ router.get('/permissions',
   async (req, res) => {
     const permissions = await Permission.find();
     
-    res.render('admin/permissions/index', { permissions });
+    res.render('admin/permissions/index', {user: req.user, permissions });
   }
 );
 
@@ -22,7 +22,7 @@ router.get('/permissions/new',
   authenticateJWT,
   hasPermission('manage_permissions'),
   async (req, res) => {
-    res.render('admin/permissions/new');
+    res.render('admin/permissions/new', {user: req.user,});
   }
 );
 

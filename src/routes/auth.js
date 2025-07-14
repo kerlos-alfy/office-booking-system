@@ -41,7 +41,9 @@ router.post('/login', async (req, res) => {
     id: user._id,
     name: user.name,
     role: user.role.name,
-    permissions: []
+      permissions: [],
+    branch: user.branch ? user.branch._id.toString() : null,
+    branches: user.branches?.map(b => b._id?.toString() || b.toString()) || (user.branch ? [user.branch._id.toString()] : [])
   };
 
   if (user.role.name === 'super_admin') {
@@ -69,7 +71,7 @@ router.post('/login', async (req, res) => {
 
   console.log('🍪 JWT Cookie Set!');
 
-  res.redirect('/admin/dashboard');
+  res.redirect('/branches');
 });
 
 // تسجيل الخروج

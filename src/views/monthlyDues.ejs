@@ -8,6 +8,7 @@
     <% if (branchName) { %>
       <br>🏢 Branch: <%= branchName %>
     <% } %>
+    
   </h1>
 
   <!-- ✅ Dashboard صغيرة -->
@@ -83,6 +84,18 @@
   </div>
 </div>
 
+<!-- ✅ فلتر الفرع Frontend -->
+<div class="row mb-4">
+  <div class="col-md-4">
+    <label class="form-label fw-semibold text-secondary">🏢 Branch (Frontend)</label>
+    <select id="branchFilter" class="form-select rounded-pill shadow-sm px-3 py-2">
+      <option value="">-- All Branches --</option>
+      <% branches.forEach(branch => { %>
+        <option value="<%= branch._id %>"><%= branch.name %></option>
+      <% }); %>
+    </select>
+  </div>
+</div>
 
   <!-- ✅ جدول المستحقات الشهرية -->
   <% if (dues.length === 0) { %>
@@ -113,7 +126,8 @@
             <% dues.forEach((due, index) => {
               let rowClass = due.paid >= due.amount ? 'table-success' : (due.paid > 0 ? 'table-info' : 'table-warning');
             %>
-            <tr class="<%= rowClass %>">
+           <tr class="<%= rowClass %>" data-branch="<%= due.branchId %>">
+
               <td><%= index + 1 %></td>
               <td><%= due.officeNumber %></td>
               <td><%= due.clientName %></td>
@@ -177,7 +191,8 @@
           <% overdueDues.forEach((due, index) => {
             let rowClass = due.paid >= due.amount ? 'table-success' : (due.paid > 0 ? 'table-warning' : 'table-danger');
           %>
-          <tr class="<%= rowClass %>">
+          <tr class="<%= rowClass %>" data-branch="<%= due.branchId %>">
+
             <td><%= index + 1 %></td>
             <td><%= due.officeNumber %></td>
             <td><%= due.clientName %></td>
@@ -231,5 +246,33 @@
 
 
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const branchFilter = document.getElementById('branchFilter');
+    console.log('✅ هل branchFilter موجود؟', branchFilter);
+
+    if (branchFilter) {
+      branchFilter.addEventListener('change', function() {
+        const selectedBranch = this.value.trim();
+        console.log('✅ Selected Branch:', selectedBranch);
+
+        document.querySelectorAll('tbody tr').forEach(row => {
+          const rowBranch = row.getAttribute('data-branch')?.trim();
+          console.log('➡️ Row Branch:', rowBranch);
+          console.log('🔗 Match:', rowBranch === selectedBranch);
+
+          if (!selectedBranch || rowBranch === selectedBranch) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    } else {
+      console.log('❌ مفيش branchFilter!');
+    }
+  });
+</script>
+
 
 <%- include('partials/footer') %>

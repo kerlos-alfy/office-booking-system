@@ -11,7 +11,7 @@ router.get('/roles',
   hasPermission('manage_roles'),
   async (req, res) => {
     const roles = await Role.find().populate('permissions');
-    res.render('admin/roles/index', { roles });
+    res.render('admin/roles/index', {user: req.user, roles });
   }
 );
 
@@ -22,7 +22,7 @@ router.get('/roles/new',
   async (req, res) => {
     const permissions = await Permission.find();
     const roles = await Role.find().populate('permissions'); // ✅ لازم تجيبها
-    res.render('admin/roles/new', { permissions, roles });
+    res.render('admin/roles/new', {user: req.user, permissions, roles });
   }
 );
 
@@ -44,7 +44,7 @@ router.get('/roles/:id/edit',
   async (req, res) => {
     const role = await Role.findById(req.params.id);
     const permissions = await Permission.find();
-    res.render('admin/roles/edit', { role, permissions });
+    res.render('admin/roles/edit', { user: req.user,role, permissions });
   }
 );
 

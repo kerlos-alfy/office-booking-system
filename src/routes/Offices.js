@@ -7,6 +7,7 @@ const Booking = require("../models/Booking");
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
+const { authenticateJWT, hasPermission } = require('../middlewares/auth');
 
 const tempUploadPath = path.join(__dirname, "../../public/uploads/offices/temp");
 fs.mkdirSync(tempUploadPath, { recursive: true });
@@ -189,32 +190,86 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
 
 // routes/offices.js
 // عرض صفحة Manage Offices
-router.get('/manage', async (req, res) => {
-  const branches = await Branch.find();
-  res.render('manageOffices', { branches });
-});
+router.get('/manage/list',
+  authenticateJWT,
+  hasPermission('manage_offices'),
+  async (req, res) => {
+    let { branch_id, floor } = req.query;
 
-// جلب المكاتب بناءً على الفرع والدور
-router.get('/manage/list', async (req, res) => {
-  const { branch_id, floor } = req.query;
-  let query = {};
-  if (branch_id) query.branch_id = branch_id;
-  if (floor) query.floor = floor;
+    if (req.user.branch) {
+      // يجمد الفرع على فرعه
+      branch_id = req.user.branch;
+    }
 
-  const offices = await Office.find(query).populate('branch_id');
-  res.json(offices);
-});
+    let query = {};
+    if (branch_id) query.branch_id = branch_id;
+    if (floor) query.floor = floor;
 
-// ✅ جلب الأدوار المتاحة في الفرع
-router.get('/branches/:id/floors', async (req, res) => {
-  const branchId = req.params.id;
+    const offices = await Office.find(query).populate('branch_id');
+    res.json(offices);
+  }
+);
 
-  const offices = await Office.find({ branch_id: branchId });
+router.get('/manage',
+  authenticateJWT,
+  hasPermission('manage_offices'),
+  async (req, res) => {
+    const officeQuery = req.user.branch
+      ? { branch_id: req.user.branch }
+      : {};
 
-  const floors = [...new Set(offices.map(o => o.floor))].sort((a, b) => a - b);
+    const offices = await Office.find(officeQuery).populate('branch_id');
 
-  res.json(floors);
-});
+    const branches = req.user.branch
+      ? await Branch.find({ _id: req.user.branch })
+      : await Branch.find({});
+
+    res.render('manageOffices', {
+      offices,
+      branches,
+      user: req.user
+    });
+  }
+);
+
+router.get('/manage/list',
+  authenticateJWT,
+  hasPermission('manage_offices'),
+  async (req, res) => {
+    let { branch_id, floor } = req.query;
+
+    if (req.user.branch) {
+      branch_id = req.user.branch;
+    }
+
+    let query = {};
+    if (branch_id) query.branch_id = branch_id;
+    if (floor) query.floor = floor;
+
+    const offices = await Office.find(query).populate('branch_id');
+    res.json(offices);
+  }
+);
+
+router.get('/branches/:id/floors',
+  authenticateJWT,
+  hasPermission('manage_offices'),
+  async (req, res) => {
+    let branchId = req.params.id;
+
+    if (req.user.branch) {
+      branchId = req.user.branch;
+    }
+
+    const offices = await Office.find({ branch_id: branchId });
+
+    const floors = [...new Set(offices.map(o => o.floor))].sort((a, b) => a - b);
+
+    res.json(floors);
+  }
+);
+
+
 router.delete('/:id', async (req, res) => {
   try {
     await Office.findByIdAndDelete(req.params.id);

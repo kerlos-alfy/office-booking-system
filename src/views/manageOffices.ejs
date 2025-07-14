@@ -6,19 +6,24 @@
   <div class="row mb-4">
     <div class="col-md-4">
       <label class="form-label fw-semibold">Branch</label>
-      <select id="branchSelect" class="form-select">
-        <option value="">Select Branch</option>
+      <select id="branchSelect" class="form-select" <%= user.branch ? 'disabled' : '' %> >
         <% branches.forEach(branch => { %>
-          <option value="<%= branch._id %>"><%= branch.name %></option>
+          <option 
+            value="<%= branch._id %>"
+            <%= user.branch && user.branch.toString() === branch._id.toString() ? 'selected' : '' %>>
+            <%= branch.name %>
+          </option>
         <% }) %>
       </select>
     </div>
+
     <div class="col-md-4">
       <label class="form-label fw-semibold">Floor</label>
       <select id="floorSelect" class="form-select" disabled>
         <option value="">Select Floor</option>
       </select>
     </div>
+
     <div class="col-md-4 d-flex align-items-end">
       <button class="btn btn-success w-100 fw-semibold" id="loadBtn">🔎 Show Offices</button>
     </div>
@@ -30,10 +35,15 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  document.getElementById('branchSelect').addEventListener('change', async function() {
-    const branchId = this.value;
-    const floorSelect = document.getElementById('floorSelect');
+  const branchSelect = document.getElementById('branchSelect');
 
+  // ✅ لما الفرع يتغير أو يتحمل
+  branchSelect.addEventListener('change', async function() {
+    const branchId = branchSelect.disabled 
+      ? '<%= user.branch ? user.branch : "" %>' 
+      : branchSelect.value;
+
+    const floorSelect = document.getElementById('floorSelect');
     floorSelect.innerHTML = '<option value="">Select Floor</option>';
 
     if (!branchId) {
@@ -41,29 +51,11 @@
       return;
     }
 
-    // Show loading option
     floorSelect.innerHTML = '<option>Loading...</option>';
 
     try {
-      // ✅ استخدم الـ prefix لو عندك Router مربوط
       const res = await fetch(`/offices/branches/${branchId}/floors`);
-
-      if (!res.ok) {
-        console.error('Error response:', res.status);
-        floorSelect.disabled = true;
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Could not load floors for this branch.'
-        });
-
-        return;
-      }
-
       const floors = await res.json();
-      console.log('Branch selected:', branchId);
-      console.log('Floors returned:', floors);
 
       floorSelect.innerHTML = '<option value="">Select Floor</option>';
 
@@ -89,16 +81,6 @@
 
       floorSelect.disabled = false;
 
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: `Loaded ${floors.length} floors`,
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true
-      });
-
     } catch (err) {
       console.error('Error fetching floors:', err);
       floorSelect.innerHTML = '<option>Error loading floors</option>';
@@ -112,8 +94,17 @@
     }
   });
 
+  // ✅ Trigger: لو الفرع ثابت — حمّل الفلورز تلقائيًا
+  if (branchSelect.disabled) {
+    branchSelect.dispatchEvent(new Event('change'));
+  }
+
+  // ✅ زرار تحميل المكاتب
   document.getElementById('loadBtn').addEventListener('click', async function() {
-    const branchId = document.getElementById('branchSelect').value;
+    const branchId = branchSelect.disabled 
+      ? '<%= user.branch ? user.branch : "" %>' 
+      : branchSelect.value;
+
     const floor = document.getElementById('floorSelect').value;
 
     if (!branchId || !floor) {
@@ -191,7 +182,6 @@
   }
 </script>
 
-
 <style>
   body {
     background: #f8f9fa;
@@ -209,6 +199,5 @@
     transform: translateY(-5px);
   }
 </style>
-<!-- SweetAlert2 CDN -->
 
 <%- include('./partials/footer') %>

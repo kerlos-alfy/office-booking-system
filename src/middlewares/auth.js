@@ -23,6 +23,29 @@ function authenticateJWT(req, res, next) {
 }
 
 // ✅ التحقق من الصلاحية
+// function hasPermission(permissionKey) {
+//   return (req, res, next) => {
+//     const userPermissions = req.user?.permissions;
+
+//     console.log('🟢 User permissions:', userPermissions);
+
+//     if (!userPermissions) {
+//       console.log('⛔️ No permissions in JWT');
+//       return res.status(403).render('unauthorized');
+//     }
+
+//     if (userPermissions.includes(permissionKey)) {
+//       console.log(`✅ Permission ${permissionKey} granted`);
+//       return next();
+//     }
+
+//     console.log(`⛔️ Permission ${permissionKey} denied`);
+//     return res.status(403).render('unauthorized');
+//   };
+// }
+
+
+
 function hasPermission(permissionKey) {
   return (req, res, next) => {
     const userPermissions = req.user?.permissions;
@@ -31,7 +54,7 @@ function hasPermission(permissionKey) {
 
     if (!userPermissions) {
       console.log('⛔️ No permissions in JWT');
-      return res.status(403).render('unauthorized');
+      return res.status(403).render('unauthorized', { user: req.user });
     }
 
     if (userPermissions.includes(permissionKey)) {
@@ -40,9 +63,10 @@ function hasPermission(permissionKey) {
     }
 
     console.log(`⛔️ Permission ${permissionKey} denied`);
-    return res.status(403).render('unauthorized');
+    return res.status(403).render('unauthorized', { user: req.user });
   };
 }
+
 
 // ✅ أهم سطر!
 module.exports = { authenticateJWT, hasPermission };

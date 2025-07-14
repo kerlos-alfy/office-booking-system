@@ -1,0 +1,185 @@
+<%- include('../partials/header') %>
+
+<div class="container my-5 px-2 px-md-5">
+  <h2 class="text-center text-primary fw-bold mb-4">✏️ Edit Daily Employee Report</h2>
+
+  <form method="POST" action="/call-reports/daily-reports/<%= report._id %>?_method=PUT" class="shadow-sm rounded-4">
+    <input type="hidden" name="user_id" value="<%= report.user_id || '' %>">
+
+    <!-- ✅ Today’s Rent Collection -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-secondary">🏢 Today’s Rent Collection</h5>
+        <button type="button" class="btn btn-outline-success btn-sm add-section">➕ Add</button>
+      </div>
+
+      <div class="card-body sections-wrapper" data-section="rent">
+        <% if (report.rent_office_no && report.rent_office_no.length) { %>
+          <% report.rent_office_no.forEach((no, i) => { %>
+            <div class="section-item border rounded p-3 mb-3 bg-white">
+              <div class="row g-3">
+                <div class="col-md-4 position-relative">
+                  <label>🏬 Office No.</label>
+                  <input type="text" name="rent_office_no[]" class="form-control officeNoInput" value="<%= no %>">
+                  <ul class="list-group position-absolute w-100 officeSuggestions" style="z-index: 999;"></ul>
+                </div>
+                <div class="col-md-4">
+                  <label>🏢 CO. Name</label>
+                  <input type="text" name="rent_company_name[]" class="form-control" value="<%= report.rent_company_name?.[i] || '' %>">
+                </div>
+                <div class="col-md-4">
+                  <label>💵 Amount</label>
+                  <input type="number" name="rent_amount[]" class="form-control" value="<%= report.rent_amount?.[i] || '' %>">
+                </div>
+                <div class="col-md-4">
+                  <label>📅 Due Date</label>
+                  <input type="date" name="rent_due_date[]" class="form-control" value="<%= report.rent_due_date?.[i] || '' %>">
+                </div>
+                <div class="col-md-4">
+                  <label>✅ Date Paid</label>
+                  <input type="date" name="rent_date_paid[]" class="form-control" value="<%= report.rent_date_paid?.[i] || '' %>">
+                </div>
+                <div class="col-md-4">
+                  <label>💳 Where Did The Money Go?</label>
+                  <select name="rent_money_destination[]" class="form-select">
+                    <option value="">Select</option>
+                    <option value="Bank Account" <%= report.rent_money_destination?.[i] === 'Bank Account' ? 'selected' : '' %>>🏦 Bank Account</option>
+                    <option value="Branch Safe" <%= report.rent_money_destination?.[i] === 'Branch Safe' ? 'selected' : '' %>>💼 Branch Safe</option>
+                    <option value="HQ" <%= report.rent_money_destination?.[i] === 'HQ' ? 'selected' : '' %>>🏢 HQ</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="btn btn-danger btn-sm mt-3 remove-section">🗑️ Remove</button>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <!-- في حالة فاضية -->
+        <% } %>
+      </div>
+    </div>
+
+    <!-- ✅ Visits -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">🚶 Number of Visits</h5>
+        <div id="visits-wrapper">
+          <% if (report.visits_details && report.visits_details.length) { %>
+            <% report.visits_details.forEach((visit, i) => { %>
+              <div class="section-item border rounded p-3 mb-3 bg-white">
+                <label>🚶 Visit No. <%= i + 1 %></label>
+                <textarea name="visits_details[]" class="form-control"><%= visit %></textarea>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Payments -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-secondary">💳 Any New Payment</h5>
+        <button type="button" class="btn btn-outline-success btn-sm add-section">➕ Add</button>
+      </div>
+
+      <div class="card-body sections-wrapper" data-section="payment">
+        <% if (report.payment_ejari && report.payment_ejari.length) { %>
+          <% report.payment_ejari.forEach((ejari, i) => { %>
+            <div class="section-item border rounded p-3 mb-3 bg-white">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label>🏠 Ejari</label>
+                  <input type="number" name="payment_ejari[]" value="<%= ejari %>" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <label>💰 D.P</label>
+                  <input type="number" name="payment_dp[]" value="<%= report.payment_dp?.[i] || '' %>" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <label>📑 Rental</label>
+                  <input type="number" name="payment_booking[]" value="<%= report.payment_booking?.[i] || '' %>" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <label>➕ Etc.</label>
+                  <input type="text" name="payment_etc[]" value="<%= report.payment_etc?.[i] || '' %>" class="form-control">
+                </div>
+              </div>
+              <button type="button" class="btn btn-danger btn-sm mt-3 remove-section">🗑️ Remove</button>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- ✅ Inspections -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">🔍 Daily Inspections</h5>
+        <div id="inspections-wrapper">
+          <% if (report.inspection_companies && report.inspection_companies.length) { %>
+            <% report.inspection_companies.forEach((company, i) => { %>
+              <div class="section-item border rounded p-3 mb-3 bg-white">
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <label>🏭 Company</label>
+                    <input type="text" name="inspection_companies[]" value="<%= company %>" class="form-control">
+                  </div>
+                  <div class="col-md-3">
+                    <label>🔍 Type</label>
+                    <select name="inspection_type[]" class="form-select">
+                      <option value="Labor" <%= report.inspection_type?.[i] === 'Labor' ? 'selected' : '' %>>Labor</option>
+                      <option value="Bank" <%= report.inspection_type?.[i] === 'Bank' ? 'selected' : '' %>>Bank</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label>#️⃣ Order</label>
+                    <select name="inspection_order[]" class="form-select">
+                      <option value="first" <%= report.inspection_order?.[i] === 'first' ? 'selected' : '' %>>First</option>
+                      <option value="second" <%= report.inspection_order?.[i] === 'second' ? 'selected' : '' %>>Second</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label>🏢 Ejari Unit</label>
+                    <input type="text" name="inspection_ejari_unit[]" value="<%= report.inspection_ejari_unit?.[i] || '' %>" class="form-control">
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Offices + Messages + Timing -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">🏢 No. Available Offices</h5>
+        <input type="number" name="available_offices" value="<%= report.available_offices %>" class="form-control">
+      </div>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">📲 Messages</h5>
+        <input type="number" name="messages_whatsapp" value="<%= report.messages_whatsapp %>" class="form-control mb-2">
+        <input type="number" name="messages_dubizzle" value="<%= report.messages_dubizzle %>" class="form-control mb-2">
+        <input type="number" name="messages_bayut" value="<%= report.messages_bayut %>" class="form-control mb-2">
+        <input type="number" name="messages_property_finder" value="<%= report.messages_property_finder %>" class="form-control">
+      </div>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">⏱️ Timing</h5>
+        <input type="time" name="arriving_time" value="<%= report.arriving_time %>" class="form-control mb-2">
+        <input type="time" name="leaving_time" value="<%= report.leaving_time %>" class="form-control">
+      </div>
+    </div>
+
+    <div class="text-end mb-5">
+      <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">💾 Save Changes</button>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

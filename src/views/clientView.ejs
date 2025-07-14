@@ -1,231 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Your Own Business Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-      body {
-        padding-bottom: 50px;
-        background-color: #f9f9fb;
-      }
-      h1 {
-        font-weight: 700;
-        font-size: 1.8rem;
-        color: #2c3e50;
-      }
-      .card {
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-      }
-      .card-header {
-        font-size: 1.05rem;
-        font-weight: 600;
-      }
-      .table thead th {
-        background-color: #34495e;
-        color: white;
-      }
-      .table-hover tbody tr:hover {
-        background-color: #f1f1f1;
-        transition: 0.3s ease;
-      }
-      .table-summary th {
-        background-color: #0d6efd;
-        color: white;
-        font-size: 1.1rem;
-      }
-      .table-summary td {
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Own Business Center</title>
+<!-- SEO Meta -->
+<meta name="description" content="Your Own Business Center | Manage branches, offices, clients, rentals, and more in a professional way.">
+<meta name="author" content="YYour Own Business Center">
+
+<!-- Open Graph Meta -->
+<meta property="og:title" content="Your Own Business Center">
+<meta property="og:description" content="Manage your branches, offices, clients and Rentals seamlessly with Your Own Business Center.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yourownb.com/">
+<meta property="og:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+<meta property="og:site_name" content="Your Own Business Center">
+
+<!-- Twitter Card Meta -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your Own Business Center">
+<meta name="twitter:description" content="Manage your branches, offices, clients and rentals seamlessly with Your Own Business Center.">
+<meta name="twitter:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+
+<!-- Favicon & Apple Touch Icon -->
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="apple-touch-icon" href="/images/logo.png">
+  <!-- External Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Global Styles -->
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --text-color: #2c3e50;
+      --bg-light: #f9f9fb;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-light);
+      font-family: 'Poppins', "Segoe UI", sans-serif;
+    }
+
+    body > .container {
+      flex: 1;
+      padding-bottom: 60px;
+    }
+
+    h1, h3 {
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .navbar {
+      min-height: 64px;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .navbar-brand img {
+      height: 40px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      border-radius: 6px;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background-color: #ffffff12;
+      color: #ffffff;
+    }
+
+    @media (min-width: 768px) {
+      .brand-title { font-size: 22px; }
+    }
+
+    @media (min-width: 992px) {
+      .navbar { min-height: 72px; }
+      .navbar-nav .nav-link {
         font-size: 1rem;
-        padding: 0.75rem 1rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
       }
-      .btn-primary {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-      }
-      .btn-primary:hover {
-        background-color: #0b5ed7;
-        border-color: #0b5ed7;
-      }
-      .office-box,
-      .branch-card {
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .office-box:hover,
-      .branch-card:hover {
-        border-color: #0d6efd;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
-      }
-      .branch-card {
-        padding: 20px;
-      }
-      .office-available {
-        background-color: #e8f5e9;
-        border-color: #81c784;
-      }
-      .office-booked {
-        background-color: #fff3f3;
-        border-color: #e57373;
-      }
-      body {
-        animation: fadeIn 0.5s ease-in;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-      }
-      body > .container {
-        flex: 1;
-      }
-    </style>
-  </head>
-  <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
-      <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-          <img src="/images/logo.png" alt="Logo" class="me-2" style="height: 40px" />
-          <span class="fw-bold fs-5">Your Own Business Center</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="/branches">🏢 Branches</a></li>
-            <li class="nav-item"><a class="nav-link" href="/clients">Clients</a></li>
-            <li class="nav-item"><a class="nav-link" href="/bookings">📋 Bookings</a></li>
-            <li class="nav-item"><a class="nav-link" href="/bookings/archive">📦 Archive</a></li>
-            <li class="nav-item"><a class="nav-link" href="/payments">Payments</a></li>
-            <li class="nav-item"><a class="nav-link" href="/reports/revenue">Revenue Report</a></li>
-            <li class="nav-item"><a class="nav-link" href="/reports/timeline">Revenue Timeline</a></li>
-          </ul>
-        </div>
+    }
+
+    .card {
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: none;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #0d6efd, #3b82f6);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .btn {
+      border-radius: 50px;
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border: none;
+      color: #fff;
+    }
+    .btn-warning:hover {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    footer {
+      background: #2c3e50;
+      color: #fff;
+    }
+
+    body {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .logout:hover {
+      background-color: #e6101073 !important;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <!-- ✅ Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="/images/logo.png" alt="Logo" class="me-2" />
+        <span class="brand-title">Your Own Business Center</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/branches"><i class="fas fa-code-branch me-2"></i>Branches</a></li>
+          <li class="nav-item"><a class="nav-link" href="/clients"><i class="fas fa-users me-2"></i>Clients</a></li>
+          <li class="nav-item"><a class="nav-link" href="/bookings"><i class="fas fa-clipboard-list me-2"></i>Rentals</a></li>
+          <li class="nav-item"><a class="nav-link" href="/bookings/archive"><i class="fas fa-archive me-2"></i>Archive</a></li>
+          <li class="nav-item"><a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i>Payments</a></li>
+          <li class="nav-item"><a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i>Revenue Report</a></li>
+          <li class="nav-item"><a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i>Revenue Timeline</a></li>
+          <li class="nav-item"><a class="nav-link" href="/offices/manage"><i class="fas fa-door-open me-2"></i>Manage Offices</a></li>
+          <li class="nav-item"><a class="nav-link" href="/bookings/tax-invoices"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Tax Invoices</a></li>
+          <li class="nav-item"><a class="nav-link logout" href="/logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
+        </ul>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <div class="container my-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-dark fw-bold"><i class="fas fa-user-circle me-2 text-primary"></i>Client Details</h1>
-        <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold">✏️ Edit</a>
-      </div>
+  <!-- ✅ Main Container -->
+  <div class="container mb-5">
+    <!-- ✅ Client Details Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1><i class="fas fa-user-circle text-primary me-2"></i> Client Details</h1>
+      <a href="/clients/<%= client._id %>/edit" class="btn btn-warning fw-bold px-4">✏️ Edit</a>
+    </div>
 
-      <div class="row g-4 mb-4">
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-dark text-white fw-bold">🧾 Basic Info</div>
-           <div class="card-body">
-  <p><strong>Company:</strong> <span class="text-muted"><%= client.company_en %> (<%= client.company_ar %>)</span></p>
-  <p><strong>Owner:</strong> <span class="text-muted"><%= client.registered_owner_name_en %> (<%= client.registered_owner_name_ar %>)</span></p>
-  <p><strong>Mobile:</strong> <span class="text-muted"><%= client.mobile %></span></p>
-  <p><strong>Nationality:</strong> <span class="text-muted"><%= client.nationality_en %> (<%= client.nationality_ar %>)</span></p>
-</div>
-
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-success text-white fw-bold">📌 Status & License</div>
-            <div class="card-body">
-              <p><strong>Emirates ID:</strong> <span class="badge bg-info text-dark"><%= client.emirates_id_status %></span></p>
-              <p><strong>Contract:</strong> <span class="badge bg-success"><%= client.contract_status %></span></p>
-              <p><strong>License:</strong> <span class="badge bg-secondary"><%= client.license_status %></span></p>
-              <p><strong>License No:</strong> <span class="text-muted"><%= client.license_number %></span></p>
-              <p><strong>Expiry:</strong> <span class="text-muted">
-              <p><strong>Expiry:</strong> <span class="text-muted">
-  <% if (client.license_expiry) {
-    const expDate = new Date(client.license_expiry);
-    const isExpired = expDate < new Date();
-  %>
-    <%= expDate.toISOString().split('T')[0] %>
-    <% if (isExpired) { %>
-      <span class="badge bg-danger ms-2">Expired</span>
-    <% } %>
-  <% } else { %> Not Provided <% } %>
-</span></p>
-
-              <p><strong>Ejari No:</strong> <span class="text-muted"><%= client.ejari_no %></span></p>
-              <a href="/clients/<%= client._id %>/invoice/download" class="btn btn-outline-success btn-sm mt-2">💾 Download Invoice</a>
-            </div>
+    <!-- ✅ Info Cards -->
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">🧾 Basic Info</div>
+          <div class="card-body">
+            <p><strong>Company:</strong> <span class="text-muted"><%= client.company_en %> (<%= client.company_ar %>)</span></p>
+            <p><strong>Owner:</strong> <span class="text-muted"><%= client.registered_owner_name_en %> (<%= client.registered_owner_name_ar %>)</span></p>
+            <p><strong>Mobile:</strong> <span class="text-muted"><%= client.mobile %></span></p>
+            <p><strong>Nationality:</strong> <span class="text-muted"><%= client.nationality_en %> (<%= client.nationality_ar %>)</span></p>
           </div>
         </div>
       </div>
-
-      <!-- Files Section -->
-      <h3 class="fw-bold text-secondary mt-4 mb-3">
-        <i class="fas fa-folder-open me-2"></i>Client Files
-      </h3>
-
-      <p class="text-muted">
-        Total Files: <%= [client.license_file_path, client.ejari_file_path, client.emirates_id_file_path, client.passport_file_path, client.contract_file_path].filter(f => f).length + (client.additional_files?.length || 0) %>
-      </p>
-
-      <div class="row g-3">
-        <% const files = [
-          { label: 'License', path: client.license_file_path },
-          { label: 'Ejari', path: client.ejari_file_path },
-          { label: 'Emirates ID', path: client.emirates_id_file_path },
-          { label: 'Passport', path: client.passport_file_path },
-          { label: 'Contract', path: client.contract_file_path }
-        ]; %>
-
-        <% files.forEach(file => { if (file.path) { %>
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 text-center">
-              <div class="card-body">
-                <h6 class="fw-bold text-primary">📄 <%= file.label %></h6>
-                <a href="<%= file.path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
-                  📥 View <%= file.label %> File
-                </a>
-              </div>
-            </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">📌 Status & License</div>
+          <div class="card-body">
+            <p><strong>Emirates ID:</strong> <span class="badge bg-info text-dark"><%= client.emirates_id_status %></span></p>
+            <p><strong>Contract:</strong> <span class="badge bg-success"><%= client.contract_status %></span></p>
+            <p><strong>License:</strong> <span class="badge bg-secondary"><%= client.license_status %></span></p>
+            <p><strong>License No:</strong> <span class="text-muted"><%= client.license_number %></span></p>
+            <p><strong>Expiry:</strong> 
+              <% if (client.license_expiry) {
+                const expDate = new Date(client.license_expiry);
+                const isExpired = expDate < new Date();
+              %>
+                <%= expDate.toISOString().split('T')[0] %>
+                <% if (isExpired) { %>
+                  <span class="badge bg-danger ms-2">Expired</span>
+                <% } %>
+              <% } else { %> Not Provided <% } %>
+            </p>
+            <p><strong>Ejari Unit No:</strong> <span class="text-muted"><%= client.ejari_no %></span></p>
+         
           </div>
-        <% }}); %>
-
-        <% if (client.additional_files && client.additional_files.length > 0) { %>
-          <div class="col-12 mt-3">
-            <h5 class="fw-bold text-primary">📎 Additional Files</h5>
-            <div class="list-group">
-              <% client.additional_files.forEach((file, index) => { %>
-                <a href="<%= file %>" target="_blank" class="list-group-item list-group-item-action">
-                  📄 View Additional File <%= index + 1 %>
-                </a>
-              <% }); %>
-            </div>
-          </div>
-        <% } %>
-
-        <div class="col-12 mt-4 text-end">
-          <a href="/clients/<%= client._id %>/upload" class="btn btn-outline-secondary">
-            📤 Upload More Files
-          </a>
         </div>
       </div>
     </div>
 
-    <footer class="bg-dark text-white text-center py-3 mt-4">
-      <small style="font-size: 0.9rem">&copy; 2025 Your Own Business Center. All rights reserved.</small>
-    </footer>
+    <!-- ✅ Tax Invoices -->
+    <h3 class="mt-5 mb-3"><i class="fas fa-file-invoice-dollar text-primary me-2"></i> Client Tax Invoices</h3>
+    <% if (invoices.length > 0) { %>
+      <div class="d-flex flex-wrap gap-3">
+        <% invoices.forEach(inv => { %>
+          <a href="/bookings/<%= inv.booking_id %>/tax-invoice/<%= inv.invoice_number %>/view" target="_blank" class="btn btn-outline-dark btn-sm">🧾 View <%= inv.invoice_number %></a>
+          <a href="/bookings/<%= inv.booking_id %>/tax-invoice/<%= inv.invoice_number %>/edit" class="btn btn-outline-primary btn-sm">✏️ Edit <%= inv.invoice_number %></a>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No tax invoices available for this client yet.</p>
+    <% } %>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    <!-- ✅ Files -->
+    <h3 class="mt-5 mb-3"><i class="fas fa-folder-open text-primary me-2"></i> Client Files</h3>
+    <p class="text-muted">
+      Total Files: <%= [client.license_file_path, client.ejari_file_path, client.emirates_id_file_path, client.passport_file_path, client.contract_file_path].filter(f => f).length + (client.additional_files?.length || 0) %>
+    </p>
+    <div class="row g-3">
+      <% const files = [
+        { label: 'License', path: client.license_file_path },
+        { label: 'Ejari', path: client.ejari_file_path },
+        { label: 'Emirates ID', path: client.emirates_id_file_path },
+        { label: 'Passport', path: client.passport_file_path },
+        { label: 'Contract', path: client.contract_file_path }
+      ]; %>
+      <% files.forEach(file => { if (file.path) { %>
+        <div class="col-md-4">
+          <div class="card text-center h-100">
+            <div class="card-body">
+              <h6 class="fw-bold text-primary">📄 <%= file.label %></h6>
+              <a href="<%= file.path %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">📥 View <%= file.label %> File</a>
+            </div>
+          </div>
+        </div>
+      <% }}); %>
+      <% if (client.additional_files && client.additional_files.length > 0) { %>
+        <div class="col-12">
+          <h5 class="fw-bold text-primary">📎 Additional Files</h5>
+          <div class="list-group">
+            <% client.additional_files.forEach((file, index) => { %>
+              <a href="<%= file %>" target="_blank" class="list-group-item list-group-item-action">📄 View Additional File <%= index + 1 %></a>
+            <% }); %>
+          </div>
+        </div>
+      <% } %>
+      <div class="col-12 text-end mt-3">
+        <a href="/clients/<%= client._id %>/upload" class="btn btn-outline-secondary">📤 Upload More Files</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Footer -->
+  <footer class="bg-dark text-white text-center py-3 mt-4">
+    <small style="font-size: 0.9rem;">&copy; 2025 Your Own Business Center. All rights reserved.</small>
+  </footer>
+
+  <!-- ✅ Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+</body>
 </html>

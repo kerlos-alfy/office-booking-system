@@ -1,0 +1,235 @@
+<%- include('../partials/header') %>
+
+<div class="container my-5">
+  <h2 class="text-center fw-bold mb-5 display-5 text-primary">
+  📊 All Daily Reports Dashboard
+  — <span id="selected-date" class="text-success"></span>
+</h2>
+
+
+  <!-- ✅ Summary Cards -->
+  <div class="row text-center mb-5">
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">🏢 Total Offices Rented</h6>
+
+          <h3 class="fw-bold text-primary" id="totalOffices">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">💰 Total Rent</h6>
+          <h3 class="fw-bold text-success" id="totalRent">AED 0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">🚶 Total Visits</h6>
+          <h3 class="fw-bold text-info" id="totalVisits">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">📞 Total Calls</h6>
+          <h3 class="fw-bold text-warning" id="totalCalls">0</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Filters -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label fw-bold">📅 Filter by Date</label>
+      <input type="date" id="filter-date" class="form-control rounded-pill shadow-sm">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-bold">👤 Filter by Employee</label>
+      <select id="filter-user" class="form-select rounded-pill shadow-sm">
+        <option value="">All Employees</option>
+        <% users.forEach(user => { %>
+          <option value="<%= user._id %>"><%= user.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-bold">🏢 Filter by Branch</label>
+      <select id="filter-branch" class="form-select rounded-pill shadow-sm">
+        <option value="">All Branches</option>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>"><%= branch.name %></option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+
+  <!-- ✅ Table -->
+  <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+    <table class="table table-striped table-hover align-middle mb-0" id="reports-table">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>#</th>
+          <th>📅 Date</th>
+
+       <th>🧑‍💼 Employee</th>
+
+          <th>📍Branch</th>
+         <th>🏢 Rented Offices</th>
+          <th>💵 Rent</th>
+          <th>🚶 Visits</th>
+          <th>📞 Calls</th>
+          <th>⚙️ Actions</th>
+
+        </tr>
+      </thead>
+      <tbody class="text-center">
+        <tr>
+          <td colspan="9" class="text-muted fw-bold">👀 Waiting for data...</td>
+        </tr>
+      </tbody>
+      <tfoot class="table-light fw-bold">
+        <!-- <tr>
+          <td colspan="4">TOTAL</td>
+          <td><span id="totalOfficesFooter">0</span></td>
+          <td><span id="totalRentFooter">AED 0</span></td>
+          <td><span id="totalVisitsFooter">0</span></td>
+          <td><span id="totalCallsFooter">0</span></td>
+          <td></td>
+        </tr> -->
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- ✅ Script -->
+<script>
+  const dateInput = document.getElementById('filter-date');
+  const userSelect = document.getElementById('filter-user');
+  const branchSelect = document.getElementById('filter-branch');
+  const tableBody = document.querySelector('#reports-table tbody');
+
+  const totalOfficesEl = document.getElementById('totalOffices');
+  const totalRentEl = document.getElementById('totalRent');
+  const totalVisitsEl = document.getElementById('totalVisits');
+  const totalCallsEl = document.getElementById('totalCalls');
+
+  const totalOfficesFooter = document.getElementById('totalOfficesFooter');
+  const totalRentFooter = document.getElementById('totalRentFooter');
+  const totalVisitsFooter = document.getElementById('totalVisitsFooter');
+  const totalCallsFooter = document.getElementById('totalCallsFooter');
+
+  // ✅ Set today's date as default
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  dateInput.value = `${yyyy}-${mm}-${dd}`;
+
+  fetchFilteredReports();
+
+  async function fetchFilteredReports() {
+    const date = dateInput.value;
+    const userId = userSelect.value;
+    const branchId = branchSelect.value;
+
+    const params = new URLSearchParams();
+    if (date) params.append('date', date);
+    if (userId) params.append('user_id', userId);
+    if (branchId) params.append('branch_id', branchId);
+
+    const res = await fetch(`/admin/reports/api?${params.toString()}`);
+    const reports = await res.json();
+
+    let rows = '';
+    let totalOffices = 0, totalRent = 0, totalVisits = 0, totalCalls = 0;
+
+    if (!Array.isArray(reports) || reports.length === 0) {
+      rows = `<tr><td colspan="9" class="text-center text-danger fw-bold">😕 No reports found.</td></tr>`;
+    } else {
+      reports.forEach((report, index) => {
+        const createdAt = report.created_at ? new Date(report.created_at).toLocaleDateString() : 'N/A';
+        const userName = report.user_id ? report.user_id.name : 'No User Linked';
+
+        // ✅ تعديل Branch Name:
+        const branchName = report.branch_id && report.branch_id.name
+          ? report.branch_id.name
+          : (report.branch_name || 'No Branch');
+
+        const officesCount = Array.isArray(report.rent_office_no) ? report.rent_office_no.length : 0;
+        const rentTotal = Array.isArray(report.rent_amount) ? report.rent_amount.reduce((sum, n) => sum + n, 0) : 0;
+        const visitsCount = Array.isArray(report.visits_details) ? report.visits_details.length : 0;
+        const callsCount = (report.messages_whatsapp || 0)
+          + (report.messages_dubizzle || 0)
+          + (report.messages_bayut || 0)
+          + (report.messages_property_finder || 0);
+
+        totalOffices += officesCount;
+        totalRent += rentTotal;
+        totalVisits += visitsCount;
+        totalCalls += callsCount;
+
+        rows += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${createdAt}</td>
+            <td>${userName}</td>
+            <td>${branchName}</td>
+            <td>${officesCount}</td>
+            <td>$ ${rentTotal}</td>
+            <td>${visitsCount}</td>
+            <td>${callsCount}</td>
+            <td><a href="/call-reports/daily-reports/${report._id}" class="btn btn-sm btn-outline-primary">🔍 View</a></td>
+          </tr>`;
+      });
+    }
+
+    tableBody.innerHTML = rows;
+
+    totalOfficesEl.innerText = totalOffices;
+    totalRentEl.innerText = `AED ${totalRent}`;
+    totalVisitsEl.innerText = totalVisits;
+    totalCallsEl.innerText = totalCalls;
+
+    totalOfficesFooter.innerText = totalOffices;
+    totalRentFooter.innerText = `AED ${totalRent}`;
+    totalVisitsFooter.innerText = totalVisits;
+    totalCallsFooter.innerText = totalCalls;
+  }
+
+  dateInput.addEventListener('change', fetchFilteredReports);
+  userSelect.addEventListener('change', fetchFilteredReports);
+  branchSelect.addEventListener('change', fetchFilteredReports);
+</script>
+
+<script>
+  const selectedDateSpan = document.getElementById('selected-date');
+
+function updateSelectedDate() {
+  const date = dateInput.value;
+  if (date) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formatted = new Date(date).toLocaleDateString(undefined, options);
+    selectedDateSpan.textContent = formatted;
+  } else {
+    selectedDateSpan.textContent = '';
+  }
+}
+
+dateInput.addEventListener('change', () => {
+  updateSelectedDate();
+  fetchFilteredReports();
+});
+
+// أول ما الصفحة تفتح:
+updateSelectedDate();
+
+</script>
+
+<%- include('../partials/footer') %>

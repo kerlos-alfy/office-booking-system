@@ -3,14 +3,14 @@
 <!-- ✅ Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<h1 class="mb-4 text-primary">📝 New Booking — Office <%= office.office_number %> (Floor: <%= office.floor || 'N/A' %>)</h1>
+<h1 class="mb-4 text-primary">📝 New Rental — Office <%= office.office_number %> (Floor: <%= office.floor || 'N/A' %>)</h1>
 
 <form method="POST" action="/bookings" class="card shadow-lg border-0 p-4">
 
   <input type="hidden" name="office_id" value="<%= office._id %>" />
 
   <!-- 🎯 Client & Booking Period -->
-  <h5 class="mb-3 text-secondary fw-bold">🎯 Client & Booking Period</h5>
+  <h5 class="mb-3 text-secondary fw-bold">🎯 Client & Rental Period</h5>
   <div class="row mb-3">
     <div class="col-md-4">
       <label class="form-label">Client</label>

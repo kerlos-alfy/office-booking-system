@@ -2,13 +2,26 @@ const express = require("express");
 const router = express.Router();
 const Booking = require("../models/Booking");
 const mongoose = require("mongoose");
+const Branch = require("../models/Branch");
+const { authenticateJWT } = require('../middlewares/auth');
 
 // ✅ صفحة شيكات الشهر + المتأخر من الشهور السابقة مع Totals كاملة
-router.get("/", async (req, res) => {
+router.get("/", authenticateJWT, async (req, res) => {
   try {
     const now = new Date();
     const selectedMonth = req.query.month ? parseInt(req.query.month) : now.getMonth();
     const selectedYear = req.query.year ? parseInt(req.query.year) : now.getFullYear();
+
+    // ✅ فلترة الفرع: لو المستخدم مربوط بفرع → يثبّت الفرع بتاعه
+    let selectedBranch = req.query.branch || "";
+    if (req.user.branch) {
+      selectedBranch = req.user.branch;
+    }
+
+    // ✅ الفروع للـ Dropdown: فرعه بس أو الكل لو Super Admin
+    const branches = req.user.branch
+      ? await Branch.find({ _id: req.user.branch })
+      : await Branch.find({});
 
     const monthNames = [
       "January","February","March","April","May","June",
@@ -21,14 +34,42 @@ router.get("/", async (req, res) => {
 
     console.log("🟢 Selected:", selectedMonth, selectedYear);
     console.log("🟢 Range:", startOfMonth.toISOString(), "-", endOfMonth.toISOString());
+    console.log("🏢 Selected Branch:", selectedBranch);
 
-    // ✅ شيكات الشهر الحالي
+    // ✅ الشرط الأساسي للتاريخ
+    const matchStage = {
+      "cheques.due_date": { $gte: startOfMonth, $lt: endOfMonth }
+    };
+
+    // ✅ الشيكات الشهرية
     const cheques = await Booking.aggregate([
       { $unwind: "$cheques" },
+
       {
+        $lookup: {
+          from: "offices",
+          localField: "office_id",
+          foreignField: "_id",
+          as: "office",
+        },
+      },
+      { $unwind: "$office" },
+
+      { $match: matchStage },
+
+      ...(selectedBranch ? [{
         $match: {
-          "cheques.due_date": { $gte: startOfMonth, $lt: endOfMonth }
+          "office.branch_id": new mongoose.Types.ObjectId(selectedBranch)
         }
+      }] : []),
+
+      {
+        $lookup: {
+          from: "branches",
+          localField: "office.branch_id",
+          foreignField: "_id",
+          as: "branch",
+        },
       },
       {
         $lookup: {
@@ -39,26 +80,44 @@ router.get("/", async (req, res) => {
         },
       },
       {
-        $lookup: {
-          from: "offices",
-          localField: "office_id",
-          foreignField: "_id",
-          as: "office",
-        },
-      },
-      {
         $sort: { "cheques.due_date": 1 }
       }
     ]);
 
-    // ✅ الشيكات المتأخرة (قبل بداية الشهر الحالي ولم تتحصل بالكامل)
+    // ✅ الشيكات المتأخرة
+    const overdueMatchStage = {
+      "cheques.due_date": { $lt: startOfMonth },
+      "cheques.collected": false
+    };
+
     const overdueCheques = await Booking.aggregate([
       { $unwind: "$cheques" },
+
       {
+        $lookup: {
+          from: "offices",
+          localField: "office_id",
+          foreignField: "_id",
+          as: "office",
+        },
+      },
+      { $unwind: "$office" },
+
+      { $match: overdueMatchStage },
+
+      ...(selectedBranch ? [{
         $match: {
-          "cheques.due_date": { $lt: startOfMonth },
-          "cheques.collected": false
+          "office.branch_id": new mongoose.Types.ObjectId(selectedBranch)
         }
+      }] : []),
+
+      {
+        $lookup: {
+          from: "branches",
+          localField: "office.branch_id",
+          foreignField: "_id",
+          as: "branch",
+        },
       },
       {
         $lookup: {
@@ -69,19 +128,11 @@ router.get("/", async (req, res) => {
         },
       },
       {
-        $lookup: {
-          from: "offices",
-          localField: "office_id",
-          foreignField: "_id",
-          as: "office",
-        },
-      },
-      {
         $sort: { "cheques.due_date": 1 }
       }
     ]);
 
-    // ✅ احسب الإجماليات مع الشرط الصح للجزئي
+    // ✅ الحسابات
     let totalChequesAmount = 0;
     let collectedAmount = 0;
 
@@ -90,16 +141,11 @@ router.get("/", async (req, res) => {
       totalChequesAmount += amount;
 
       const paidAmount = (c.cheques.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
-
-      // ✅ لو فيه أي مبلغ مدفوع يتحسب حتى لو الشيك Pending
-      if (paidAmount > 0) {
-        collectedAmount += paidAmount;
-      }
+      if (paidAmount > 0) collectedAmount += paidAmount;
     });
 
     const remainingAmount = totalChequesAmount - collectedAmount;
 
-    // ✅ المتأخرات بنفس المبدأ
     let totalOverdueAmount = 0;
     let overdueCollectedAmount = 0;
 
@@ -108,10 +154,7 @@ router.get("/", async (req, res) => {
       totalOverdueAmount += amount;
 
       const paidAmount = (c.cheques.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
-
-      if (paidAmount > 0) {
-        overdueCollectedAmount += paidAmount;
-      }
+      if (paidAmount > 0) overdueCollectedAmount += paidAmount;
     });
 
     const overdueRemainingAmount = totalOverdueAmount - overdueCollectedAmount;
@@ -125,6 +168,14 @@ router.get("/", async (req, res) => {
     console.log("✅ Overdue Collected:", overdueCollectedAmount);
     console.log("⏳ Overdue Remaining:", overdueRemainingAmount);
 
+    let branchName = "All Branches";
+    if (selectedBranch) {
+      const branchDoc = await Branch.findById(selectedBranch);
+      if (branchDoc) branchName = branchDoc.name;
+    } else if (cheques.length > 0 && cheques[0].branch && cheques[0].branch.length > 0) {
+      branchName = cheques[0].branch[0].name || "Unknown Branch";
+    }
+
     res.render("latestPayments", {
       cheques,
       overdueCheques,
@@ -136,7 +187,11 @@ router.get("/", async (req, res) => {
       remainingAmount,
       totalOverdueAmount,
       overdueCollectedAmount,
-      overdueRemainingAmount
+      overdueRemainingAmount,
+      branches,
+      selectedBranch,
+      branchName,
+      user: req.user // لو هتستخدمه في الـ EJS
     });
 
   } catch (err) {
@@ -144,5 +199,7 @@ router.get("/", async (req, res) => {
     res.status(500).send("Error loading cheques");
   }
 });
+
+
 
 module.exports = router;

@@ -1,0 +1,141 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm p-4">
+        <h3 class="text-primary fw-bold mb-4">
+          ✏️ Edit Call Report — <%= call.phone_number %>
+        </h3>
+
+        <form action="/call-reports/<%= call._id %>?_method=PUT" method="POST" id="editCallForm">
+          
+          <!-- ✅ Fields: Phone Number, Source, Action, Call Date -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">📞 Phone Number</label>
+            <input type="text" name="phone_number" class="form-control rounded-pill"
+              value="<%= call.phone_number %>" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">🌐 Source</label>
+            <select name="source" class="form-select rounded-pill" required>
+              <option value="dubizzle" <%= call.source === 'dubizzle' ? 'selected' : '' %>>Dubizzle</option>
+              <option value="bayut" <%= call.source === 'bayut' ? 'selected' : '' %>>Bayut</option>
+              <option value="meta" <%= call.source === 'meta' ? 'selected' : '' %>>Meta</option>
+              <option value="PropertyFinder" <%= call.source === 'PropertyFinder' ? 'selected' : '' %>>Property Finder</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">📝 Action</label>
+            <textarea name="action" class="form-control rounded-4" rows="3" required><%= call.action %></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">🗓️ Call Date</label>
+            <input type="date" name="call_date" class="form-control rounded-pill"
+              value="<%= new Date(call.call_date).toISOString().slice(0, 10) %>" required>
+          </div>
+
+          <!-- ✅ Existing Follow-Ups -->
+          <% if (call.follow_up_logs && call.follow_up_logs.length) { %>
+            <div class="mb-4">
+              <h5 class="fw-bold text-secondary">🗂️ Previous Follow-Ups</h5>
+              <ul class="list-group">
+                <% call.follow_up_logs.forEach((log, idx) => { %>
+                  <li class="list-group-item">
+                    <strong><%= new Date(log.date).toLocaleDateString() %>:</strong> <%= log.note %>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+
+          <!-- ✅ Add New Follow-Up Blocks -->
+          <div id="followUpContainer"></div>
+          <button type="button" class="btn btn-outline-primary rounded-pill mb-3" onclick="addFollowUpBlock()">
+            ➕ Add New Follow-Up
+          </button>
+
+          <!-- ✅ Answered & Followed Up -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="answered" id="answered"
+              <%= call.answered ? 'checked' : '' %>>
+            <label class="form-check-label fw-bold" for="answered">✅ Mark as Answered</label>
+          </div>
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="followed_up" id="followed_up"
+              <%= call.followed_up ? 'checked' : '' %>>
+            <label class="form-check-label fw-bold" for="followed_up">🔁 Mark as Followed Up</label>
+          </div>
+
+          <!-- ✅ Save -->
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary rounded-pill fw-bold flex-grow-1">
+              💾 Save Changes
+            </button>
+
+            <!-- ✅ زر تم لإزالة الـ Overdue -->
+            <% if (call.overdue) { %>
+              <button type="button" id="markDoneBtn" class="btn btn-success rounded-pill fw-bold">
+                ✅ تم (Mark Done)
+              </button>
+            <% } %>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function addFollowUpBlock() {
+    const container = document.getElementById('followUpContainer');
+    const now = new Date().toISOString().slice(0,10);
+    const index = container.children.length;
+
+    const block = `
+      <div class="border rounded p-3 mb-3 shadow-sm">
+        <label class="form-label fw-bold">🗓️ Follow-Up Date</label>
+        <input type="date" name="follow_up_logs[${index}][date]" class="form-control rounded-pill mb-2"
+          value="${now}" required>
+        <label class="form-label fw-bold">📝 Note</label>
+        <textarea name="follow_up_logs[${index}][note]" class="form-control rounded-4" rows="2" required></textarea>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', block);
+  }
+
+  // زر تم (Mark Done)
+  document.addEventListener('DOMContentLoaded', function() {
+    const markDoneBtn = document.getElementById('markDoneBtn');
+    if (markDoneBtn) {
+      markDoneBtn.addEventListener('click', function() {
+        if (!confirm('هل أنت متأكد أنك تريد وضع علامة "تم" على هذه المكالمة؟')) return;
+
+        const callId = "<%= call._id %>";
+
+        fetch(`/call-reports/${callId}/mark-done`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            alert('تم تحديث حالة المكالمة بنجاح.');
+            window.location.href = '/call-reports/pending';
+          } else {
+            alert('حدث خطأ أثناء تحديث حالة المكالمة.');
+          }
+        })
+        .catch(() => alert('حدث خطأ أثناء تحديث حالة المكالمة.'));
+      });
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>

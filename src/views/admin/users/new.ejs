@@ -1,9 +1,9 @@
 <%- include('../../partials/header') %>
 
 <div class="container py-5">
-  <h2 class="mb-4 text-success">➕ إضافة مستخدم جديد</h2>
+  <h2 class="mb-4 text-success">➕ Add New User</h2>
 
-  <!-- رسالة خطأ لو في -->
+  <!-- Error message if any -->
   <% if (typeof error !== 'undefined') { %>
     <div class="alert alert-danger"><%= error %></div>
   <% } %>
@@ -11,35 +11,35 @@
   <form action="/admin/users" method="POST" class="shadow p-4 bg-white rounded">
 
     <div class="mb-3">
-      <label class="form-label">الاسم الكامل</label>
+      <label class="form-label">Full Name</label>
       <input type="text" name="name" class="form-control" required>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">البريد الإلكتروني</label>
+      <label class="form-label">Email</label>
       <input type="email" name="email" class="form-control" required>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">كلمة المرور</label>
+      <label class="form-label">Password</label>
       <input type="password" name="password" class="form-control" required>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">الدور</label>
+      <label class="form-label">Role</label>
       <select name="role" class="form-select" required>
-        <option value="">-- اختر الدور --</option>
+        <option value="">-- Select Role --</option>
         <% roles.forEach(role => { %>
           <option value="<%= role._id %>"><%= role.name %></option>
         <% }) %>
       </select>
     </div>
 
-    <!-- ✅✅✅ جزء الفروع -->
+    <!-- ✅✅✅ Branch Section -->
     <div class="mb-3">
-      <label class="form-label">الفرع</label>
+      <label class="form-label">Branch</label>
       <select name="branch" class="form-select">
-        <option value="">-- بدون فرع --</option>
+        <option value="">-- No Branch --</option>
         <% branches.forEach(branch => { %>
           <option value="<%= branch._id %>">
             <%= branch.name %> | <%= branch.name_ar %>
@@ -49,8 +49,8 @@
     </div>
 
     <div class="text-end">
-      <a href="/admin/users" class="btn btn-outline-secondary">رجوع</a>
-      <button type="submit" class="btn btn-success">💾 حفظ المستخدم</button>
+      <a href="/admin/users" class="btn btn-outline-secondary">Back</a>
+      <button type="submit" class="btn btn-success">💾 Save User</button>
     </div>
 
   </form>

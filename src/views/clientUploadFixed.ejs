@@ -1,6 +1,6 @@
 ﻿<%- include('partials/header') %>
 
-<h1 class="mb-4 text-success">➕ Booking Office <%= office.office_number %> in <%= office.branch_id.name %></h1>
+<h1 class="mb-4 text-success">➕ Rental Office <%= office.office_number %> in <%= office.branch_id.name %></h1>
 
 <form method="POST" action="">
     <div class="mb-3">
@@ -40,7 +40,7 @@
         <input type="number" name="total_price" class="form-control" required>
     </div>
 
-    <button type="submit" class="btn btn-primary">Confirm Booking</button>
+    <button type="submit" class="btn btn-primary">Confirm Rental</button>
     <a href="/bookings/branch/<%= office.branch_id._id %>" class="btn btn-secondary ms-2">Back to Offices</a>
 </form>
 

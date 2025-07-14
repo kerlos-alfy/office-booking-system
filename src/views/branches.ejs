@@ -3,7 +3,10 @@
     
 <h1 class="mb-4 text-primary">🏢 Branches List</h1>
 
-<a href="/branches/new" class="btn btn-success mb-4">+ Add New Branch</a>
+<!-- <a href="/branches/new" class="btn btn-success mb-4">+ Add New Branch</a> -->
+<% if (user && user.permissions.includes('branches.create')) { %>
+  <a href="/branches/new" class="btn btn-success mb-4">+ Add New Branch</a>
+<% } %>
 
 <% if (branches.length === 0) { %>
     <div class="alert alert-info">No branches found.</div>

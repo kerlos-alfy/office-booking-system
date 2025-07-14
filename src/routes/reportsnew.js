@@ -141,9 +141,43 @@ router.get('/monthly-dues', async (req, res) => {
 
 
 
+router.post('/add-multiple', async (req, res) => {
+  const calls = req.body.calls;
 
-router.get('/', (req, res) => {
-  res.send('✅ Reports Route Connected! جرب /reports/monthly-dues');
+  const docs = calls.map(c => ({
+    employee_id: req.user._id,
+    call_date: new Date(), // او دخّلها لو عاوز لكل صف تاريخ
+    phone_number: c.phone_number,
+    source: c.source,
+    action: c.action,
+    answered: c.answered === 'on'
+  }));
+
+  await CallReport.insertMany(docs);
+
+  res.redirect('/call-reports/pending');
 });
+
+
+
+// ✅ حفظ البيانات
+router.post('/add-multiple', async (req, res) => {
+  const calls = req.body.calls;
+
+  const docs = calls.map(c => ({
+    employee_id: req.user._id || 'dummy', // عدلها حسب الـ JWT
+    call_date: new Date(),
+    phone_number: c.phone_number,
+    source: c.source,
+    action: c.action,
+    answered: c.answered === 'on'
+  }));
+
+  await CallReport.insertMany(docs);
+
+  res.redirect('/call-reports/pending');
+});
+
+
 
 module.exports = router;

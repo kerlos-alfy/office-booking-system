@@ -1,11 +1,11 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📋 Bookings List</h1>
+<h1 class="mb-4 text-primary">📋 Rentals List</h1>
 
-<a href="/bookings/new" class="btn btn-success mb-4">+ Add New Booking</a>
+<a href="/bookings/new" class="btn btn-success mb-4">+ Add New Rental</a>
 
 <% if (bookings.length === 0) { %>
-    <div class="alert alert-info">No bookings found.</div>
+    <div class="alert alert-info">No rentals found.</div>
 <% } else { %>
     <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
@@ -30,8 +30,8 @@
                     <td><%= booking.contract_type %></td>
                     <td><%= booking.start_date.toISOString().split('T')[0] %></td>
                     <td><%= booking.end_date.toISOString().split('T')[0] %></td>
-                    <td>$<%= booking.total_price %></td>
-                    <td>$<%= booking.initial_payment %></td>
+                    <td>AED<%= booking.total_price %></td>
+                    <td>AED<%= booking.initial_payment %></td>
                     <td>
                         <!-- ✅ هنا الزرار بتاع View Payments -->
                         <a href="/payments/booking/<%= booking._id %>" class="btn btn-info btn-sm">View Payments</a>

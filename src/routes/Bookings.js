@@ -13,6 +13,7 @@ const fs = require("fs");
 const ejs = require("ejs");
 const puppeteer = require("puppeteer");
 const numberToWords = require('number-to-words');
+const { authenticateJWT, hasPermission } = require('../middlewares/auth');
 
 
 async function archiveExpiredBookings() {
@@ -34,15 +35,30 @@ async function archiveExpiredBookings() {
 	}
 }
 
-router.get("/", async (req, res) => {
-	try {
-		const branches = await Branch.find();
-		res.render("bookingBranches", { branches });
-	} catch (err) {
-		res.status(500).send("Error loading branches");
+router.get("/",
+	authenticateJWT,
+	async (req, res) => {
+		try {
+			let query = {};
+
+			// ✨ لو المستخدم مربوط بفرع ➜ يعرضه بس
+			if (req.user.branch) {
+				query._id = req.user.branch;
+			}
+
+			const branches = await Branch.find(query);
+
+			res.render("bookingBranches", {
+				branches,
+				user: req.user // مهم لو هتستخدمه في EJS
+			});
+		} catch (err) {
+			console.error(err);
+			res.status(500).send("Error loading branches");
+		}
 	}
-});
-router.get("/branch/:branchId", async (req, res) => {
+);
+router.get("/branch/:branchId",authenticateJWT, async (req, res) => {
 	try {
 		await archiveExpiredBookings();
 
@@ -118,18 +134,20 @@ router.get("/branch/:branchId", async (req, res) => {
 
 		// 6️⃣ إرسال البيانات للعرض
 		res.render("bookingOffices", {
-			offices: filteredOffices,
-			branchId,
-			bookedOfficeIds,
-			bookings: activeBookings,
-			inspectionStatusMap,
-			filter,
-			size_category,
-			totalOffices: offices.length,
-			totalBooked: bookedOfficeIds.length,
-			totalAvailable: offices.length - bookedOfficeIds.length,
-			expiringThisMonth,
-		});
+  user: req.user, 
+  offices: filteredOffices,
+  branchId,
+  bookedOfficeIds,
+  bookings: activeBookings,
+  inspectionStatusMap,
+  filter,
+  size_category,
+  totalOffices: offices.length,
+  totalBooked: bookedOfficeIds.length,
+  totalAvailable: offices.length - bookedOfficeIds.length,
+  expiringThisMonth,
+});
+
 	} catch (err) {
 		console.error("❌ Error loading offices:", err);
 		res.status(500).send("Error loading offices");
@@ -240,77 +258,97 @@ router.post("/", async (req, res) => {
 
 
 
-router.get("/view/:bookingId", async (req, res) => {
-	try {
-		const booking = await Booking.findById(req.params.bookingId)
-			.populate({
-				path: "office_id",
-				populate: { path: "branch_id" }, // ✅ لعرض اسم الفرع
-			})
-			.populate("client_id"); // ✅ لعرض بيانات العميل
-
-		if (!booking) return res.status(404).send("Booking not found");
-
-		const inspections = await Inspection.find({ booking_id: booking._id });
-
-		// ✅ حساب عدد التفتيشات المجانية اللي اتعملت
-		const freeTypes = ["labor", "bank"];
-		const completedFree = inspections.filter((i) => freeTypes.includes(i.type) && i.status === "done").length;
-		const remainingFree = 2 - completedFree;
-
-		res.render("bookingView", { booking, inspections, remainingFree });
-	} catch (err) {
-		console.error("❌ Error loading booking view:", err);
-		res.status(500).send("Error loading booking view");
-	}
-});
-// 📦 Archive Route
-router.get("/archive", async (req, res) => {
+router.get("/view/:bookingId",authenticateJWT, async (req, res) => {
   try {
-    const clientFilter = req.query.client;
-    let query = { status: "archived" };
-
-    if (clientFilter) {
-      const matchingClients = await Client.find({
-        name: { $regex: clientFilter, $options: "i" },
-      }).distinct("_id");
-
-      query.client_id = { $in: matchingClients };
-    }
-
-    // ✅ Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = 10;
-    const skip = (page - 1) * limit;
-
-    // ✅ Count total documents for pagination
-    const totalBookings = await Booking.countDocuments(query);
-    const totalPages = Math.ceil(totalBookings / limit);
-
-    // ✅ Fetch paginated results
-    const archivedBookings = await Booking.find(query)
+    const booking = await Booking.findById(req.params.bookingId)
       .populate({
         path: "office_id",
         populate: { path: "branch_id" },
       })
-      .populate("client_id")
-      .sort({ start_date: -1 }) // optional: order by date desc
-      .skip(skip)
-      .limit(limit);
+      .populate("client_id");
 
-    res.render("bookingArchive", {
-      archivedBookings,
-      client: clientFilter,
-      totalPages,
-      currentPage: page,
-      limit
-    });
+    if (!booking) return res.status(404).send("Booking not found");
+
+    const inspections = await Inspection.find({ booking_id: booking._id });
+
+    // ✅ عدد التفتيشات المجانية
+    const freeTypes = ["labor", "bank"];
+    const completedFree = inspections.filter(
+      (i) => freeTypes.includes(i.type) && i.status === "done"
+    ).length;
+    const remainingFree = 2 - completedFree;
+
+    // ✅ تحميل الفواتير الضريبية المرتبطة بالحجز
+    const invoices = await TaxInvoice.find({ booking_id: booking._id });
+
+    res.render("bookingView", {   user: req.user,booking, inspections, remainingFree, invoices });
   } catch (err) {
-    console.error("❌ Error loading archive:", err);
-    res.status(500).send("Error loading archive");
+    console.error("❌ Error loading booking view:", err);
+    res.status(500).send("Error loading booking view");
   }
 });
 
+// 📦 Archive Route
+router.get("/archive",
+  authenticateJWT,
+  async (req, res) => {
+    try {
+      const clientFilter = req.query.client;
+      let query = { status: "archived" };
+
+      // ✅ فلترة حسب client لو فيه search
+      if (clientFilter) {
+        const matchingClients = await Client.find({
+          name: { $regex: clientFilter, $options: "i" },
+        }).distinct("_id");
+
+        query.client_id = { $in: matchingClients };
+      }
+
+      // ✅ فلترة حسب الفرع
+      if (req.user.branch) {
+        // هات الـ offices اللي فرعها نفس فرع المستخدم
+        const allowedOffices = await Office.find({
+          branch_id: req.user.branch
+        }).distinct('_id');
+
+        query.office_id = { $in: allowedOffices };
+      }
+      // ✅ لو branch = null ➜ يشوف كل الـ bookings (مفيش شرط)
+
+      // ✅ Pagination
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+      const skip = (page - 1) * limit;
+
+      const totalBookings = await Booking.countDocuments(query);
+      const totalPages = Math.ceil(totalBookings / limit);
+
+      const archivedBookings = await Booking.find(query)
+        .populate({
+          path: "office_id",
+          populate: { path: "branch_id" },
+        })
+        .populate("client_id")
+        .sort({ start_date: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      res.render("bookingArchive", {
+        archivedBookings,
+        client: clientFilter,
+        totalPages,
+        currentPage: page,
+        limit,
+        user: req.user // لو هتستخدمه في الصفحة
+      });
+
+    } catch (err) {
+      console.error("❌ Error loading archive:", err);
+      res.status(500).send("Error loading archive");
+    }
+  }
+);
 
 
 router.post("/:bookingId/archive", async (req, res) => {
@@ -437,6 +475,8 @@ router.get("/:bookingId/generate-contract", async (req, res) => {
 				? new Date(booking.end_date).toISOString().split("T")[0]
 				: "",
 			branch_en: booking.office_id?.branch_id?.name || "",
+			location_en: booking.office_id?.branch_id?.location || "",
+			whatsapp_number: booking.office_id?.branch_id?.whatsapp_number || "",
 			branch_ar: booking.office_id?.branch_id?.name_ar || "",
 
 			// الدفع
@@ -667,7 +707,6 @@ router.post('/:bookingId/tax-invoice/update', async (req, res) => {
   const booking = await Booking.findById(req.params.bookingId);
   if (!booking) return res.status(404).send('Booking not found');
 
-  // ✏️ جهز البيانات من الفورم
   const taxInvoiceData = {
     company: {
       name: req.body.company_name,
@@ -704,85 +743,109 @@ router.post('/:bookingId/tax-invoice/update', async (req, res) => {
     },
   };
 
-  // ✅ خزّن نسخة داخل الحجز نفسه
-  booking.tax_invoice_data = taxInvoiceData;
-  await booking.save();
+  const invoiceNumber = req.body.invoice_number;
 
-  // ✅ خزّن نسخة منفصلة في جدول TaxInvoice
   await TaxInvoice.findOneAndUpdate(
-    { booking_id: booking._id },
-    {
-      booking_id: booking._id,
-      invoice_number: taxInvoiceData.invoice.number,
-      data: taxInvoiceData,
-      updated_at: new Date(),
-    },
+    { booking_id: booking._id, invoice_number: invoiceNumber },
+    { booking_id: booking._id, invoice_number: invoiceNumber, data: taxInvoiceData, updated_at: new Date() },
     { upsert: true, new: true }
   );
 
-  // ✅ بعد الحفظ يحولك للصفحة اللي تولد PDF
-  res.redirect(`/bookings/${booking._id}/tax-invoice/view`);
+  res.redirect(`/bookings/${booking._id}/tax-invoice/${invoiceNumber}/view`);
+});
+
+// ✅ Route: View Tax Invoice with invoice_number
+router.get('/:bookingId/tax-invoice/:invoiceNumber/view', async (req, res) => {
+  try {
+    const bookingId = req.params.bookingId;
+    const invoiceNumber = req.params.invoiceNumber;
+
+    console.log("📌 === Debug Tax Invoice View ===");
+    console.log("🔍 Looking for booking_id:", bookingId);
+    console.log("🔍 Looking for invoice_number:", invoiceNumber);
+
+    const taxInvoice = await TaxInvoice.findOne({
+      booking_id: bookingId,
+      invoice_number: invoiceNumber
+    });
+
+    if (!taxInvoice) {
+      console.log("❌ Tax Invoice not found");
+      return res.status(404).send("❌ Tax Invoice not found");
+    }
+
+    console.log("✅ Raw Tax Invoice Result:", taxInvoice);
+
+    const templateData = taxInvoice.data;
+
+    // ✅ Generate Amount in words dynamically
+    const totalAmount = Number(templateData.invoice.total) || 0;
+
+    let rawWords = numberToWords.toWords(totalAmount);
+    rawWords = rawWords.replace(/ thousand /, " thousand, ");
+    const capitalized = rawWords.charAt(0).toUpperCase() + rawWords.slice(1);
+
+    templateData.invoice.total_in_words = `${capitalized} Dirhams Only`;
+
+    console.log("✅ ✅ ✅ Stored Data:", JSON.stringify(templateData, null, 2));
+
+    // ✅ Use your correct template path
+    const templatePath = path.join(__dirname, "../views/templates/taxInvoiceTemplate.ejs");
+
+    const html = await ejs.renderFile(templatePath, templateData);
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "10mm", bottom: "10mm", left: "10mm", right: "10mm" },
+    });
+
+    await browser.close();
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="Tax_Invoice_${taxInvoice.invoice_number}.pdf"`,
+    });
+    res.send(pdfBuffer);
+
+  } catch (err) {
+    console.error("❌ Error generating Tax Invoice View:", err);
+    res.status(500).send("Server Error");
+  }
 });
 
 
-router.get('/:bookingId/tax-invoice', async (req, res) => {
-  const TaxInvoice = require('../models/TaxInvoice');
-  const ejs = require('ejs');
-  const puppeteer = require('puppeteer');
-  const path = require('path');
 
-  const taxInvoice = await TaxInvoice.findOne({ booking_id: req.params.bookingId });
-  if (!taxInvoice) return res.status(404).send('No Tax Invoice found');
 
-  const templatePath = path.join(__dirname, '../templates/taxInvoiceTemplate.ejs');
-
-  const html = await ejs.renderFile(templatePath, taxInvoice.data);
-
-  const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox"] });
-  const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle0" });
-
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-    margin: { top: "10mm", bottom: "10mm", left: "10mm", right: "10mm" },
-  });
-
-  await browser.close();
-
-  res.set({
-    "Content-Type": "application/pdf",
-    "Content-Disposition": `inline; filename="Tax_Invoice_${taxInvoice.invoice_number}.pdf"`,
-  });
-  res.send(pdfBuffer);
-});
-router.get('/:bookingId/tax-invoice/edit', async (req, res) => {
-  const bookingId = req.params.bookingId;
-
-  const booking = await Booking.findById(bookingId)
+router.get('/:bookingId/tax-invoice/:invoiceNumber/edit', async (req, res) => {
+  const booking = await Booking.findById(req.params.bookingId)
+    .populate("client_id")
     .populate({
       path: "office_id",
       populate: { path: "branch_id" },
-    })
-    .populate("client_id");
+    });
 
   if (!booking) return res.status(404).send("Booking not found");
 
-  // ✅ حاول تجيب النسخة المحفوظة من TaxInvoice
-  const taxInvoice = await TaxInvoice.findOne({ booking_id: bookingId });
+  const taxInvoice = await TaxInvoice.findOne({
+    booking_id: booking._id,
+    invoice_number: req.params.invoiceNumber
+  });
 
   let data;
 
   if (taxInvoice) {
-    // لو عندك فاتورة محفوظة بالفعل
     data = taxInvoice.data;
-  } else if (booking.tax_invoice_data) {
-    // لو عندك نسخة جوه الـ booking
-    data = booking.tax_invoice_data;
   } else {
-    // لو مفيش الاتنين fallback للـ default
     data = {
-      bookingId: booking._id,
       company: {
         name: "YOUR OWN BUSINESS CENTER",
         address: "Zalfa Building, Al Garhoud, Dubai, UAE",
@@ -792,7 +855,7 @@ router.get('/:bookingId/tax-invoice/edit', async (req, res) => {
         bank_name: "ABU DHABI COMMERCIAL BANK",
         account_number: "12854021920001",
         iban: "AE100030012854021920001",
-        swift: "ADCBAEAAXXX"
+        swift: "ADCBAEAAXXX",
       },
       client: {
         name: booking.client_id?.company_en || "",
@@ -801,14 +864,14 @@ router.get('/:bookingId/tax-invoice/edit', async (req, res) => {
         email: booking.client_id?.email || "",
       },
       contract: {
-        period: `${new Date(booking.start_date).toLocaleDateString()} - ${new Date(booking.end_date).toLocaleDateString()}`
+        period: `${new Date(booking.start_date).toLocaleDateString()} - ${new Date(booking.end_date).toLocaleDateString()}`,
       },
       office: {
         unit_number: booking.office_id?.office_number || "",
         location: booking.office_id?.branch_id?.name || "",
       },
       invoice: {
-        number: `INV-${booking._id.toString().slice(-6)}`,
+        number: req.params.invoiceNumber,
         date: new Date().toLocaleDateString(),
         taxable_amount: booking.total_price - booking.vat,
         vat_amount: booking.vat,
@@ -822,7 +885,7 @@ router.get('/:bookingId/tax-invoice/edit', async (req, res) => {
             taxable: booking.total_price - booking.vat,
             vat_rate: "5%",
             vat_amount: booking.vat,
-            total: booking.total_price
+            total: booking.total_price,
           }
         ]
       }
@@ -838,6 +901,8 @@ router.get('/:bookingId/tax-invoice/edit', async (req, res) => {
     invoice: data.invoice,
   });
 });
+
+
 
 
 
@@ -899,14 +964,15 @@ router.get("/:bookingId/tax-invoice/view", async (req, res) => {
 
 
 // ✅ يعرض كل الفواتير الضريبية
-router.get('/tax-invoices', async (req, res) => {
+router.get('/tax-invoices',  authenticateJWT,
+  hasPermission('accounting.view'),async (req, res) => {
   const TaxInvoice = require('../models/TaxInvoice');
   const invoices = await TaxInvoice.find().populate({
     path: 'booking_id',
     populate: { path: 'client_id office_id' }
   }).sort({ created_at: -1 });
 
-  res.render('taxInvoicesList', { invoices });
+  res.render('taxInvoicesList', { invoices , user: req.user });
 });
 
 // ✅ من صفحة عرض العميل
@@ -919,6 +985,85 @@ router.get('/client/:clientId/tax-invoices', async (req, res) => {
 
   res.render('taxInvoicesList', { invoices });
 });
+
+// ✅ NEW TAX INVOICE FORM
+// ✅ توليد فاتورة جديدة برقم جديد
+router.get("/:bookingId/tax-invoice/new", async (req, res) => {
+  const booking = await Booking.findById(req.params.bookingId)
+    .populate("client_id")
+    .populate({
+      path: "office_id",
+      populate: { path: "branch_id" },
+    });
+
+  if (!booking) return res.status(404).send("Booking not found");
+
+  const lastInvoice = await TaxInvoice.findOne({ booking_id: booking._id })
+    .sort({ created_at: -1 });
+
+  let newInvoiceNumber = "INV-001";
+  if (lastInvoice) {
+    const lastNum = parseInt(lastInvoice.invoice_number.split("-")[1]) || 1;
+    const next = String(lastNum + 1).padStart(3, "0");
+    newInvoiceNumber = `INV-${next}`;
+  }
+
+  const defaultData = {
+    company: {
+      name: "YOUR OWN BUSINESS CENTER",
+      address: "Zalfa Building, Al Garhoud, Dubai, UAE",
+      trn: "000000000000000",
+      phone: "04 529 4459",
+      email: "yourown781@gmail.com",
+      bank_name: "ABU DHABI COMMERCIAL BANK",
+      account_number: "12854021920001",
+      iban: "AE100030012854021920001",
+      swift: "ADCBAEAAXXX",
+    },
+    client: {
+      name: booking.client_id?.company_en || "",
+      trn: booking.client_id?.trn || "",
+      phone: booking.client_id?.mobile || "",
+      email: booking.client_id?.email || "",
+    },
+    contract: {
+      period: `${new Date(booking.start_date).toLocaleDateString()} - ${new Date(booking.end_date).toLocaleDateString()}`,
+    },
+    office: {
+      unit_number: booking.office_id?.office_number || "",
+      location: booking.office_id?.branch_id?.name || "",
+    },
+    invoice: {
+      number: newInvoiceNumber,
+      date: new Date().toLocaleDateString(),
+      taxable_amount: booking.total_price - booking.vat,
+      vat_amount: booking.vat,
+      total: booking.total_price,
+      total_in_words: "",
+      items: [
+        {
+          description: "Booking",
+          qty: 1,
+          rate: booking.total_price - booking.vat,
+          taxable: booking.total_price - booking.vat,
+          vat_rate: "5%",
+          vat_amount: booking.vat,
+          total: booking.total_price
+        }
+      ]
+    },
+  };
+
+  res.render("taxInvoiceEditable", {
+    bookingId: booking._id,
+    company: defaultData.company,
+    client: defaultData.client,
+    contract: defaultData.contract,
+    office: defaultData.office,
+    invoice: defaultData.invoice,
+  });
+});
+
 
 
 module.exports = router;

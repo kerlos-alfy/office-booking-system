@@ -28,7 +28,7 @@ router.get('/users',
       path: 'role',
       populate: { path: 'permissions' }
     });
-    res.render('admin/users/index', { users });
+    res.render('admin/users/index', { user: req.user,users });
   }
 );
 
@@ -39,7 +39,7 @@ router.get('/users/new',
   async (req, res) => {
     const roles = await Role.find();
     const branches = await Branch.find();
-    res.render('admin/users/new', { roles, branches }); // ابعت الاتنين!
+    res.render('admin/users/new', { user: req.user,roles, branches }); // ابعت الاتنين!
   }
 );
 
@@ -65,7 +65,7 @@ router.post('/users',
       res.redirect('/admin/users');
     } catch (err) {
       console.error(err);
-      res.render('admin/users/new', {
+      res.render('admin/users/new', { user: req.user,
         error: 'حدث خطأ أثناء حفظ المستخدم',
         roles: await Role.find(),
         branches: await Branch.find() // ✅ مهم جداً عشان الـ Dropdown
@@ -85,7 +85,7 @@ router.get('/users/:id/edit',
 
     if (!user) return res.redirect('/admin/users');
 
-    res.render('admin/users/edit', { user, roles, branches });
+    res.render('admin/users/edit', { user: req.user, editUser: user, roles, branches });
   }
 );
 
@@ -201,20 +201,20 @@ router.delete('/users/:id',
 // );
 
 // تعديل الدور
-// router.put('/roles/:id',
-//   authenticateJWT,
-//   hasPermission('manage_roles'),
-//   async (req, res) => {
-//     const { name, permissions } = req.body;
-//     try {
-//       await Role.findByIdAndUpdate(req.params.id, { name, permissions });
-//       res.redirect('/admin/roles');
-//     } catch (err) {
-//       console.error(err);
-//       res.redirect('/admin/roles');
-//     }
-//   }
-// );
+router.put('/roles/:id',
+  authenticateJWT,
+  hasPermission('manage_roles'),
+  async (req, res) => {
+    const { name, permissions } = req.body;
+    try {
+      await Role.findByIdAndUpdate(req.params.id, { name, permissions });
+      res.redirect('/admin/roles');
+    } catch (err) {
+      console.error(err);
+      res.redirect('/admin/roles');
+    }
+  }
+);
 
 // حذف الدور
 // router.delete('/roles/:id',

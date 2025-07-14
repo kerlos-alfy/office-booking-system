@@ -1,0 +1,121 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+  <h2 class="fw-bold mb-4 text-primary">📊 Reports Overview</h2>
+
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#dailyReports">🗓️ Daily Reports</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#callReports">📞 Call Reports</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#fullDailyReports">🗂️ Full Daily Reports</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- DAILY REPORTS -->
+    <div class="tab-pane fade show active" id="dailyReports">
+      <% if (dailyReports.length === 0) { %>
+        <div class="alert alert-warning">🙁 No Daily Reports Found.</div>
+      <% } else { %>
+        <div class="table-responsive shadow rounded">
+          <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>User</th>
+                <th>Date</th>
+                <th>Offices</th>
+                <th>Rent</th>
+                <th>Visits</th>
+                <th>Calls</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% dailyReports.forEach(r => { %>
+                <tr>
+                  <td><%= r.user_id?.name || 'N/A' %></td>
+                  <td><%= r.date ? r.date.toISOString().slice(0,10) : 'N/A' %></td>
+                  <td><%= r.offices || 0 %></td>
+                  <td><%= r.rent || 0 %></td>
+                  <td><%= r.visits || 0 %></td>
+                  <td><%= r.calls || 0 %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- CALL REPORTS -->
+    <div class="tab-pane fade" id="callReports">
+      <% if (callReports.length === 0) { %>
+        <div class="alert alert-warning">🙁 No Call Reports Found.</div>
+      <% } else { %>
+        <div class="table-responsive shadow rounded">
+          <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>Employee</th>
+                <th>Call Date</th>
+                <th>Phone</th>
+                <th>Source</th>
+                <th>Action</th>
+                <th>Answered</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% callReports.forEach(r => { %>
+                <tr>
+                  <td><%= r.employee_id?.name || 'N/A' %></td>
+                  <td><%= r.call_date ? r.call_date.toISOString().slice(0,10) : 'N/A' %></td>
+                  <td><%= r.phone_number %></td>
+                  <td><%= r.source %></td>
+                  <td><%= r.action %></td>
+                  <td><%= r.answered ? 'Yes' : 'No' %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- FULL DAILY REPORTS -->
+    <div class="tab-pane fade" id="fullDailyReports">
+      <% if (fullDailyReports.length === 0) { %>
+        <div class="alert alert-warning">🙁 No Full Daily Reports Found.</div>
+      <% } else { %>
+        <div class="table-responsive shadow rounded">
+          <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>User</th>
+                <th>Branch</th>
+                <th>Created At</th>
+                <th>Visits Count</th>
+                <th>Inspection Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% fullDailyReports.forEach(r => { %>
+                <tr>
+                  <td><%= r.user_id?.name || 'N/A' %></td>
+                  <td><%= r.branch_name || r.branch_id?.name || 'N/A' %></td>
+                  <td><%= r.created_at ? r.created_at.toISOString().slice(0,10) : 'N/A' %></td>
+                  <td><%= r.visits_count || 0 %></td>
+                  <td><%= r.inspection_count || 0 %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

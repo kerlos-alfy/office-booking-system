@@ -1,0 +1,193 @@
+<%- include('../partials/header') %>
+
+<!-- ✅ CDN SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  body {
+    background: #f4f6f9;
+  }
+
+  .dashboard-table thead {
+    background: #343a40;
+    color: #fff;
+  }
+
+  .dashboard-table tbody tr {
+    transition: background 0.3s ease;
+  }
+
+  .dashboard-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .badge {
+    border-radius: 50rem;
+    font-size: 0.9rem;
+    padding: 0.35rem 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-offices { background: #6c757d; color: #fff; }
+  .badge-visits { background: #198754; color: #fff; }
+  .badge-inspect { background: #ffc107; color: #212529; }
+  .badge-calls { background: #0dcaf0; color: #212529; }
+  .badge-time { background: #dee2e6; color: #212529; }
+
+  .btn-view {
+    display: inline-block;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: #fff;
+    border: none;
+    border-radius: 50rem;
+    padding: 0.35rem 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+  }
+
+  .btn-edit {
+    display: inline-block;
+    background: linear-gradient(135deg, #fd7e14 0%, #fdb14c 100%);
+    color: #fff;
+    border: none;
+    border-radius: 50rem;
+    padding: 0.35rem 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+  }
+
+  .btn-add {
+    display: inline-block;
+    background: linear-gradient(135deg, #198754 0%, #00c896 100%);
+    color: #fff;
+    border: none;
+    border-radius: 50rem;
+    padding: 0.5rem 1.2rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+  }
+
+  .card {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+</style>
+
+<div class="container py-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold text-primary display-5 mb-2">
+      📊 Daily Reports Dashboard
+    </h2>
+    <p class="text-muted fs-5 mb-0">
+      User: <span class="fw-bold text-success"><%= user.name || user.email || 'User' %></span>
+    </p>
+  </div>
+
+  <!-- ✅ زر إضافة جديد -->
+  <div class="text-end mb-3">
+    <a href="/call-reports/daily-reports/new" class="btn-add">
+      ➕ Add New Report
+    </a>
+  </div>
+
+  <% if (reports.length === 0) { %>
+    <div class="alert alert-info text-center rounded-pill fw-bold fs-5 py-4 shadow">
+      🚫 No daily reports available yet. Stay tuned!
+    </div>
+  <% } else { %>
+    <div class="card mb-5">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table dashboard-table align-middle mb-0">
+            <thead class="text-center">
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>🏢 Offices</th>
+                <th>💰 Rent</th>
+                <th>👣 Visits</th>
+                <th>💳 Payments</th>
+                <th>🕵️ Inspections</th>
+                <th>📞 Calls</th>
+                <th>⏱️ Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% reports.forEach((r, i) => {
+                const totalRent = (r.rent_amount || []).reduce((a,b)=>a+Number(b),0);
+                const visitsCount = (r.visits_details || []).length;
+                const totalPayments = 
+                  (r.payment_ejari || []).reduce((a,b)=>a+Number(b),0) + 
+                  (r.payment_dp || []).reduce((a,b)=>a+Number(b),0) + 
+                  (r.payment_booking || []).reduce((a,b)=>a+Number(b),0);
+                const inspectionsCount = (r.inspection_companies || []).length;
+                const totalCalls = 
+                  (r.messages_whatsapp || 0) + 
+                  (r.messages_dubizzle || 0) + 
+                  (r.messages_bayut || 0) + 
+                  (r.messages_property_finder || 0);
+
+                const now = new Date();
+                const createdAt = new Date(r.created_at);
+                const diffMs = now - createdAt;
+                const diffMinutes = diffMs / (1000 * 60);
+              %>
+                <tr class="text-center">
+                  <td class="fw-bold"><%= i + 1 %></td>
+                  <td><%= r.created_at.toLocaleDateString() %></td>
+                  <td><span class="badge badge-offices"><%= r.available_offices || 0 %></span></td>
+                  <td><span class="fw-bold text-success">AED <%= totalRent.toLocaleString() %></span></td>
+                  <td><span class="badge badge-visits"><%= visitsCount %></span></td>
+                  <td><span class="fw-bold text-primary">AED <%= totalPayments.toLocaleString() %></span></td>
+                  <td><span class="badge badge-inspect"><%= inspectionsCount %></span></td>
+                  <td><span class="badge badge-calls"><%= totalCalls %></span></td>
+                  <td><span class="badge badge-time"><%= r.arriving_time || '-' %> → <%= r.leaving_time || '-' %></span></td>
+                  <td class="d-flex flex-column gap-2">
+                    <a href="/call-reports/daily-reports/<%= r._id %>" class="btn-view">🔍 View</a>
+
+                 
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<!-- ✅ SweetAlert function -->
+<script>
+  function showEditBlocked() {
+    Swal.fire({
+      icon: 'error',
+      title: '🚫 ممنوع التعديل',
+      text: 'عفواً لا يمكنك التعديل.. مرّ أكثر من 10 دقائق!',
+      confirmButtonColor: '#fd7e14'
+    });
+  }
+</script>
+
+<%- include('../partials/footer') %>

@@ -5,6 +5,9 @@ const upload = require("../utils/multer");
 const nationalities = require("../utils/nationalities");
 const puppeteer = require("puppeteer");
 const path = require("path");
+const Booking = require("../models/Booking");
+const TaxInvoice = require("../models/TaxInvoice");
+
 // View all clients
 // router.get("/", async (req, res) => {
 // 	try {
@@ -21,17 +24,27 @@ router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
 
-    const totalClients = await Client.countDocuments();
+    const search = req.query.search ? req.query.search.trim() : "";
+
+    // ✅ لو فيه كلمة بحث نفلتر بيها الاسم
+    let query = {};
+    if (search) {
+      query.company_en = { $regex: search, $options: "i" };
+    }
+
+    const totalClients = await Client.countDocuments(query);
     const totalPages = Math.ceil(totalClients / limit);
 
-    const clients = await Client.find().skip(skip).limit(limit);
+    const clients = await Client.find(query).skip(skip).limit(limit);
 
     res.render("clients", {
       clients,
       currentPage: page,
-      totalPages
+      totalPages,
+      search // مهم عشان يرجعلك القيمة في الـ EJS
     });
   } catch (err) {
+    console.error("❌ Error loading clients:", err);
     res.status(500).send("Error loading clients");
   }
 });
@@ -182,18 +195,31 @@ router.post(
   }
 );
 // View Client Details
+// ✅ View Client Details - مع الفواتير المرتبطة
 router.get("/:clientId/view", async (req, res) => {
-	try {
-		const client = await Client.findById(req.params.clientId);
-		if (!client) {
-			return res.status(404).send("Client not found");
-		}
+  try {
+    const client = await Client.findById(req.params.clientId);
+    if (!client) return res.status(404).send("Client not found");
 
-		res.render("clientView", { client });
-	} catch (err) {
-		res.status(500).send("Error loading client details");
-	}
+    // ✅ حمّل كل الحجوزات المرتبطة
+    const bookings = await Booking.find({ client_id: client._id });
+
+    // ✅ حمّل الفواتير المرتبطة بالحجوزات دي
+    const invoices = bookings.length > 0
+      ? await TaxInvoice.find({ booking_id: { $in: bookings.map(b => b._id) } })
+      : [];
+
+    console.log("✅ Client:", client.company_en);
+    console.log("✅ Total Bookings:", bookings.length);
+    console.log("✅ Total Invoices:", invoices.length);
+
+    res.render("clientView", { client, invoices }); // مهم تبعته للـ EJS
+  } catch (err) {
+    console.error("❌ Error loading client details:", err);
+    res.status(500).send("Error loading client details");
+  }
 });
+
 
 // Edit Client Form
 router.get("/:clientId/edit", async (req, res) => {
@@ -330,6 +356,47 @@ router.get("/:clientId/invoice/download", async (req, res) => {
 	});
 
 	res.send(pdfBuffer);
+});
+
+// ✅ AJAX Search Route
+router.get("/search", async (req, res) => {
+  try {
+    const query = req.query.q || "";
+    const regex = new RegExp(query, "i");
+
+    const clients = await Client.find({
+      $or: [
+        { company_en: regex },
+        { registered_owner_name_en: regex },
+        { mobile: regex }
+      ]
+    }).limit(30); // حد أقصى عشان الأداء
+
+    res.render("partials/clientTableRows", { clients, currentPage: 1 });
+  } catch (err) {
+    console.error("❌ Error in AJAX search:", err);
+    res.status(500).send("Server Error");
+  }
+});
+
+router.get("/api/search", async (req, res) => {
+  try {
+    const searchQuery = req.query.q || "";
+    const regex = new RegExp(searchQuery, "i");
+
+    const clients = await Client.find({
+      $or: [
+        { company_en: regex },
+        { registered_owner_name_en: regex },
+        { mobile: regex },
+      ],
+    }).limit(20); // limit للسرعة
+
+    res.json(clients);
+  } catch (err) {
+    console.error("❌ Error in AJAX search:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;

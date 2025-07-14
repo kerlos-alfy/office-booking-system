@@ -17,7 +17,7 @@
       <select name="filter" class="form-select rounded-pill px-3 shadow-sm" onchange="this.form.submit()">
         <option value="all" <%= filter === 'all' ? 'selected' : '' %>>Show All</option>
         <option value="available" <%= filter === 'available' ? 'selected' : '' %>>Show Only Available</option>
-        <option value="booked" <%= filter === 'booked' ? 'selected' : '' %>>Show Only Booked</option>
+        <option value="booked" <%= filter === 'booked' ? 'selected' : '' %>>Show Only Rented</option>
       </select>
     </div>
   </div>
@@ -28,7 +28,7 @@
   <% const statCards = [
     { label: 'Total Offices', value: totalOffices, color: 'primary' },
     { label: 'Available Offices', value: totalAvailable, color: 'success' },
-    { label: 'Booked Offices', value: totalBooked, color: 'danger' },
+    { label: 'Rented Offices', value: totalBooked, color: 'danger' },
     { label: 'Expiring This Month', value: expiringThisMonth, color: 'warning', textColor: 'text-dark' },
   ]; %>
 
@@ -84,60 +84,68 @@
     if (filter === 'all' || (filter === 'available' && !isBooked) || (filter === 'booked' && isBooked)) { %>
 
     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-      <div class="office-box p-3 shadow-sm rounded d-flex flex-column justify-content-between <%= isBooked ? 'office-booked' : 'office-available' %>">
-
+      <div class="office-box <%= isBooked ? 'office-booked' : 'office-available' %>">
         <% if (isBooked) { %>
-        <a href="/bookings/view/<%= booking._id %>" class="text-decoration-none text-dark d-block flex-grow-1">
+          <a href="/bookings/view/<%= booking._id %>" class="stretched-link"></a>
         <% } %>
 
-        <div class="d-flex justify-content-end mb-2">
+        <div class="d-flex justify-content-between mb-2">
           <span class="badge rounded-pill <%= isBooked ? 'bg-danger' : 'bg-success' %>">
             <%= isBooked ? '🔴 Booked' : '🟢 Available' %>
           </span>
         </div>
 
-        <h6 class="fw-bold mb-1">Office <%= office.office_number %></h6>
-        <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
+        <div class="flex-grow-1 d-flex flex-column justify-content-between">
+          <div>
+            <h6 class="fw-bold">Office <%= office.office_number %></h6>
+            <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
 
-        <% if (isExpiringSoon) { %>
-        <span class="badge bg-warning text-dark mb-2">⚠️ Expires This Month</span>
-        <% } %>
+            <% if (isExpiringSoon) { %>
+              <span class="badge bg-warning text-dark mb-2">⚠️ Expires This Month</span>
+            <% } %>
 
-        <% if (isBooked) { %>
-        <p class="mb-1"><strong>Booked by:</strong> <%= booking.client_id?.company_en || booking.client_id?.name || 'N/A' %></p>
+            <% if (isBooked) { %>
+              <p class="mb-1"><strong>Booked by:</strong> <%= booking.client_id?.company_en || booking.client_id?.name || 'N/A' %></p>
 
-        <% if (inspectionStatusMap && inspectionStatusMap[booking._id.toString()] !== undefined) { %>
-        <div class="remaining-inspections">
-          🛡️ <%= inspectionStatusMap[booking._id.toString()] %> free inspections remaining
+              <% if (inspectionStatusMap && inspectionStatusMap[booking._id.toString()] !== undefined) { %>
+                <div class="remaining-inspections mb-1">
+                  🛡️ <%= inspectionStatusMap[booking._id.toString()] %> free inspections remaining
+                </div>
+              <% } %>
+
+              <p class="mb-1"><strong>From:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
+              <p class="mb-0"><strong>To:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
+            <% } %>
+          </div>
+
+          <% if (!isBooked) { %>
+            <div class="mt-2">
+              <a href="/bookings/new/<%= office._id %>" class="btn btn-sm btn-outline-primary w-100 fw-bold">
+                🚀 Rent Now
+              </a>
+            </div>
+          <% } %>
         </div>
-        <% } %>
-
-        <p class="mb-1"><strong>From:</strong> <%= new Date(booking.start_date).toISOString().split('T')[0] %></p>
-        <p class="mb-1"><strong>To:</strong> <%= new Date(booking.end_date).toISOString().split('T')[0] %></p>
-        <% } %>
-
-        <% if (isBooked) { %></a><% } %>
-
-        <% if (!isBooked) { %>
-        <div class="d-grid mt-2">
-          <a href="/bookings/new/<%= office._id %>" class="btn btn-sm btn-outline-primary fw-bold">🚀 Book Now</a>
-        </div>
-        <% } %>
-
       </div>
     </div>
 
   <% } }); %>
 </div>
 
-<!-- Styling -->
 <style>
   .office-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 280px;
+    padding: 1rem;
     border: 2px solid #e0e0e0;
     border-radius: 16px;
     background-color: #fff;
     transition: all 0.3s ease;
-    height: 260px;
+    gap: 0.5rem;
+    overflow: hidden;
   }
 
   .office-available {
@@ -164,7 +172,22 @@
     padding: 4px 8px;
     border: 1px solid #bee5eb;
     border-radius: 4px;
-    margin-bottom: 4px;
+  }
+
+  .office-box h6,
+  .office-box p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stretched-link {
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    z-index: 1;
   }
 
   .stat-card {
@@ -178,4 +201,3 @@
 </style>
 
 <%- include('partials/footer') %>
-    

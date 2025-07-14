@@ -1,17 +1,17 @@
 <%- include('partials/header') %>
 
 <div class="container py-5">
-  <h1 class="mb-4 text-primary fw-bold">📦 Booking Archive</h1>
+  <h1 class="mb-4 text-primary fw-bold">📦 Rentals Archive</h1>
 
   <!-- ✅ Search -->
   <div class="mb-4">
-    <input id="bookingSearch" type="text" placeholder="🔍 Search bookings..."
+    <input id="bookingSearch" type="text" placeholder="🔍 Search rentals..."
       class="form-control w-100 w-md-50 shadow-sm border-0"
       style="border-radius: 30px; padding: 0.75rem 1.25rem;">
   </div>
 
   <% if (archivedBookings.length === 0) { %>
-    <div class="alert alert-info shadow-sm">No archived bookings found.</div>
+    <div class="alert alert-info shadow-sm">No archived rentals found.</div>
   <% } else { %>
     <div class="table-responsive shadow-sm rounded-4">
       <table class="table table-bordered table-hover bg-white">

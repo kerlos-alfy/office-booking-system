@@ -1,9 +1,9 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📦 Booking Archive</h1>
+<h1 class="mb-4 text-primary">📦 Rental Archive</h1>
 
 <!-- Back Button -->
-<a href="/bookings" class="btn btn-secondary mb-3">⬅️ Back to Bookings</a>
+<a href="/bookings" class="btn btn-secondary mb-3">⬅️ Back to Rentals</a>
 
 <!-- Filter Client -->
 <form method="GET" action="/bookings/archive" class="mb-3">
@@ -19,7 +19,7 @@
 </form>
 
 <% if (archivedBookings.length === 0) { %>
-    <div class="alert alert-info">No archived bookings found.</div>
+    <div class="alert alert-info">No archived rentals found.</div>
 <% } else { %>
     <table class="table table-bordered table-hover table-striped bg-white">
         <thead class="table-dark">

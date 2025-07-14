@@ -1,9 +1,9 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">📋 Bookings List</h1>
+<h1 class="mb-4 text-primary">📋 Rentals List</h1>
 
 <% if (bookings.length === 0) { %>
-    <div class="alert alert-info">No bookings found.</div>
+    <div class="alert alert-info">No rentals found.</div>
 <% } else { %>
     <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
@@ -31,11 +31,11 @@
                     <td><%= booking.page_no %></td>
                     <td><%= new Date(booking.start_date).toISOString().split('T')[0] %></td>
                     <td><%= new Date(booking.end_date).toISOString().split('T')[0] %></td>
-                    <td>$<%= booking.total_price %></td>
-                    <td>$<%= booking.initial_payment %></td>
-                    <td>$<%= booking.vat %></td>
-                    <td>$<%= booking.admin_fee %></td>
-                    <td>$<%= booking.commission %></td>
+                    <td>AED<%= booking.total_price %></td>
+                    <td>AED<%= booking.initial_payment %></td>
+                    <td>AED<%= booking.vat %></td>
+                    <td>AED<%= booking.admin_fee %></td>
+                    <td>AED<%= booking.commission %></td>
                     <td><%= booking.ejari_no %></td>
                     <td><%= booking.cheques.length %></td>
                     <td>
@@ -62,7 +62,7 @@
                                     <% booking.cheques.forEach((cheque, cIndex) => { %>
                                         <tr>
                                             <td><%= cIndex + 1 %></td>
-                                            <td>$<%= cheque.amount %></td>
+                                            <td>AED<%= cheque.amount %></td>
                                             <td><%= new Date(cheque.due_date).toISOString().split('T')[0] %></td>
                                         </tr>
                                     <% }) %>

@@ -1,0 +1,441 @@
+<%- include('../partials/header') %>
+
+<div class="container my-5 px-2 px-md-5">
+  <h2 class="text-center text-primary fw-bold mb-4">📝 Daily Employee Report</h2>
+
+  <form method="POST" action="/call-reports/daily-reports" class="shadow-sm rounded-4">
+<% if (branches && branches.length > 0) { %>
+  <div class="mb-4">
+    <label class="fw-semibold text-secondary">🏢 Select Branch</label>
+
+    <% if (branches.length === 1) { %>
+      <input type="hidden" name="branch_id" value="<%= branches[0]._id %>">
+      <p class="fw-bold text-success">✅ <%= branches[0].name %></p>
+    <% } else { %>
+      <select name="branch_id" class="form-select" required>
+        <option value="">-- Select Branch --</option>
+        <% branches.forEach(branch => { %>
+          <option value="<%= branch._id %>"><%= branch.name %></option>
+        <% }) %>
+      </select>
+    <% } %>
+  </div>
+<% } else { %>
+  <p class="text-danger fw-bold">⚠️ No branches available for your account.</p>
+<% } %>
+
+
+
+
+<!-- ✅ Today’s Rent Collection -->
+<div class="card mb-4 border-0 shadow-sm rounded-4">
+  <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 text-secondary">🏢 Today’s Rent Collection</h5>
+    <button type="button" class="btn btn-outline-success btn-sm add-section">➕ Add</button>
+  </div>
+
+  <div class="card-body sections-wrapper" data-section="rent">
+    <div class="section-item border rounded p-3 mb-3 bg-white">
+      <div class="row g-3">
+
+
+          <!-- 🏬 Office No. with Autocomplete -->
+        <div class="col-12 col-md-4 position-relative">
+          <label class="fw-semibold text-secondary">🏬 Office No.</label>
+         <input type="text" name="rent_office_no[]" class="form-control officeNoInput" placeholder="Type office number">
+
+          <ul id="officeSuggestions" class="list-group position-absolute w-100" style="z-index: 999;"></ul>
+        </div>
+        <!-- 🏢 CO. Name -->
+        <div class="col-12 col-md-4">
+          <label class="fw-semibold text-secondary">🏢 CO. Name</label>
+          <input type="text" name="rent_company_name[]" class="form-control">
+        </div>
+
+      
+
+        <!-- 💵 Amount -->
+        <div class="col-12 col-md-4">
+          <label class="fw-semibold text-secondary">💵 Amount</label>
+          <input type="number" name="rent_amount[]" class="form-control">
+        </div>
+
+        <!-- 📅 Due Date -->
+        <div class="col-12 col-md-4">
+          <label class="fw-semibold text-secondary">📅 Due Date</label>
+          <input type="date" name="rent_due_date[]" class="form-control">
+        </div>
+
+        <!-- ✅ Date Paid -->
+        <div class="col-12 col-md-4">
+          <label class="fw-semibold text-secondary">✅ Date Paid</label>
+          <input type="date" name="rent_date_paid[]" class="form-control">
+        </div>
+
+        <!-- 💳 Where Did The Money Go? -->
+        <div class="col-12 col-md-4">
+          <label class="fw-semibold text-secondary">💳 Where Did The Money Go?</label>
+          <select name="rent_money_destination[]" class="form-select">
+            <option value="">Select</option>
+            <option value="Bank Account">🏦 Bank Account</option>
+            <option value="Branch Safe">💼 Branch Safe</option>
+            <option value="HQ">🏢 HQ / Management</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-danger btn-sm mt-3 remove-section">🗑️ Remove</button>
+    </div>
+  </div>
+</div>
+
+
+    <!-- ✅ Visits Section (Auto Generate) -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">🚶 Number of Visits</h5>
+        <div class="mb-3">
+          <label class="fw-semibold text-secondary">🔢 How many?</label>
+          <input type="number" id="visits_count_input" class="form-control w-50 w-md-25">
+        </div>
+        <div id="visits-wrapper"></div>
+      </div>
+    </div>
+
+    <!-- ✅ Payments Section -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-secondary">💳 Any New Payment</h5>
+        <button type="button" class="btn btn-outline-success btn-sm add-section">➕ Add</button>
+      </div>
+      <div class="card-body sections-wrapper" data-section="payment">
+        <div class="section-item border rounded p-3 mb-3 bg-white">
+          <div class="row g-3">
+            <div class="col-12 col-md-3">
+              <label class="fw-semibold text-secondary">🏠 Ejari</label>
+              <input type="number" name="payment_ejari[]" class="form-control">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="fw-semibold text-secondary">💰 D.P</label>
+              <input type="number" name="payment_dp[]" class="form-control">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="fw-semibold text-secondary">📑 Rental</label>
+              <input type="number" name="payment_booking[]" class="form-control">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="fw-semibold text-secondary">➕ Etc.</label>
+              <input type="text" name="payment_etc[]" class="form-control">
+            </div>
+          </div>
+          <button type="button" class="btn btn-danger btn-sm mt-3 remove-section">🗑️ Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Inspections Section -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">🔍 Daily Inspections</h5>
+        <div class="mb-3">
+          <label class="fw-semibold text-secondary">🔢 Number of inspections</label>
+          <input type="number" id="inspection_count_input" class="form-control w-50 w-md-25">
+        </div>
+        <div id="inspections-wrapper"></div>
+      </div>
+    </div>
+
+    <!-- ✅ Available Offices -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">🏢 No. Available Offices</h5>
+        <input type="number" name="available_offices" class="form-control">
+      </div>
+    </div>
+
+    <!-- ✅ Messages -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">📲 Number of Messages</h5>
+        <div class="row g-3">
+          <div class="col-12 col-md-3">
+            <label class="fw-semibold text-secondary">💬 Meta</label>
+            <input type="number" name="messages_whatsapp" class="form-control">
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="fw-semibold text-secondary">📣 Dubizzle</label>
+            <input type="number" name="messages_dubizzle" class="form-control">
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="fw-semibold text-secondary">🏠 Bayut</label>
+            <input type="number" name="messages_bayut" class="form-control">
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="fw-semibold text-secondary">🔍 Property Finder</label>
+            <input type="number" name="messages_property_finder" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Timing -->
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h5 class="fw-bold text-secondary mb-3">⏱️ Timing</h5>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="fw-semibold text-secondary">⏰ Arriving T2ime</label>
+           <input type="time" name="arriving_time" class="form-control" value="09:00" min="06:00" max="22:00">
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="fw-semibold text-secondary">🏁 Leaving Time</label>
+            <input type="time" name="leaving_time" class="form-control" value="09:00" min="06:00" max="22:00">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Submit -->
+    <div class="text-end mb-5">
+      <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+        📤 Submit Report
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<!-- ✅ Scripts -->
+<script>
+  // Add/Remove manual sections
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('add-section')) {
+      const wrapper = e.target.closest('.card').querySelector('.sections-wrapper');
+      const item = wrapper.querySelector('.section-item').cloneNode(true);
+      item.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+      wrapper.appendChild(item);
+    }
+    if (e.target.classList.contains('remove-section')) {
+      const wrapper = e.target.closest('.sections-wrapper');
+      if (wrapper.querySelectorAll('.section-item').length > 1) {
+        e.target.closest('.section-item').remove();
+      } else {
+        alert('At least one item required.');
+      }
+    }
+  });
+
+  // Inspections auto generate
+// Inspections auto generate ✅ مع 🏬 Office No.
+document.getElementById('inspection_count_input').addEventListener('input', function () {
+  const wrapper = document.getElementById('inspections-wrapper');
+  const count = parseInt(this.value) || 0;
+  wrapper.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const item = document.createElement('div');
+    item.className = 'section-item border rounded p-3 mb-3 bg-white';
+    item.innerHTML = `
+      <div class="row g-3">
+       <div class="col-12 col-md-3 position-relative">
+  <label class="fw-semibold text-secondary">🏬 Office No.</label>
+  <input type="text" name="inspection_office_no[]" class="form-control inspectionOfficeInput" placeholder="Type Office No.">
+  <ul class="list-group position-absolute w-100 inspectionSuggestions" style="z-index: 999;"></ul>
+</div>
+
+        <div class="col-12 col-md-3">
+          <label class="fw-semibold text-secondary">🏭 Company name(s)</label>
+          <input type="text" name="inspection_companies[]" class="form-control">
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="fw-semibold text-secondary">🔍 Type of inspections</label>
+          <select name="inspection_type[]" class="form-select">
+            <option value="">Select</option>
+            <option value="Labor">👷 Labor</option>
+            <option value="Bank">🏦 Bank</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="fw-semibold text-secondary">#️⃣ First/Second</label>
+          <select name="inspection_order[]" class="form-select">
+            <option value="">Select</option>
+            <option value="first">First</option>
+            <option value="second">Second</option>
+          </select>
+        </div>
+    
+      </div>
+    `;
+    wrapper.appendChild(item);
+  }
+});
+
+  // Visits auto generate
+  document.getElementById('visits_count_input').addEventListener('input', function () {
+    const wrapper = document.getElementById('visits-wrapper');
+    const count = parseInt(this.value) || 0;
+    wrapper.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const item = document.createElement('div');
+      item.className = 'section-item border rounded p-3 mb-3 bg-white';
+      item.innerHTML = `
+        <label class="fw-semibold text-secondary">🚶 Visit No. ${i + 1}</label>
+        <div class="mb-3">
+          <label class="fw-semibold text-secondary">🗒️ What happened with this visit?</label>
+          <textarea name="visits_details[]" class="form-control"></textarea>
+        </div>
+      `;
+      wrapper.appendChild(item);
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('input', function(e) {
+    if (e.target.matches('.officeNoInput')) {
+      const input = e.target;
+      const wrapper = input.closest('.section-item');
+      let suggestions = wrapper.querySelector('.officeSuggestions');
+
+      if (!suggestions) {
+        suggestions = document.createElement('ul');
+        suggestions.className = 'list-group position-absolute w-100 officeSuggestions';
+        suggestions.style.zIndex = '999';
+        input.parentElement.appendChild(suggestions);
+      }
+
+      const q = input.value.trim();
+      if (q.length < 1) {
+        suggestions.innerHTML = '';
+        return;
+      }
+
+      fetch(`/call-reports/offices/search?number=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+          suggestions.innerHTML = '';
+
+          if (data.length === 0) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item text-muted';
+            li.textContent = '❌ No offices found';
+            suggestions.appendChild(li);
+            return;
+          }
+
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action';
+            li.style.cursor = 'pointer';
+            li.textContent = `${item.number} (${item.branch})`;
+
+            li.addEventListener('click', () => {
+              input.value = item.number;
+              suggestions.innerHTML = '';
+
+              fetch(`/call-reports/offices/${item.id}/booking-info`)
+                .then(res => res.json())
+                .then(info => {
+                  if (info.found) {
+                    wrapper.querySelector('[name="rent_company_name[]"]').value = info.company || '';
+                    wrapper.querySelector('[name="rent_amount[]"]').value = info.amount || '';
+                    wrapper.querySelector('[name="rent_due_date[]"]').value = info.due_date ? info.due_date.substring(0,10) : '';
+                    wrapper.querySelector('[name="rent_date_paid[]"]').value = info.date_paid ? info.date_paid.substring(0,10) : '';
+                  } else {
+                    alert(info.msg || 'No active booking found.');
+                  }
+                })
+                .catch(err => {
+                  console.error(err);
+                  alert('Error fetching booking info.');
+                });
+            });
+
+            suggestions.appendChild(li);
+          });
+        })
+        .catch(err => console.error(err));
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.officeSuggestions') && !e.target.classList.contains('officeNoInput')) {
+      document.querySelectorAll('.officeSuggestions').forEach(s => s.innerHTML = '');
+    }
+  });
+</script>
+
+
+<script>
+document.addEventListener('input', function (e) {
+  if (e.target.matches('.inspectionOfficeInput')) {
+    const input = e.target;
+    const wrapper = input.closest('.section-item');
+
+    let suggestions = wrapper.querySelector('.inspectionSuggestions');
+    if (!suggestions) {
+      suggestions = document.createElement('ul');
+      suggestions.className = 'list-group position-absolute w-100 inspectionSuggestions';
+      suggestions.style.zIndex = '999';
+      input.parentElement.appendChild(suggestions);
+    }
+
+    const q = input.value.trim();
+    if (q.length < 1) {
+      suggestions.innerHTML = '';
+      return;
+    }
+
+    fetch(`/call-reports/offices/search?number=${encodeURIComponent(q)}`)
+      .then(res => res.json())
+      .then(data => {
+        suggestions.innerHTML = '';
+
+        if (data.length === 0) {
+          const li = document.createElement('li');
+          li.className = 'list-group-item text-muted';
+          li.textContent = '❌ No offices found';
+          suggestions.appendChild(li);
+          return;
+        }
+
+        data.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item list-group-item-action';
+          li.style.cursor = 'pointer';
+          li.textContent = `${item.number} (${item.branch})`;
+
+          li.addEventListener('click', () => {
+            input.value = item.number;
+            suggestions.innerHTML = '';
+
+            fetch(`/call-reports/offices/${item.id}/booking-info`)
+              .then(res => res.json())
+              .then(info => {
+                if (info.found) {
+                  wrapper.querySelector('input[name="inspection_companies[]"]').value = info.company || '';
+                } else {
+                  wrapper.querySelector('input[name="inspection_companies[]"]').value = '';
+                }
+              });
+          });
+
+          suggestions.appendChild(li);
+        });
+      })
+      .catch(err => console.error(err));
+  }
+});
+
+// ✅ لغلق القائمة عند الضغط خارجها
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.inspectionSuggestions') && !e.target.classList.contains('inspectionOfficeInput')) {
+    document.querySelectorAll('.inspectionSuggestions').forEach(s => s.innerHTML = '');
+  }
+});
+
+</script>
+
+
+
+
+<%- include('../partials/footer') %>

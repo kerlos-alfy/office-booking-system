@@ -203,7 +203,7 @@
 
     let html = '<option value="">-- Select Branch --</option>';
     branches.forEach(branch => {
-      html += `<option value="${branch._id}">${branch.name}</option>`;
+      html += `<option value="${branch._id}">AED{branch.name}</option>`;
     });
 
     $('#branchSelect').html(html);
@@ -242,14 +242,14 @@
    offices.forEach(office => {
   table.row.add({
     select: `<input type="checkbox" class="office-checkbox form-check-input" value="${office._id}" />`,
-    office_number: `<strong>${office.office_number}</strong>`,
+    office_number: `<strong>AED{office.office_number}</strong>`,
     floor: office.floor,
     payment_plans: `
       <ul class="list-unstyled mb-0">
         ${office.payment_plans.map(p => `
           <li class="mb-1">
             <span class="badge bg-primary">💳 ${p.type}</span>
-            <span class="text-muted">${p.total_price} AED</span>
+            <span class="text-muted">AED{p.total_price} AED</span>
           </li>
         `).join('')}
       </ul>

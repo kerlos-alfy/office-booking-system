@@ -72,12 +72,17 @@ const clientsRoutes = require("./src/routes/Clients");
 const bookingsRoutes = require("./src/routes/Bookings");
 const paymentsRoutes = require("./src/routes/Payments");
 const reportsRoutes = require("./src/routes/Reports");
+// const reportsRoutes = require("./src/routes/reportsnew");
 const inspectionRoutes = require("./src/routes/Inspections");
 const exploreRoutes = require("./src/routes/explore");
 const generalRoutes = require("./src/routes/general");
 const invoiceRoutes = require("./src/routes/invoice");
 const adminBranchRoutes = require('./src/routes/adminBranch');
-const reportsRouter = require('./src/routes/reportsnew');
+const callReports = require("./src/routes/callReports");
+const adminReportsRoutes = require('./src/routes/admin/reports');
+
+
+
 
 
 // ✅ Route: /
@@ -104,8 +109,9 @@ app.use("/client", exploreRoutes);
 app.use(generalRoutes);
 app.use("/", invoiceRoutes);
 app.use(adminBranchRoutes);
+app.use("/call-reports", callReports);
+app.use('/admin/reports', adminReportsRoutes);
 
-app.use('/reports', reportsRouter);
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

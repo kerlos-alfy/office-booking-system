@@ -1,0 +1,125 @@
+<%- include('../partials/header') %>
+
+<style>
+  body { background: #f5f7fa; }
+  .form-card {
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+  }
+  .form-label { font-weight: 600; color: #333; margin-bottom: .3rem; }
+  .call-row { background: #fff; }
+  .text-danger { font-size: 0.85rem; }
+</style>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card form-card p-4 border-0">
+        <h4 class="text-center mb-4 fw-bold text-primary">📞 Add Calls</h4>
+
+        <form action="/call-reports/add-multiple" method="POST">
+
+          <div id="callsContainer">
+            <!-- ✅ أول صف -->
+            <div class="call-row mb-3 border p-3 rounded">
+              <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                  <label class="form-label">Phone Number</label>
+                  <input name="calls[0][phone_number]"
+                         class="form-control phone-input"
+                         placeholder="05XXXXXXXX"
+                         pattern="^05\d{8}$"
+                         title="Please enter a valid UAE mobile number like 05XXXXXXXX"
+                         required>
+                  <small class="text-danger d-none">❌ Invalid UAE number!</small>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Source</label>
+                  <select name="calls[0][source]" class="form-select" required>
+                    <option value="" disabled selected>Choose Source</option>
+                    <option value="dubizzle">Dubizzle</option>
+                    <option value="bayut">Bayut</option>
+                    <option value="meta">Meta</option>
+               <option value="PropertyFinder">Property Finder</option>
+
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Action Taken</label>
+                  <input name="calls[0][action]" class="form-control" placeholder="e.g. Sent details..." required>
+                </div>
+                <div class="col-md-2 form-check form-switch mt-4">
+                  <input class="form-check-input" type="checkbox" name="calls[0][answered]">
+                  <label class="form-check-label">Answered</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mb-4">
+            <button type="button" id="addRowBtn" class="btn btn-outline-primary rounded-pill">➕ Add Another</button>
+            <button type="button" id="removeRowBtn" class="btn btn-outline-danger rounded-pill">🗑️ Remove Last</button>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 fw-semibold py-2 rounded-pill">
+            ✅ Save All Calls
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let counter = 1;
+  const container = document.getElementById('callsContainer');
+  const addBtn = document.getElementById('addRowBtn');
+  const removeBtn = document.getElementById('removeRowBtn');
+
+  addBtn.onclick = () => {
+    const newRow = container.firstElementChild.cloneNode(true);
+    newRow.querySelectorAll('input, select').forEach(el => {
+      const oldName = el.getAttribute('name');
+      const newName = oldName.replace(/\[\d+\]/, `[${counter}]`);
+      el.setAttribute('name', newName);
+
+      if (el.classList.contains('phone-input')) {
+        el.value = '';
+        el.nextElementSibling.classList.add('d-none');
+      } else if (el.type === 'checkbox') {
+        el.checked = false;
+      } else {
+        el.value = '';
+      }
+    });
+    container.appendChild(newRow);
+    bindValidation(newRow);
+    counter++;
+  };
+
+  removeBtn.onclick = () => {
+    if (container.children.length > 1) {
+      container.removeChild(container.lastElementChild);
+      counter--;
+    }
+  };
+
+  function bindValidation(row) {
+    const phoneInput = row.querySelector('.phone-input');
+    const helpText = phoneInput.nextElementSibling;
+
+    phoneInput.addEventListener('input', function() {
+      const regex = /^05\d{8}$/;
+      if (!regex.test(this.value)) {
+        helpText.classList.remove('d-none');
+      } else {
+        helpText.classList.add('d-none');
+      }
+    });
+  }
+
+  document.querySelectorAll('.call-row').forEach(row => bindValidation(row));
+</script>
+
+<%- include('../partials/footer') %>

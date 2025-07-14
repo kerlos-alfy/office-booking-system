@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<div class="container my-5">
+  <h2 class="text-primary fw-bold mb-4">📄 Report Details</h2>
+
+  <ul class="list-group mb-3">
+    <li class="list-group-item">
+      <strong>Date:</strong>
+      <% if (report.created_at) { %>
+        <%= new Date(report.created_at).toLocaleDateString() %>
+      <% } else { %>
+        N/A
+      <% } %>
+    </li>
+
+    <li class="list-group-item">
+      <strong>Employee:</strong>
+      <% if (report.user_id) { %>
+        <%= report.user_id.name %>
+      <% } else { %>
+        <span class="text-danger">No User Linked</span>
+      <% } %>
+    </li>
+
+    <li class="list-group-item">
+      <strong>🏬 Offices:</strong>
+      <%= Array.isArray(report.rent_office_no) ? report.rent_office_no.length : 0 %>
+    </li>
+
+    <li class="list-group-item">
+      <strong>💵 Rent:</strong>
+      <%= Array.isArray(report.rent_amount) ? report.rent_amount.reduce((sum, n) => sum + n, 0) : 0 %>
+    </li>
+
+    <li class="list-group-item">
+      <strong>🚶 Visits:</strong>
+      <%= Array.isArray(report.visits_details) ? report.visits_details.length : 0 %>
+    </li>
+
+    <li class="list-group-item">
+      <strong>📞 Calls:</strong>
+      <%= 
+        (report.messages_whatsapp || 0) +
+        (report.messages_dubizzle || 0) +
+        (report.messages_bayut || 0) +
+        (report.messages_property_finder || 0)
+      %>
+    </li>
+  </ul>
+
+  <a href="/admin/reports" class="btn btn-secondary">🔙 Back to Reports</a>
+</div>
+
+<%- include('../partials/footer') %>

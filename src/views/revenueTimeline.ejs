@@ -1,6 +1,6 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">💰 Monthly Collection & Bookings</h1>
+<h1 class="mb-4 text-primary">💰 Monthly Collection & Rentals</h1>
 
 <form method="GET" action="/reports/timeline" class="mb-4">
   <div class="row g-3 align-items-center mb-2">
@@ -52,19 +52,19 @@
   <div class="col-md-6">
     <div class="card shadow text-center p-3">
       <h5>Total Collected</h5>
-      <h2 class="text-success">$<%= dataPoints.reduce((s, p) => s + p.paid, 0).toLocaleString() %></h2>
+      <h2 class="text-success">AED<%= dataPoints.reduce((s, p) => s + p.paid, 0).toLocaleString() %></h2>
     </div>
   </div>
   <div class="col-md-6">
     <div class="card shadow text-center p-3">
-      <h5>Total Bookings</h5>
+      <h5>Total Rentals</h5>
       <h2 class="text-warning"><%= dataPoints.reduce((s, p) => s + p.bookingsCount, 0) %></h2>
     </div>
   </div>
 </div>
 
 <div class="card shadow mb-4">
-  <div class="card-header bg-primary text-white fw-bold">📊 Monthly Collection vs Bookings</div>
+  <div class="card-header bg-primary text-white fw-bold">📊 Monthly Collection vs Rentals</div>
   <div class="card-body">
     <% if (dataPoints.length > 0) { %>
       <table class="table table-bordered">
@@ -72,14 +72,14 @@
           <tr>
             <th>Month</th>
             <th>Collected</th>
-            <th>Bookings Count</th>
+            <th>Rentals Count</th>
           </tr>
         </thead>
         <tbody>
           <% dataPoints.forEach(p => { %>
             <tr>
               <td><%= p.label %></td>
-              <td>$<%= p.paid.toLocaleString() %></td>
+              <td>AED<%= p.paid.toLocaleString() %></td>
               <td><%= p.bookingsCount %></td>
             </tr>
           <% }) %>
@@ -92,7 +92,7 @@
 </div>
 
 <div class="card shadow mb-4">
-  <div class="card-header bg-primary text-white fw-bold text-center">📈 Collected vs Bookings Count</div>
+  <div class="card-header bg-primary text-white fw-bold text-center">📈 Collected vs Rentals Count</div>
   <div class="card-body">
     <% if (dataPoints.length > 0) { %>
       <canvas id="comparisonChart" height="120"></canvas>

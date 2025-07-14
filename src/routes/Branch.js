@@ -2,21 +2,41 @@
 const express = require('express');
 const router = express.Router();
 const Branch = require('../models/Branch');
+const { authenticateJWT, hasPermission } = require('../middlewares/auth');
 
 // عرض كل الفروع
-router.get('/', async (req, res) => {
+router.get('/',
+  authenticateJWT, // لو عندك auth
+  hasPermission('branches.view'), // لو فيه صلاحية
+  async (req, res) => {
     try {
-        const branches = await Branch.find();
-        res.render('branches', { branches });
+      let query = {};
+
+      // ✨ لو المستخدم مربوط بفرع → يعرض الفرع ده بس
+      if (req.user.branch) {
+        query._id = req.user.branch;
+      }
+      // ✨ لو الفرع null → مفيش شرط → هيجيب كل الفروع
+
+      const branches = await Branch.find(query);
+
+     res.render('branches', { branches, user: req.user });
+
     } catch (err) {
-        res.status(500).send('Error loading branches');
+      console.error(err);
+      res.status(500).send('Error loading branches');
     }
-});
+  }
+);
+
 
 // صفحة إضافة فرع جديد (Form)
-router.get('/new', (req, res) => {
-    res.render('newBranch');
+router.get('/new',authenticateJWT, (req, res) => {
+  res.render('newBranch', {
+    user: req.user  // ✅ كده ال header هيلاقي ال user
+  });
 });
+
 
 // حفظ فرع جديد
 router.post('/new', async (req, res) => {
