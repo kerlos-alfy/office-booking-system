@@ -4,6 +4,12 @@
   📞 <%= user.name %>’s Call Activity Log 📑
 </h2>
 
+  <div class="d-flex justify-content-end mb-3">
+    <a href="/call-reports/add" class="btn btn-success rounded-pill fw-bold shadow-sm">
+      ➕ Add New Call
+    </a>
+  </div>
+
 <% const overdueCalls = calls.filter(c => c.overdue); %>
 <% const normalCalls = calls.filter(c => !c.overdue); %>
 
@@ -25,12 +31,14 @@
           <thead class="table-danger text-center">
             <tr>
               <th>#</th>
+              <th>👤 Client Name</th>
               <th>📞 Phone</th>
               <th>🌐 Source</th>
               <th>📝 Action</th>
               <th>📣 Answered</th>
               <th>🗓️ Call Date</th>
               <th>🔁 Follow-Ups Count</th>
+              <th>🗓️ Last Follow-Up</th>
               <th>✏️</th>
             </tr>
           </thead>
@@ -40,25 +48,30 @@
                 <%= call.answered ? 'table-info text-white' : '' %>
                 <%= (!call.answered && call.follow_up_logs && call.follow_up_logs.length > 0) ? 'table-warning' : '' %>">
                 <td><%= idx + 1 %></td>
+                <td><%= call.client_name || '-' %></td>
                 <td><%= call.phone_number %></td>
                 <td>
-                 <% if (call.source === 'dubizzle') { %>
-  <span class="badge bg-danger">Dubizzle</span>
-<% } else if (call.source === 'bayut') { %>
-  <span class="badge bg-success">Bayut</span>
-<% } else if (call.source === 'meta') { %>
-  <span class="badge bg-primary">Meta</span>
-<% } else if (call.source === 'PropertyFinder') { %>
-  <span class="badge bg-warning text-dark">Property Finder</span>
-<% } else { %>
-  <span class="badge bg-secondary"><%= call.source %></span>
-<% } %>
-
+                  <% if (call.source === 'dubizzle') { %>
+                    <span class="badge bg-danger">Dubizzle</span>
+                  <% } else if (call.source === 'bayut') { %>
+                    <span class="badge bg-success">Bayut</span>
+                  <% } else if (call.source === 'meta') { %>
+                    <span class="badge bg-primary">Meta</span>
+                  <% } else if (call.source === 'PropertyFinder') { %>
+                    <span class="badge bg-warning text-dark">Property Finder</span>
+                  <% } else { %>
+                    <span class="badge bg-secondary"><%= call.source %></span>
+                  <% } %>
                 </td>
                 <td class="text-start"><%= call.action %></td>
                 <td><%= call.answered ? '✅ Answered' : '❌ Not Answered' %></td>
                 <td><%= new Date(call.call_date).toLocaleDateString() %></td>
                 <td><%= call.follow_up_logs ? call.follow_up_logs.length : 0 %></td>
+                <td>
+                  <%= call.last_follow_up 
+                      ? new Date(call.last_follow_up).toLocaleDateString()
+                      : '-' %>
+                </td>
                 <td>
                   <a href="/call-reports/<%= call._id %>/edit" class="btn btn-sm btn-outline-primary rounded-pill">
                     ✏️ Follow Up
@@ -71,44 +84,10 @@
       </div>
     </div>
   <% } %>
-<div class="d-flex justify-content-end mb-3">
-    <a href="/call-reports/add" class="btn btn-success rounded-pill fw-bold shadow-sm">
-      ➕ Add New Call
-    </a>
-  </div>
-  <!-- ✅ Filters Card -->
-  <div class="card border-0 shadow-sm p-4 mb-4 rounded-4">
-    <h5 class="fw-bold mb-3 text-secondary">🔍 Filter Calls</h5>
-    <div class="row g-3">
-      <div class="col-md-3">
-        <label class="form-label">🌐 Source</label>
-        <select id="filterSource" class="form-select rounded-pill shadow-sm">
-          <option value="">All</option>
-          <option value="dubizzle">Dubizzle</option>
-          <option value="bayut">Bayut</option>
-          <option value="meta">Meta</option>
-          <option value="PropertyFinder">Property Finder</option>
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">📣 Answered</label>
-        <select id="filterAnswered" class="form-select rounded-pill shadow-sm">
-          <option value="">All</option>
-          <option value="true">✅ Answered</option>
-          <option value="false">❌ Not Answered</option>
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">🗓️ Call Date</label>
-        <input type="date" id="filterDate" class="form-control rounded-pill shadow-sm">
-      </div>
-      <div class="col-md-3 d-flex align-items-end">
-        <button type="button" id="resetFilters" class="btn btn-secondary w-100 rounded-pill">
-          🔄 Reset Filters
-        </button>
-      </div>
-    </div>
-  </div>
+
+
+
+
 
   <!-- ✅ Normal Calls Table -->
   <div class="table-responsive">
@@ -116,6 +95,7 @@
       <thead class="table-primary">
         <tr class="text-center">
           <th>#</th>
+          <th>👤 Client Name</th>
           <th>📞 Phone</th>
           <th>🌐 Source</th>
           <th>📝 Action</th>
@@ -133,21 +113,21 @@
               data-answered="<%= call.answered %>"
               data-date="<%= new Date(call.call_date).toISOString().slice(0,10) %>">
             <td><%= idx + 1 %></td>
+            <td><%= call.client_name || '-' %></td>
             <td><%= call.phone_number %></td>
-           <td>
-  <% if (call.source === 'dubizzle') { %>
-    <span class="badge bg-danger">Dubizzle</span>
-  <% } else if (call.source === 'bayut') { %>
-    <span class="badge bg-success">Bayut</span>
-  <% } else if (call.source === 'meta') { %>
-    <span class="badge bg-primary">Meta</span>
-  <% } else if (call.source === 'PropertyFinder') { %>
-    <span class="badge bg-warning text-dark">Property Finder</span>
-  <% } else { %>
-    <span class="badge bg-secondary"><%= call.source %></span>
-  <% } %>
-</td>
-
+            <td>
+              <% if (call.source === 'dubizzle') { %>
+                <span class="badge bg-danger">Dubizzle</span>
+              <% } else if (call.source === 'bayut') { %>
+                <span class="badge bg-success">Bayut</span>
+              <% } else if (call.source === 'meta') { %>
+                <span class="badge bg-primary">Meta</span>
+              <% } else if (call.source === 'PropertyFinder') { %>
+                <span class="badge bg-warning text-dark">Property Finder</span>
+              <% } else { %>
+                <span class="badge bg-secondary"><%= call.source %></span>
+              <% } %>
+            </td>
             <td class="text-start"><%= call.action %></td>
             <td><%= call.answered ? '✅ Answered' : '❌ Not Answered' %></td>
             <td><%= new Date(call.call_date).toLocaleDateString() %></td>
@@ -170,47 +150,5 @@
   </div>
 
 <% } %>
-
-<!-- ✅ Simple Filtering Script (No DataTables) -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const filterSource = document.getElementById('filterSource');
-    const filterAnswered = document.getElementById('filterAnswered');
-    const filterDate = document.getElementById('filterDate');
-    const resetBtn = document.getElementById('resetFilters');
-    const rows = document.querySelectorAll('#callsTable tbody tr');
-    const noResultsMsg = document.getElementById('noResultsMsg');
-
-    function filterRows() {
-      let visibleCount = 0;
-      rows.forEach(row => {
-        const source = row.dataset.source;
-        const answered = row.dataset.answered;
-        const date = row.dataset.date;
-
-        let show = true;
-        if (filterSource.value && filterSource.value !== source) show = false;
-        if (filterAnswered.value && filterAnswered.value !== answered) show = false;
-        if (filterDate.value && filterDate.value !== date) show = false;
-
-        row.style.display = show ? '' : 'none';
-        if (show) visibleCount++;
-      });
-
-      noResultsMsg.classList.toggle('d-none', visibleCount > 0);
-    }
-
-    filterSource.addEventListener('change', filterRows);
-    filterAnswered.addEventListener('change', filterRows);
-    filterDate.addEventListener('input', filterRows);
-
-    resetBtn.addEventListener('click', function() {
-      filterSource.value = '';
-      filterAnswered.value = '';
-      filterDate.value = '';
-      filterRows();
-    });
-  });
-</script>
 
 <%- include('../partials/footer') %>

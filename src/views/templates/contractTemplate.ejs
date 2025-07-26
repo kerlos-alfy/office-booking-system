@@ -481,6 +481,32 @@ const grandTotal = downPayment + chequeTotal;
             <td>Office Rent / قيمة الإيجار :</td>
             <td><%= office_rent %> AED</td>
         </tr>
+
+
+<tr>
+             <td>Security Deposit / التأمين :</td>
+             <td><%= Number(security_deposit).toFixed(2) %> AED</td>
+        </tr>
+
+
+        <% if (Number(security_deposit) > 0) { %>
+  <tr>
+    <td>Security Deposit / التأمين :</td>
+    <td><%= Number(security_deposit).toFixed(2) %> AED</td>
+  </tr>
+<% } %>
+
+<% if (Number(admin_fee) > 0) { %>
+  <tr>
+    <td>Admin Fee / رسوم إدارية :</td>
+    <td><%= Number(admin_fee).toFixed(2) %> AED</td>
+  </tr>
+<% } %>
+
+        <tr>
+            <td>TOTAL / المجموع</td>
+            <td><%= total_price %> AED</td>
+        </tr>
         <tr>
             <td>TOTAL / المجموع</td>
             <td><%= total_price %> AED</td>

@@ -7,6 +7,11 @@
   </a>
 </div>
 
+<!-- 🔍 Live Search -->
+<div class="mb-4">
+  <input id="searchInput" type="text" placeholder="🔍 Search office number, floor, status, or company..." class="form-control form-control-lg shadow-sm rounded-pill">
+</div>
+
 <!-- Filter -->
 <form method="GET" action="/bookings/branch/<%= branchId %>" class="mb-4">
   <div class="row g-3 align-items-center">
@@ -31,7 +36,6 @@
     { label: 'Rented Offices', value: totalBooked, color: 'danger' },
     { label: 'Expiring This Month', value: expiringThisMonth, color: 'warning', textColor: 'text-dark' },
   ]; %>
-
   <% statCards.forEach(stat => { %>
     <div class="col-sm-6 col-md-3">
       <div class="card text-center bg-<%= stat.color %> text-white shadow-sm stat-card">
@@ -75,7 +79,7 @@
 %>
 
 <!-- Office Grid -->
-<div class="row g-3">
+<div class="row g-3" id="officeGrid">
   <% offices.forEach(office => {
     const booking = bookings.find(b => b.office_id?.toString() === office._id.toString());
     const isBooked = !!booking;
@@ -83,7 +87,12 @@
 
     if (filter === 'all' || (filter === 'available' && !isBooked) || (filter === 'booked' && isBooked)) { %>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 office-card"
+         data-number="<%= office.office_number %>"
+         data-floor="<%= office.floor %>"
+         data-status="<%= isBooked ? 'booked' : 'available' %>"
+         data-company="<%= booking?.client_id?.company_en || booking?.client_id?.name || '' %>">
+         
       <div class="office-box <%= isBooked ? 'office-booked' : 'office-available' %>">
         <% if (isBooked) { %>
           <a href="/bookings/view/<%= booking._id %>" class="stretched-link"></a>
@@ -131,6 +140,26 @@
 
   <% } }); %>
 </div>
+
+<!-- 🔍 Live Search Script -->
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const officeCards = document.querySelectorAll('.office-card');
+
+  searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+
+    officeCards.forEach(card => {
+      const number = card.dataset.number?.toLowerCase() || '';
+      const floor = card.dataset.floor?.toLowerCase() || '';
+      const status = card.dataset.status?.toLowerCase() || '';
+      const company = card.dataset.company?.toLowerCase() || '';
+
+      const match = number.includes(query) || floor.includes(query) || status.includes(query) || company.includes(query);
+      card.style.display = match ? 'block' : 'none';
+    });
+  });
+</script>
 
 <style>
   .office-box {

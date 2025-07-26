@@ -4,104 +4,180 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Your Own Business Center</title>
-<!-- SEO Meta -->
-<meta name="description" content="Your Own Business Center | Manage branches, offices, clients, rentals, and more in a professional way.">
-<meta name="author" content="YYour Own Business Center">
 
-<!-- Open Graph Meta -->
-<meta property="og:title" content="Your Own Business Center">
-<meta property="og:description" content="Manage your branches, offices, clients and Rentals seamlessly with Your Own Business Center.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://yourownb.com/">
-<meta property="og:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
-<meta property="og:site_name" content="Your Own Business Center">
+  <!-- SEO & Social -->
+  <meta name="description" content="Your Own Business Center | Manage branches, offices, clients, rentals, and more in a professional way.">
+  <meta name="author" content="Your Own Business Center">
+  <meta property="og:title" content="Your Own Business Center">
+  <meta property="og:description" content="Manage your branches, offices, clients and rentals seamlessly with Your Own Business Center.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourownb.com/">
+  <meta property="og:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+  <meta property="og:site_name" content="Your Own Business Center">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Your Own Business Center">
+  <meta name="twitter:description" content="Manage your branches, offices, clients and rentals seamlessly with Your Own Business Center.">
+  <meta name="twitter:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
 
-<!-- Twitter Card Meta -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Your Own Business Center">
-<meta name="twitter:description" content="Manage your branches, offices, clients and rentals seamlessly with Your Own Business Center.">
-<meta name="twitter:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="apple-touch-icon" href="/images/logo.png">
 
-<!-- Favicon & Apple Touch Icon -->
-<link rel="icon" type="image/png" href="/images/logo.png">
-<link rel="apple-touch-icon" href="/images/logo.png">
-  <!-- External Styles -->
+  <!-- External CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
 
-  <!-- Global Styles -->
+  <!-- Lightbox & Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Active link highlight -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.nav-link');
+      const path = window.location.pathname;
+      links.forEach(link => {
+        if (link.getAttribute('href') === path) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+
+  <!-- Styles -->
   <style>
-    :root {
-      --primary: #0d6efd;
-      --text-color: #2c3e50;
-      --bg-light: #f9f9fb;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
+    body {
       display: flex;
-      flex-direction: column;
-      background-color: var(--bg-light);
-      font-family: 'Poppins', "Segoe UI", sans-serif;
+      flex-direction: row;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9f9fb;
+      font-family: "Segoe UI", sans-serif;
+      animation: fadeIn 0.5s ease-in;
     }
 
-    body > .container {
-      flex: 1;
-      padding-bottom: 60px;
+    .sidebar {
+      width: 250px;
+      background: #212529;
+      color: #fff;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
     }
 
-    h1, h3 {
-      font-weight: 700;
-      color: var(--text-color);
+    .sidebar .sidebar-header {
+      display: none;
     }
 
-    .navbar {
-      min-height: 64px;
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
+    .sidebar .brand {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      text-decoration: none;
+      color: #fff;
     }
 
-    .navbar-brand img {
+    .sidebar .brand img {
       height: 40px;
+      margin-right: 10px;
     }
 
-    .brand-title {
-      font-size: 18px;
-      line-height: 1;
+    .sidebar hr {
+      border-top: 1px solid #444;
+      margin: 0 20px;
     }
 
-    .navbar-nav .nav-link {
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
-      font-size: 0.95rem;
-      transition: background-color 0.2s ease, color 0.2s ease;
+    .sidebar .nav-link {
+      color: #fff;
+      padding: 10px 20px;
+      display: block;
+      transition: background 0.2s ease, color 0.2s ease;
       border-radius: 6px;
     }
 
-    .navbar-nav .nav-link:hover {
-      background-color: #ffffff12;
-      color: #ffffff;
+   
+    .sidebar .nav-link.active {
+      background: #13b41b69;
+      color: #fff !important;
+      font-weight: bold;
     }
 
-    @media (min-width: 768px) {
-      .brand-title { font-size: 22px; }
+    
+.sidebar .nav-link:hover{
+      background: #38f3418c;
+      color: #fff !important;
+      font-weight: bold;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
     }
 
-    @media (min-width: 992px) {
-      .navbar { min-height: 72px; }
-      .navbar-nav .nav-link {
-        font-size: 1rem;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
+    .topbar {
+      display: none;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 30px;
+    }
+
+    footer {
+      background: #212529;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .sidebar .sidebar-header {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 20px;
+        border-bottom: 1px solid #444;
+      }
+
+      .topbar {
+        display: flex;
+        background: #212529;
+        color: #fff;
+        padding: 10px 20px;
+        justify-content: space-between;
+        align-items: center;
       }
     }
 
-    .card {
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .logout:hover {
+      background: #e6101073 !important;
+    }
+
+    /* .nav-item{
+      border-bottom: #ffffff3a solid 1px;
+  
+    } */
+
+
+     .card {
       border-radius: 16px;
       box-shadow: var(--shadow);
       border: none;
@@ -131,55 +207,86 @@
       background: linear-gradient(135deg, #f59e0b, #d97706);
     }
 
-    footer {
-      background: #2c3e50;
-      color: #fff;
-    }
 
-    body {
-      animation: fadeIn 0.5s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .logout:hover {
-      background-color: #e6101073 !important;
-      color: #fff;
-    }
   </style>
 </head>
 
-<body class="bg-light">
-  <!-- ✅ Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="/">
-        <img src="/images/logo.png" alt="Logo" class="me-2" />
-        <span class="brand-title">Your Own Business Center</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
+<body>
+
+  <!-- Sidebar -->
+  <nav id="sidebar" class="sidebar">
+    <!-- Close button يظهر في الموبايل فقط -->
+    <div class="sidebar-header d-md-none">
+      <button id="closeSidebar" class="btn btn-outline-light">
+        <i class="fas fa-times"></i>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/branches"><i class="fas fa-code-branch me-2"></i>Branches</a></li>
-          <li class="nav-item"><a class="nav-link" href="/clients"><i class="fas fa-users me-2"></i>Clients</a></li>
-          <li class="nav-item"><a class="nav-link" href="/bookings"><i class="fas fa-clipboard-list me-2"></i>Rentals</a></li>
-          <li class="nav-item"><a class="nav-link" href="/bookings/archive"><i class="fas fa-archive me-2"></i>Archive</a></li>
-          <li class="nav-item"><a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i>Payments</a></li>
-          <li class="nav-item"><a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i>Revenue Report</a></li>
-          <li class="nav-item"><a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i>Revenue Timeline</a></li>
-          <li class="nav-item"><a class="nav-link" href="/offices/manage"><i class="fas fa-door-open me-2"></i>Manage Offices</a></li>
-          <li class="nav-item"><a class="nav-link" href="/bookings/tax-invoices"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Tax Invoices</a></li>
-          <li class="nav-item"><a class="nav-link logout" href="/logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
-        </ul>
-      </div>
     </div>
+
+    <a href="/" class="brand">
+      <img src="/images/logo.png" alt="Logo" />
+      <span class="fw-bold">Your Own Business Center</span>
+    </a>
+    <hr>
+
+    <ul class="nav flex-column mb-auto">
+      <% if (user && user.permissions.includes('branches.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/branches"><i class="fas fa-code-branch me-2"></i> Branches</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('branch_manager')) { %>
+        <li class="nav-item"><a class="nav-link" href="/clients"><i class="fas fa-users me-2"></i> Clients</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('bookings.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/bookings"><i class="fas fa-clipboard-list me-2"></i> Rentals</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bookings/archive"><i class="fas fa-archive me-2"></i> Archive</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('accounting.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/bookings/tax-invoices"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Tax Invoices</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('branch_manager')) { %>
+        <li class="nav-item"><a class="nav-link" href="/call-reports/pending"><i class="fas fa-phone-volume me-2"></i> Calls</a></li>
+        <li class="nav-item"><a class="nav-link" href="/call-reports/daily-reports"><i class="fas fa-calendar-check me-2"></i> Daily Reports</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('ceo')) { %>
+        <li class="nav-item"><a class="nav-link" href="/admin/reports"><i class="fas fa-calendar-check me-2"></i> Reports</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('payments.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i> Payments</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('accounting.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i> Monthly Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i> Revenue Timeline</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('manage_offices')) { %>
+        <li class="nav-item"><a class="nav-link" href="/offices/manage"><i class="fas fa-door-open me-2"></i> Manage Offices</a></li>
+      <% } %>
+
+      <li class="nav-item">
+        <a class="nav-link logout" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+      </li>
+    </ul>
   </nav>
 
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Topbar للموبايل -->
+    <div class="topbar d-md-none">
+      <button id="toggleSidebar" class="btn btn-outline-light">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="fw-bold">Your Own Business Center</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content">
+   
   <!-- ✅ Main Container -->
   <div class="container mb-5">
     <!-- ✅ Client Details Header -->
@@ -278,17 +385,29 @@
       </div>
     </div>
   </div>
+ </main>
 
-  <!-- ✅ Footer -->
-  <footer class="bg-dark text-white text-center py-3 mt-4">
-    <small style="font-size: 0.9rem;">&copy; 2025 Your Own Business Center. All rights reserved.</small>
-  </footer>
+    <!-- Footer -->
+    <footer>
+      © 2025 Your Own Business Center. All rights reserved.
+    </footer>
+  </div>
 
-  <!-- ✅ Scripts -->
+  <!-- Toggle Script -->
+  <script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const closeBtn = document.getElementById('closeSidebar');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.add('show');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      sidebar.classList.remove('show');
+    });
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 </body>
 </html>

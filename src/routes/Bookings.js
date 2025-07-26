@@ -154,11 +154,11 @@ router.get("/branch/:branchId",authenticateJWT, async (req, res) => {
 	}
 });
 
-router.get("/new/:officeId", async (req, res) => {
+router.get("/new/:officeId",authenticateJWT, async (req, res) => {
 	try {
 		const office = await Office.findById(req.params.officeId).populate("branch_id");
 		const clients = await Client.find();
-		res.render("bookingNew", { office, clients });
+		res.render("bookingNew", {  user: req.user,office, clients });
 	} catch (err) {
 		res.status(500).send("Error loading new booking form");
 	}
@@ -405,115 +405,117 @@ router.post("/:bookingId/cheques/:chequeIndex/toggle-collected", async (req, res
 	}
 });
 
-router.get("/success", (req, res) => {
-	res.render("bookingSuccess");
+router.get("/success", authenticateJWT, (req, res) => {
+	res.render("bookingSuccess", {
+    user: req.user // ✅ ابعته عشان الـ header يشوفه
+  });
 });
 
 router.get("/:bookingId/generate-contract", async (req, res) => {
-	try {
-		const booking = await Booking.findById(req.params.bookingId)
-			.populate("office_id")
-			.populate({ path: "office_id", populate: { path: "branch_id" } })
-			.populate("client_id");
+  try {
+    const booking = await Booking.findById(req.params.bookingId)
+      .populate("office_id")
+      .populate({ path: "office_id", populate: { path: "branch_id" } })
+      .populate("client_id");
 
-		if (!booking) return res.status(404).send("Booking not found");
+    if (!booking) return res.status(404).send("Booking not found");
 
-		const templatePath = path.join(__dirname, "../templates/contractTemplate.ejs");
+    console.log("📌 Booking:", booking);
 
-		const cheques = (booking.cheques || []).map((chq) => ({
-			date: chq.due_date ? new Date(chq.due_date).toISOString().split("T")[0] : "",
-			amount: chq.amount || 0,
-			collected: chq.collected,
-			collected_at: chq.collected_at
-				? new Date(chq.collected_at).toISOString().split("T")[0]
-				: "",
-			note: chq.note || "",
-		}));
+    const templatePath = path.join(__dirname, "../templates/contractTemplate.ejs");
+    console.log("✅ Template Path:", templatePath);
 
-		const initial_payment = booking.initial_payment || 0;
+    const cheques = (booking.cheques || []).map((chq) => ({
+      date: chq.due_date ? new Date(chq.due_date).toISOString().split("T")[0] : "",
+      amount: chq.amount || 0,
+      collected: chq.collected,
+      collected_at: chq.collected_at
+        ? new Date(chq.collected_at).toISOString().split("T")[0]
+        : "",
+      note: chq.note || "",
+    }));
 
-		const payments = (booking.payments || []).map((p) => ({
-			amount: p.amount || 0,
-			payment_date: p.payment_date
-				? new Date(p.payment_date).toISOString().split("T")[0]
-				: "",
-			payment_type: p.payment_type || "",
-		}));
+    const initial_payment = booking.initial_payment || 0;
+    const chequeTotal = cheques.reduce((sum, c) => sum + (c.amount || 0), 0);
+    const grandTotal = initial_payment + chequeTotal;
 
-		const extraPaymentsTotal = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-		const chequeTotal = cheques.reduce((sum, c) => sum + (c.amount || 0), 0);
-		const grandTotal = initial_payment + extraPaymentsTotal + chequeTotal;
+    const templateData = {
 
-		const html = await ejs.renderFile(templatePath, {
-			// بيانات العميل
-			tenant_name: booking.client_id?.registered_owner_name_ar || "",
-			tenant_company_ar: booking.client_id?.company_ar || "",
-			tenant_company_en: booking.client_id?.company_en || "",
-			license_no: booking.client_id?.license_number || "",
-			email: booking.client_id?.email || "",
-			phone: booking.client_id?.mobile || "",
-			license_expiry: booking.client_id?.license_expiry
-				? new Date(booking.client_id.license_expiry).toISOString().split("T")[0]
-				: "",
-			trn: booking.client_id?.trn || "",
+       security_deposit: Number(booking.sec_deposit) || 0,
+  admin_fee: Number(booking.admin_fee) || 0,
+      // بيانات العميل
+      tenant_name: booking.client_id?.registered_owner_name_ar || "",
+      tenant_company_ar: booking.client_id?.company_ar || "",
+      tenant_company_en: booking.client_id?.company_en || "",
+      license_no: booking.client_id?.license_number || "",
+      email: booking.client_id?.email || "",
+      phone: booking.client_id?.mobile || "",
+      license_expiry: booking.client_id?.license_expiry
+        ? new Date(booking.client_id.license_expiry).toISOString().split("T")[0]
+        : "",
+      trn: booking.client_id?.trn || "",
 
-			// بيانات المكتب والحجز
-			unit_number: booking.office_id?.office_number || "",
-			ejari: booking.ejari_no || "0",
-			vat: booking.vat || 0,
-			commission: booking.commission || 0,
-			sec_deposit: booking.sec_deposit || 0,
-			admin_fee: booking.admin_fee || 0,
-			rent_amount: booking.rent_amount || 0,
-			registration_fee: booking.registration_fee || 0,
-			office_rent: booking.rent_amount,
-			total_price: booking.total_price || 0,
-			start_date: booking.start_date
-				? new Date(booking.start_date).toISOString().split("T")[0]
-				: "",
-			end_date: booking.end_date
-				? new Date(booking.end_date).toISOString().split("T")[0]
-				: "",
-			branch_en: booking.office_id?.branch_id?.name || "",
-			location_en: booking.office_id?.branch_id?.location || "",
-			whatsapp_number: booking.office_id?.branch_id?.whatsapp_number || "",
-			branch_ar: booking.office_id?.branch_id?.name_ar || "",
+      // بيانات المكتب والحجز
+      unit_number: booking.office_id?.office_number || "",
+      registration_fee: booking.registration_fee || 0,
+      vat: booking.vat || 0,
+      commission: booking.commission || 0,
+   
+      office_rent: booking.rent_amount || 0,
+      total_price: booking.total_price || 0,
+      start_date: booking.start_date
+        ? new Date(booking.start_date).toISOString().split("T")[0]
+        : "",
+      end_date: booking.end_date
+        ? new Date(booking.end_date).toISOString().split("T")[0]
+        : "",
+      branch_en: booking.office_id?.branch_id?.name || "",
+      branch_ar: booking.office_id?.branch_id?.name_ar || "",
+      location_en: booking.office_id?.branch_id?.location || "",
+      whatsapp_number: booking.office_id?.branch_id?.whatsapp_number || "",
 
-			// الدفع
-			cheques,
-			initial_payment,
-			payments,
-			extraPaymentsTotal,
-			chequeTotal,
-			grandTotal,
-		});
+      // الدفع
+      cheques,
+      initial_payment,
+      chequeTotal,
+      grandTotal,
+    };
 
-		const browser = await puppeteer.launch({
-			headless: "new",
-			args: ["--no-sandbox", "--disable-setuid-sandbox"],
-		});
-		const page = await browser.newPage();
-		await page.setContent(html, { waitUntil: "networkidle0" });
-		const pdfBuffer = await page.pdf({
-			format: "A4",
-			printBackground: true,
-			margin: { top: "10mm", bottom: "10mm", left: "10mm", right: "10mm" },
-		});
-		await browser.close();
+    // ✅ أطبع القيم للتأكيد
+    console.log("✅ Data to EJS:", templateData);
 
-		const filename = `Tenancy_Contract_${booking._id}.pdf`;
-		res.set({
-			"Content-Type": "application/pdf",
-			"Content-Disposition": `attachment; filename="${filename}"`,
-		});
-		res.send(pdfBuffer);
-	} catch (err) {
-		console.error("❌ Error generating contract:", err);
-		res.status(500).send("Error generating contract");
-	}
+    const html = await ejs.renderFile(templatePath, templateData);
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "10mm", bottom: "10mm", left: "10mm", right: "10mm" },
+    });
+
+    await browser.close();
+
+    const filename = `Tenancy_Contract_${booking._id}.pdf`;
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+    });
+    res.send(pdfBuffer);
+
+  } catch (err) {
+    console.error("❌ FULL Error:", err);
+    res.status(500).send("Error generating contract");
+  }
 });
 
-router.get("/archive/:bookingId", async (req, res) => {
+
+router.get("/archive/:bookingId", authenticateJWT, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.bookingId)
       .populate({
@@ -531,7 +533,7 @@ router.get("/archive/:bookingId", async (req, res) => {
     // مثلا لو عندك حقل archived_at في الـ DB ممكن تستخدمه
     // booking.cancel_date = booking.cancel_date || booking.archived_at;
 
-    res.render("bookingArchivedView", { booking });
+    res.render("bookingArchivedView", {user: req.user, booking });
   } catch (err) {
     console.error("❌ Error loading archived booking details:", err);
     res.status(500).send("Error loading archived booking details");

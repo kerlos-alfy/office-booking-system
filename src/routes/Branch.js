@@ -5,22 +5,23 @@ const Branch = require('../models/Branch');
 const { authenticateJWT, hasPermission } = require('../middlewares/auth');
 
 // عرض كل الفروع
+// GET /branches
 router.get('/',
-  authenticateJWT, // لو عندك auth
-  hasPermission('branches.view'), // لو فيه صلاحية
+  authenticateJWT,
+  hasPermission('branches.view'),
   async (req, res) => {
     try {
       let query = {};
 
-      // ✨ لو المستخدم مربوط بفرع → يعرض الفرع ده بس
       if (req.user.branch) {
         query._id = req.user.branch;
       }
-      // ✨ لو الفرع null → مفيش شرط → هيجيب كل الفروع
 
       const branches = await Branch.find(query);
 
-     res.render('branches', { branches, user: req.user });
+      console.log('✅ Branches from DB:', JSON.stringify(branches, null, 2)); // Debug
+
+      res.render('branches', { branches, user: req.user });
 
     } catch (err) {
       console.error(err);

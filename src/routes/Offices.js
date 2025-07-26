@@ -23,36 +23,74 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
-
-router.get("/", async (req, res) => {
+router.get("/", authenticateJWT, async (req, res) => {
   try {
-    let offices = await Office.find().populate("branch_id");
+    const { branch, status } = req.query;
+
+    // ⬇️ 1. تحميل المكاتب مع الفرع المرتبط
+    let offices = await Office.find(
+      branch && branch !== "all" ? { branch_id: branch } : {}
+    ).populate("branch_id");
+
+    // ⬇️ 2. ترتيبهم حسب الرقم
     offices = offices.sort((a, b) => {
       const aNum = parseInt(a.office_number.replace(/\D/g, "")) || 0;
       const bNum = parseInt(b.office_number.replace(/\D/g, "")) || 0;
       return aNum - bNum;
     });
 
+    // ⬇️ 3. تحميل الحجوزات النشطة
     const activeBookings = await Booking.find({
       status: "active",
       end_date: { $gte: new Date() },
     });
+
     const bookedOfficeIds = activeBookings.map((b) => b.office_id.toString());
 
-    res.render("offices", { 
-      offices, 
+    // ⬇️ 4. فلترة المكاتب حسب الحالة
+    let filteredOffices = offices;
+    if (status === "available") {
+      filteredOffices = offices.filter(
+        (office) => !bookedOfficeIds.includes(office._id.toString())
+      );
+    } else if (status === "rented") {
+      filteredOffices = offices.filter(
+        (office) => bookedOfficeIds.includes(office._id.toString())
+      );
+    }
+
+    // ⬇️ 5. الإحصائيات
+    const rentedCount = offices.filter((office) =>
+      bookedOfficeIds.includes(office._id.toString())
+    ).length;
+
+    const availableCount = offices.length - rentedCount;
+
+    // ⬇️ 6. تحميل الفروع
+    const branches = await Branch.find();
+
+    // ⬇️ 7. إرسال البيانات للواجهة
+    res.render("offices", {
+      user: req.user,
+      offices: filteredOffices,
       bookedOfficeIds,
-      query: req.query // ✅ أضف دي
+      branches,
+      selectedBranch: branch || "all",
+      selectedStatus: status || "",
+      rentedCount,
+      availableCount,
+      query: req.query
     });
+
   } catch (err) {
     console.error("Error loading offices", err);
     res.status(500).send("Error loading offices");
   }
 });
 
-router.get("/new", async (req, res) => {
+router.get("/new", authenticateJWT,async (req, res) => {
   const branches = await Branch.find();
-  res.render("newOffice", { branches });
+  res.render("newOffice", { user: req.user, branches });
 });
 
 router.post("/new", upload.fields([
@@ -114,7 +152,7 @@ router.post("/new", upload.fields([
   }
 });
 
-router.get('/:id/edit', async (req, res) => {
+router.get('/:id/edit', authenticateJWT, async (req, res) => {
   const office = await Office.findById(req.params.id).populate("branch_id");
   const branches = await Branch.find();
   if (!office) return res.status(404).send("Office not found");
@@ -123,7 +161,7 @@ router.get('/:id/edit', async (req, res) => {
     ? [...office.gallery]
     : [office.main_image, ...office.gallery];
 
-  res.render("editOffice", { office, branches, allImages });
+  res.render("editOffice", { user: req.user,office, branches, allImages });
 });
 
 router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
@@ -131,10 +169,12 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
     const office = await Office.findById(req.params.id);
     if (!office) return res.status(404).send("Office not found");
 
+    // 🟢 احفظ رقم المكتب الحالي قبل التعديل
+    const currentOfficeNumber = office.office_number;
+
     const {
       office_number,
       branch_id,
-     
       floor,
       size_category,
       main_image,
@@ -143,6 +183,7 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
       payment_plans_json,
     } = req.body;
 
+    // ✅ حذف الصور القديمة
     const deleteArr = Array.isArray(delete_images) ? delete_images : [delete_images];
     deleteArr.forEach(img => {
       office.gallery = office.gallery.filter(existing => existing !== img);
@@ -151,16 +192,39 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
       if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
     });
 
-    const folderPath = path.join(__dirname, "../../public", office.image_folder);
-    fs.mkdirSync(folderPath, { recursive: true });
+    // ✅ إنشاء فولدر جديد لو مش موجود (باستخدام رقم المكتب الأصلي)
+    let folderPath = "";
+    if (!office.image_folder || office.image_folder.trim() === "") {
+      const officeNumberClean = currentOfficeNumber.replace(/\s+/g, "");
+      const timestamp = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 12);
+      const folderName = `office_${officeNumberClean}_${timestamp}`;
+      const relativeFolder = path.posix.join("uploads/offices", folderName);
+      folderPath = path.join(__dirname, "../../public", relativeFolder);
+      fs.mkdirSync(folderPath, { recursive: true });
+      office.image_folder = relativeFolder;
+    } else {
+      folderPath = path.join(__dirname, "../../public", office.image_folder);
+      if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+      }
+    }
 
+    // ✅ حفظ الصور الجديدة في الفولدر
     req.files.forEach(file => {
       const targetPath = path.join(folderPath, file.originalname);
-      fs.renameSync(file.path, targetPath);
       const relativePath = path.posix.join(office.image_folder, file.originalname);
-      office.gallery.push(relativePath);
+
+      try {
+        fs.copyFileSync(file.path, targetPath);
+        fs.unlinkSync(file.path);
+        office.gallery.push(relativePath);
+        console.log("✅ Image saved to:", targetPath);
+      } catch (err) {
+        console.error("❌ Error saving image:", err);
+      }
     });
 
+    // ✅ ترتيب الصور حسب اختيار المستخدم
     const sortArr = Array.isArray(sorted_gallery) ? sorted_gallery : [sorted_gallery];
     const filteredSorted = sortArr.filter(img => office.gallery.includes(img));
     const extra = office.gallery.filter(img => !filteredSorted.includes(img));
@@ -168,9 +232,9 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
 
     if (main_image) office.main_image = main_image;
 
+    // ✅ تحديث باقي بيانات المكتب
     office.office_number = office_number;
     office.branch_id = branch_id;
-  
     office.floor = floor;
     office.size_category = size_category;
 
@@ -187,6 +251,8 @@ router.post('/:id/edit', upload.array("new_images", 10), async (req, res) => {
     res.status(500).send("Error updating office");
   }
 });
+
+
 
 // routes/offices.js
 // عرض صفحة Manage Offices

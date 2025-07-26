@@ -7,7 +7,7 @@ const puppeteer = require("puppeteer");
 const path = require("path");
 const Booking = require("../models/Booking");
 const TaxInvoice = require("../models/TaxInvoice");
-
+const {authenticateJWT} = require("../middlewares/auth")
 // View all clients
 // router.get("/", async (req, res) => {
 // 	try {
@@ -18,7 +18,7 @@ const TaxInvoice = require("../models/TaxInvoice");
 // 	}
 // });
 
-router.get("/", async (req, res) => {
+router.get("/",authenticateJWT, async (req, res) => {
   try {
     const limit = 10;
     const page = parseInt(req.query.page) || 1;
@@ -37,7 +37,7 @@ router.get("/", async (req, res) => {
 
     const clients = await Client.find(query).skip(skip).limit(limit);
 
-    res.render("clients", {
+    res.render("clients", {user: req.user,
       clients,
       currentPage: page,
       totalPages,
@@ -51,8 +51,8 @@ router.get("/", async (req, res) => {
 
 
 // New Client Form
-router.get("/new", (req, res) => {
-	res.render("newClient", { nationalities });
+router.get("/new",authenticateJWT, (req, res) => {
+	res.render("newClient", {user: req.user, nationalities });
 });
 
 // Save new client
@@ -105,14 +105,14 @@ router.post("/new", async (req, res) => {
 });
 
 // Upload Page
-router.get("/:clientId/upload", async (req, res) => {
+router.get("/:clientId/upload", authenticateJWT, async (req, res) => {
 	try {
 		const client = await Client.findById(req.params.clientId);
 		if (!client) {
 			return res.status(404).send("Client not found");
 		}
 
-		res.render("clientUpload", { client });
+		res.render("clientUpload", {user: req.user, client });
 	} catch (err) {
 		res.status(500).send("Error loading upload page");
 	}
@@ -196,7 +196,7 @@ router.post(
 );
 // View Client Details
 // ✅ View Client Details - مع الفواتير المرتبطة
-router.get("/:clientId/view", async (req, res) => {
+router.get("/:clientId/view",authenticateJWT, async (req, res) => {
   try {
     const client = await Client.findById(req.params.clientId);
     if (!client) return res.status(404).send("Client not found");
@@ -213,7 +213,7 @@ router.get("/:clientId/view", async (req, res) => {
     console.log("✅ Total Bookings:", bookings.length);
     console.log("✅ Total Invoices:", invoices.length);
 
-    res.render("clientView", { client, invoices }); // مهم تبعته للـ EJS
+    res.render("clientView", {user: req.user, client, invoices }); // مهم تبعته للـ EJS
   } catch (err) {
     console.error("❌ Error loading client details:", err);
     res.status(500).send("Error loading client details");
@@ -222,13 +222,13 @@ router.get("/:clientId/view", async (req, res) => {
 
 
 // Edit Client Form
-router.get("/:clientId/edit", async (req, res) => {
+router.get("/:clientId/edit", authenticateJWT, async (req, res) => {
 	try {
 		const client = await Client.findById(req.params.clientId);
 		if (!client) return res.status(404).send("Client not found");
 
 		const nationalities = require("../utils/nationalities");
-		res.render("editClient", { client, nationalities });
+		res.render("editClient", { user: req.user,client, nationalities });
 	} catch (err) {
 		res.status(500).send("Error loading edit form");
 	}
@@ -264,12 +264,12 @@ router.post("/:clientId/edit", async (req, res) => {
 });
 
 
-router.get("/:clientId/invoice", async (req, res) => {
+router.get("/:clientId/invoice",authenticateJWT, async (req, res) => {
 	const client = await Client.findById(req.params.clientId);
 
 	if (!client) return res.status(404).send("Client not found");
 
-	res.render("invoice", {
+	res.render("invoice", {user: req.user,
 		invoice: {
 			number: `INV-${client._id.toString().slice(-6)}`,
 			date: new Date().toLocaleDateString("en-GB"),
@@ -359,7 +359,7 @@ router.get("/:clientId/invoice/download", async (req, res) => {
 });
 
 // ✅ AJAX Search Route
-router.get("/search", async (req, res) => {
+router.get("/search", authenticateJWT, async (req, res) => {
   try {
     const query = req.query.q || "";
     const regex = new RegExp(query, "i");
@@ -372,7 +372,7 @@ router.get("/search", async (req, res) => {
       ]
     }).limit(30); // حد أقصى عشان الأداء
 
-    res.render("partials/clientTableRows", { clients, currentPage: 1 });
+    res.render("partials/clientTableRows", { user: req.user,clients, currentPage: 1 });
   } catch (err) {
     console.error("❌ Error in AJAX search:", err);
     res.status(500).send("Server Error");

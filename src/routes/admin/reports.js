@@ -149,40 +149,152 @@ router.get('/overview', authenticateJWT, async (req, res) => {
   }
 });
 
+// ✅ src/routes/yourRoutes.js أو أينما تضعه
 
-// ✅ ROUTE: Single Report by ID (always last!)
-router.get('/:id', authenticateJWT, async (req, res) => {
-  if (!isValidObjectId(req.params.id)) {
-    return res.status(400).send('Invalid ID format');
-  }
+// ✅ src/routes/callReports.js
 
+// ✅ src/routes/adminReports.js (مثلاً)
+
+router.get('/call-reports', authenticateJWT, async (req, res) => {
   try {
-    const report = await Report.findById(req.params.id).populate('user_id').populate('branch_id');
-    if (!report) {
-      return res.status(404).send('Report not found');
+    const { employee_id, date } = req.query;
+
+    // ✅ فلتر المكالمات العادية
+    const filter = {
+      overdue: { $ne: true }
+    };
+
+    if (date) {
+      const start = new Date(date);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 1);
+      filter.call_date = { $gte: start, $lt: end };
     }
 
-    res.render('admin/report-details', { user: req.user, report });
-
-  } catch (err) {
-    console.error('[ERROR] /admin/reports/:id:', err);
-    res.status(500).send('Server Error');
-  }
-});
-
-router.get('/:id',authenticateJWT, async (req, res) => {
-  try {
-    const report = await Report.findById(req.params.id).populate('user_id');
-
-    if (!report) {
-      return res.status(404).send('Report not found');
+    if (employee_id) {
+      filter.employee_id = employee_id;
     }
 
-    res.render('admin/report-details', { user: req.user,report });
+    console.log('✅ Normal Calls Filter:', filter);
+
+    // ✅ تحديث الـ Overdue: شرط أوسع
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const overdueResult = await CallReport.updateMany(
+      {
+        $or: [
+          { answered: false },
+          { $and: [
+              { answered: true },
+              { $or: [
+                  { followed_up: false },
+                  { follow_up_logs: { $size: 0 } },
+                  { followed_up: { $exists: false } }
+                ]
+              }
+            ]
+          }
+        ],
+        marked_done: { $ne: true },
+        overdue: { $ne: true },
+        call_date: { $lt: today }
+      },
+      { $set: { overdue: true } }
+    );
+
+    console.log(`🔄 Updated Overdue: ${overdueResult.modifiedCount}`);
+
+    // ✅ جلب المكالمات العادية
+    const callReports = await CallReport.find(filter)
+      .populate('employee_id', 'name')
+      .sort({ call_date: -1 });
+
+    // ✅ فلتر المكالمات المتأخرة الصحيح
+    const overdueFilter = {
+      overdue: true,
+      call_date: { $lt: today },
+      marked_done: { $ne: true }
+    };
+
+    if (employee_id) {
+      overdueFilter.employee_id = employee_id;
+    }
+
+    console.log('✅ Overdue Calls Filter:', overdueFilter);
+
+    const overdueCalls = await CallReport.find(overdueFilter)
+      .populate('employee_id', 'name')
+      .sort({ call_date: -1 });
+
+    console.log('📊 Normal Calls Count:', callReports.length);
+    console.log('📊 Overdue Calls Count:', overdueCalls.length);
+
+    const users = await User.find({}, 'name');
+
+    res.render('admin/call-reports/index', {
+      user: req.user,
+      callReports,
+      overdueCalls,
+      users,
+      query: {
+        employee_id: employee_id || '',
+        date: date || ''
+      }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 });
+
+
+
+/* ✅ 2) تفاصيل مكالمة واحدة: /admin/reports/call-reports/:id */
+router.get('/call-reports/:id', authenticateJWT, async (req, res) => {
+  const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(400).send('Invalid ID format');
+  }
+
+  const report = await CallReport.findById(id)
+    .populate('employee_id', 'name');
+
+  if (!report) {
+    return res.status(404).send('Call Report not found');
+  }
+
+  res.render('admin/call-reports/show', {
+    user: req.user,
+    report
+  });
+});
+
+
+/* ✅ 3) تفاصيل تقرير يومي: /admin/reports/:id (دايماً آخر واحد) */
+router.get('/:id', authenticateJWT, async (req, res) => {
+  const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(400).send('Invalid ID format');
+  }
+
+  const report = await Report.findById(id)
+    .populate('user_id')
+    .populate('branch_id');
+
+  if (!report) {
+    return res.status(404).send('Daily Report not found');
+  }
+
+  res.render('admin/report-details', {
+    user: req.user,
+    report
+  });
+});
+
 
 module.exports = router;

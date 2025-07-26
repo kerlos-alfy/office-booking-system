@@ -24,7 +24,13 @@
             <div class="call-row mb-3 border p-3 rounded">
               <div class="row g-2 align-items-end">
                 <div class="col-md-3">
-                  <label class="form-label">Phone Number</label>
+                  <label class="form-label">📛 Client Name</label>
+                  <input name="calls[0][client_name]"
+                         class="form-control"
+                         placeholder="Client Name">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">📞 Phone Number</label>
                   <input name="calls[0][phone_number]"
                          class="form-control phone-input"
                          placeholder="05XXXXXXXX"
@@ -34,21 +40,20 @@
                   <small class="text-danger d-none">❌ Invalid UAE number!</small>
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">Source</label>
+                  <label class="form-label">🌐 Source</label>
                   <select name="calls[0][source]" class="form-select" required>
                     <option value="" disabled selected>Choose Source</option>
                     <option value="dubizzle">Dubizzle</option>
                     <option value="bayut">Bayut</option>
                     <option value="meta">Meta</option>
-               <option value="PropertyFinder">Property Finder</option>
-
+                    <option value="PropertyFinder">Property Finder</option>
                   </select>
                 </div>
-                <div class="col-md-4">
-                  <label class="form-label">Action Taken</label>
+                <div class="col-md-3">
+                  <label class="form-label">📝 Action Taken</label>
                   <input name="calls[0][action]" class="form-control" placeholder="e.g. Sent details..." required>
                 </div>
-                <div class="col-md-2 form-check form-switch mt-4">
+                <div class="col-md-2 form-check form-switch mt-4 ms-2">
                   <input class="form-check-input" type="checkbox" name="calls[0][answered]">
                   <label class="form-check-label">Answered</label>
                 </div>

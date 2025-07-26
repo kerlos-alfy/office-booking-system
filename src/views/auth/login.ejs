@@ -39,23 +39,17 @@
       margin-bottom: 2rem;
       font-size: 0.9rem;
     }
-    .input-group-text {
-      background: transparent;
-      border: none;
-    }
     .form-control {
       border-radius: 50px;
-      padding-left: 45px;
+      padding-left: 2.5rem;
     }
-    .input-group {
-      position: relative;
-    }
-    .input-group .fa {
+    .position-relative .fa {
       position: absolute;
       top: 50%;
       left: 15px;
       transform: translateY(-50%);
       color: #003366;
+      font-size: 1rem;
     }
     .btn-login {
       background: linear-gradient(135deg, #003366, #0055a5);
@@ -78,24 +72,26 @@
 </head>
 <body>
   <div class="login-card">
-    <!-- لو عندك لوجو حطه هنا -->
     <img src="/images/logo.svg" alt="Logo" />
     <h2>🔒 Welcome Back!</h2>
     <p>Login to manage your business center</p>
+
     <% if (typeof error !== 'undefined') { %>
       <div class="alert alert-danger"><%= error %></div>
     <% } %>
+
     <form action="/login" method="POST">
-      <div class="mb-3 input-group">
+      <div class="mb-3 position-relative">
         <i class="fa fa-envelope"></i>
         <input type="email" name="email" class="form-control" placeholder="Email" required />
       </div>
-      <div class="mb-3 input-group">
+      <div class="mb-3 position-relative">
         <i class="fa fa-lock"></i>
         <input type="password" name="password" class="form-control" placeholder="Password" required />
       </div>
       <button type="submit" class="btn btn-login w-100">Login</button>
     </form>
+
     <p class="footer-text">© 2025 Your Own Business Center</p>
   </div>
 </body>

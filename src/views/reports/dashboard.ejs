@@ -1,75 +1,77 @@
 <%- include('../partials/header') %>
 
-<div class="container my-5">
-  <h2 class="text-center text-primary fw-bold mb-5 display-5">📊 Reports Dashboard</h2>
+<div class="container py-5">
+  <h2 class="text-center fw-bold mb-5 display-5 text-primary">
+     
+  </h2>
 
-  <div class="row g-4">
+  <div class="row justify-content-center g-4">
     <!-- 📋 All Daily Reports -->
     <div class="col-md-4">
       <a href="/admin/reports" class="text-decoration-none">
-        <div class="card shadow-sm border-0 p-4 text-center h-100">
-          <h5 class="fw-bold mb-3">📋 All Daily Reports</h5>
-          <p class="text-muted">Full summary of all daily reports.</p>
+        <div class="card dashboard-card glass-effect p-4 text-center border-0 h-100">
+          <div class="icon-glass bg-gradient-primary mb-3">
+            <span class="fs-1 text-primary">📋</span>
+          </div>
+          <h5 class="fw-bold mb-2">All Daily Reports</h5>
+          <p class="text-muted mb-3">Full summary of all daily reports.</p>
           <button class="btn btn-primary rounded-pill fw-bold px-4">View</button>
         </div>
       </a>
     </div>
 
-    <!-- 🏢 Rent Collections -->
+    <!-- 📞 Calls -->
     <div class="col-md-4">
-      <a href="/admin/reports?type=rent" class="text-decoration-none">
-        <div class="card shadow-sm border-0 p-4 text-center h-100">
-          <h5 class="fw-bold mb-3">🏢 Rent Collections</h5>
-          <p class="text-muted">See detailed rent payment reports.</p>
-          <button class="btn btn-success rounded-pill fw-bold px-4">View</button>
-        </div>
-      </a>
-    </div>
-
-    <!-- 🔍 Inspections -->
-    <div class="col-md-4">
-      <a href="/admin/reports?type=inspections" class="text-decoration-none">
-        <div class="card shadow-sm border-0 p-4 text-center h-100">
-          <h5 class="fw-bold mb-3">🔍 Inspections</h5>
-          <p class="text-muted">Check inspections activities.</p>
-          <button class="btn btn-warning rounded-pill fw-bold px-4">View</button>
-        </div>
-      </a>
-    </div>
-
-    <!-- 🚶 Visits -->
-    <div class="col-md-4">
-      <a href="/admin/reports?type=visits" class="text-decoration-none">
-        <div class="card shadow-sm border-0 p-4 text-center h-100">
-          <h5 class="fw-bold mb-3">🚶 Visits</h5>
-          <p class="text-muted">Track customer visits records.</p>
-          <button class="btn btn-info rounded-pill fw-bold px-4">View</button>
-        </div>
-      </a>
-    </div>
-
-    <!-- 📲 Messages -->
-    <div class="col-md-4">
-      <a href="/admin/reports?type=messages" class="text-decoration-none">
-        <div class="card shadow-sm border-0 p-4 text-center h-100">
-          <h5 class="fw-bold mb-3">📲 Messages</h5>
-          <p class="text-muted">Summary of all received messages.</p>
-          <button class="btn btn-secondary rounded-pill fw-bold px-4">View</button>
-        </div>
-      </a>
-    </div>
-
-    <!-- 📞 Calls (Optional) -->
-    <div class="col-md-4">
-      <a href="/admin/reports?type=calls" class="text-decoration-none">
-        <div class="card shadow-sm border-0 p-4 text-center h-100">
-          <h5 class="fw-bold mb-3">📞 Calls</h5>
-          <p class="text-muted">View all call activity logs.</p>
+      <a href="/admin/reports/call-reports" class="text-decoration-none">
+        <div class="card dashboard-card glass-effect p-4 text-center border-0 h-100">
+          <div class="icon-glass bg-gradient-dark mb-3">
+            <span class="fs-1 text-dark">📞</span>
+          </div>
+          <h5 class="fw-bold mb-2">Calls</h5>
+          <p class="text-muted mb-3">View all call activity logs.</p>
           <button class="btn btn-dark rounded-pill fw-bold px-4">View</button>
         </div>
       </a>
     </div>
   </div>
 </div>
+
+<style>
+  .dashboard-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
+
+  .icon-glass {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    backdrop-filter: blur(8px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #00c3ff 100%);
+  }
+
+  .bg-gradient-dark {
+    background: linear-gradient(135deg, #343a40 0%, #6c757d 100%);
+  }
+
+  .glass-effect {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+  }
+</style>
 
 <%- include('../partials/footer') %>

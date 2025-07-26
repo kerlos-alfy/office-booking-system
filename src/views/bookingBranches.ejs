@@ -1,6 +1,12 @@
 <%- include('partials/header') %>
 
-<h1 class="mb-4 text-primary">🏢 Branches</h1>
+<div class="text-center mb-4">
+  <h1 class="text-primary mb-1">🏢 Branches</h1>
+  <p class="fst-italic" style="color: #d63031; font-size: 0.95rem; margin-left: 50px;">
+    Select branch for Rent
+  </p>
+</div>
+
 
 <% if (branches.length === 0) { %>
     <div class="alert alert-info">No branches found.</div>

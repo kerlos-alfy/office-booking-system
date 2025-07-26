@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Your Own Business Center</title>
+
   <!-- SEO & Social -->
   <meta name="description" content="Your Own Business Center | Manage branches, offices, clients, rentals, and more in a professional way.">
   <meta name="author" content="Your Own Business Center">
@@ -26,145 +27,240 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
-<style>
-  .navbar-dark .navbar-nav .nav-link.active {
-    background-color: #13b41b69; /* أخضر جميل */
-    color: #fff !important;
-    font-weight: bold;
-  }
-</style>
 
-  <!-- Scripts -->
+  <!-- Lightbox & Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const links = document.querySelectorAll('.navbar-nav .nav-link');
-    const path = window.location.pathname;
 
-    links.forEach(link => {
-      if (link.getAttribute('href') === path) {
-        link.classList.add('active');
-      }
+  <!-- Active link highlight -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.nav-link');
+      const path = window.location.pathname;
+      links.forEach(link => {
+        if (link.getAttribute('href') === path) {
+          link.classList.add('active');
+        }
+      });
     });
-  });
-</script>
+  </script>
 
   <!-- Styles -->
   <style>
-    :root { --primary: #0d6efd; --text-color: #2c3e50; --bg-light: #f9f9fb; --shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
-    html, body { height: 100%; margin: 0; display: flex; flex-direction: column; background-color: var(--bg-light); font-family: "Segoe UI", sans-serif; }
-    body > .container { flex: 1; padding-bottom: 60px; }
-    h1 { font-weight: 700; font-size: 1.8rem; color: var(--text-color); }
-    .card { border-radius: 12px; box-shadow: var(--shadow); border: none; }
-    .navbar-dark .navbar-nav .nav-link { transition: background-color 0.2s ease, color 0.2s ease; border-radius: 6px; padding: 8px 12px; }
-    .navbar-dark .navbar-nav .nav-link:hover { background-color: #13b41b69; color: #ffffff; }
-    .brand-title { font-size: 16px; font-weight: bold; }
-    @media (min-width: 768px) { .brand-title { font-size: 24px; } }
-    .logout:hover { background-color: #e6101073 !important; color: #ffffff; }
-    body { animation: fadeIn 0.5s ease-in; }
+    body {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9f9fb;
+      font-family: "Segoe UI", sans-serif;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #212529;
+      color: #fff;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar .sidebar-header {
+      display: none;
+    }
+
+    .sidebar .brand {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .sidebar .brand img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .sidebar hr {
+      border-top: 1px solid #444;
+      margin: 0 20px;
+    }
+
+    .sidebar .nav-link {
+      color: #fff;
+      padding: 10px 20px;
+      display: block;
+      transition: background 0.2s ease, color 0.2s ease;
+      border-radius: 6px;
+    }
+
+   
+    .sidebar .nav-link.active {
+      background: #13b41b69;
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    
+.sidebar .nav-link:hover{
+      background: #38f3418c;
+      color: #fff !important;
+      font-weight: bold;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .topbar {
+      display: none;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 30px;
+    }
+
+    footer {
+      background: #212529;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .sidebar .sidebar-header {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 20px;
+        border-bottom: 1px solid #444;
+      }
+
+      .topbar {
+        display: flex;
+        background: #212529;
+        color: #fff;
+        padding: 10px 20px;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .logout:hover {
+      background: #e6101073 !important;
+    }
+
+    /* .nav-item{
+      border-bottom: #ffffff3a solid 1px;
+  
+    } */
+
+  
   </style>
 </head>
 
-<body class="bg-light">
-  <!-- Navbar -->
-  <nav style="font-size: 13px;" class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="/">
-        <img src="/images/logo.png" alt="Logo" class="me-2" style="height: 40px" />
-        <span class="brand-title">Your Own Business Center</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
+<body>
+
+  <!-- Sidebar -->
+  <nav id="sidebar" class="sidebar">
+    <!-- Close button يظهر في الموبايل فقط -->
+    <div class="sidebar-header d-md-none">
+      <button id="closeSidebar" class="btn btn-outline-light">
+        <i class="fas fa-times"></i>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <% if (user && user.permissions.includes('branches.view')) { %>
-            <li class="nav-item"><a class="nav-link" href="/branches"><i class="fas fa-code-branch me-2"></i>Branches</a></li>
-          <% } %>
+    </div>
 
-          <% if (user && user.permissions.includes('clients.view')) { %>
-            <li class="nav-item"><a class="nav-link" href="/clients"><i class="fas fa-users me-2"></i>Clients</a></li>
-          <% } %>
+    <a href="/" class="brand">
+      <img src="/images/logo.png" alt="Logo" />
+      <span class="fw-bold">Your Own Business Center</span>
+    </a>
+    <hr>
 
-          <% if (user && user.permissions.includes('bookings.view')) { %>
-            <li class="nav-item"><a class="nav-link" href="/bookings"><i class="fas fa-clipboard-list me-2"></i>Rentals</a></li>
-            <li class="nav-item"><a class="nav-link" href="/bookings/archive"><i class="fas fa-archive me-2"></i>Archive</a></li>
-           
-          <% } %>
+    <ul class="nav flex-column mb-auto">
+      <% if (user && user.permissions.includes('branches.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/branches"><i class="fas fa-code-branch me-2"></i> Branches</a></li>
+      <% } %>
 
-		     <% if (user && user.permissions.includes('accounting.view')) { %>
-            
-            <li class="nav-item"><a class="nav-link" href="/bookings/tax-invoices"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Tax invoices</a></li>
-          <% } %>
- <% if (user && user.permissions.includes('branch_manager')) { %>
+      <% if (user && user.permissions.includes('branch_manager')) { %>
+        <li class="nav-item"><a class="nav-link" href="/clients"><i class="fas fa-users me-2"></i> Clients</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('bookings.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/bookings"><i class="fas fa-clipboard-list me-2"></i> Rentals</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bookings/archive"><i class="fas fa-archive me-2"></i> Archive</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('accounting.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/bookings/tax-invoices"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Tax Invoices</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('add_reports')) { %>
+       
+        <li class="nav-item"><a class="nav-link" href="/call-reports/daily-reports"><i class="fas fa-calendar-check me-2"></i> Daily Reports</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('call.create')) { %>
   <li class="nav-item">
     <a class="nav-link" href="/call-reports/pending">
       <i class="fas fa-phone-volume me-2"></i> Calls
     </a>
   </li>
 <% } %>
- <% if (user && user.permissions.includes('branch_manager')) { %>
-  <li class="nav-item">
-    <a class="nav-link" href="/call-reports/daily-reports">
-      <i class="fas fa-calendar-check me-2"></i> Daily Reports
-    </a>
-  </li>
-<% } %>
- <% if (user && user.permissions.includes('ceo')) { %>
-  <li class="nav-item">
-    <a class="nav-link" href="/call-reports/daily-reports">
-      <i class="fas fa-calendar-check me-2"></i> Daily Reports
-    </a>
-  </li>
-<% } %>
- <% if (user) { %>
-  <% if (user.permissions.includes('ceo')) { %>
-    <li class="nav-item">
-      <a class="nav-link" href="/admin/reports">
-        <i class="fas fa-calendar-check me-2"></i> Reports
-      </a>
-    </li>
-  <% } else if (user.permissions.includes('branch_manager')) { %>
-    <li class="nav-item">
-      <a class="nav-link" href="/admin/reports">
-        <i class="fas fa-calendar-check me-2"></i> Branch Reports
-      </a>
-    </li>
-  <% } %>
-<% } %>
 
- <% if (user && user.permissions.includes('ceo')) { %>
-  <li class="nav-item">
-    <a class="nav-link" href="/call-reports/daily-reports">
-      <i class="fas fa-calendar-check me-2"></i> Daily Reports
-    </a>
-  </li>
-<% } %>
-          <% if (user && user.permissions.includes('payments.view')) { %>
-            <li class="nav-item"><a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i>Payments</a></li>
-          <% } %>
+      <% if (user && user.permissions.includes('ceo')) { %>
+        <li class="nav-item"><a class="nav-link" href="/call-reports/dashboard"><i class="fas fa-calendar-check me-2"></i> Reports</a></li>
+      <% } %>
 
-          <% if (user && user.permissions.includes('accounting.view')) { %>
-            <li class="nav-item"><a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i>Revenue Report</a></li>
-            <li class="nav-item"><a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i>Revenue Timeline</a></li>
-          <% } %>
+      <% if (user && user.permissions.includes('payments.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i> Payments</a></li>
+      <% } %>
 
-          <% if (user && user.permissions.includes('manage_offices')) { %>
-            <li class="nav-item"><a class="nav-link" href="/offices/manage"><i class="fas fa-door-open me-2"></i>Manage Offices</a></li>
-          <% } %>
+      <% if (user && user.permissions.includes('accounting.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i> Monthly Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i> Revenue Timeline</a></li>
+      <% } %>
 
-          <li class="nav-item">
-            <a class="nav-link logout" href="/logout">
-              <i class="fas fa-sign-out-alt me-1"></i> Logout
-            </a>
-          </li>
-         
-        </ul>
-      </div>
-    </div>
+      <% if (user && user.permissions.includes('manage_offices')) { %>
+        <li class="nav-item"><a class="nav-link" href="/offices/manage"><i class="fas fa-door-open me-2"></i> Manage Offices</a></li>
+      <% } %>
+
+      <li class="nav-item">
+        <a class="nav-link logout" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+      </li>
+    </ul>
   </nav>
 
-  <div class="container">
-    <!-- محتوى الصفحة هنا -->
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Topbar للموبايل -->
+    <div class="topbar d-md-none">
+      <button id="toggleSidebar" class="btn btn-outline-light">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="fw-bold">Your Own Business Center</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content">
+   

@@ -6,7 +6,7 @@
   <div class="row mb-4">
     <div class="col-md-4">
       <label class="form-label fw-semibold">Branch</label>
-      <select id="branchSelect" class="form-select" <%= user.branch ? 'disabled' : '' %> >
+      <select id="branchSelect" class="form-select shadow-sm" <%= user.branch ? 'disabled' : '' %>>
         <% branches.forEach(branch => { %>
           <option 
             value="<%= branch._id %>"
@@ -19,13 +19,13 @@
 
     <div class="col-md-4">
       <label class="form-label fw-semibold">Floor</label>
-      <select id="floorSelect" class="form-select" disabled>
+      <select id="floorSelect" class="form-select shadow-sm" disabled>
         <option value="">Select Floor</option>
       </select>
     </div>
 
     <div class="col-md-4 d-flex align-items-end">
-      <button class="btn btn-success w-100 fw-semibold" id="loadBtn">🔎 Show Offices</button>
+      <button id="loadBtn" class="btn btn-success w-100 fw-semibold shadow-sm">🔎 Show Offices</button>
     </div>
   </div>
 
@@ -33,109 +33,87 @@
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <script>
   const branchSelect = document.getElementById('branchSelect');
+  const floorSelect = document.getElementById('floorSelect');
+  const loadBtn = document.getElementById('loadBtn');
 
-  // ✅ لما الفرع يتغير أو يتحمل
-  branchSelect.addEventListener('change', async function() {
+  branchSelect.addEventListener('change', async () => {
     const branchId = branchSelect.disabled 
       ? '<%= user.branch ? user.branch : "" %>' 
       : branchSelect.value;
 
-    const floorSelect = document.getElementById('floorSelect');
-    floorSelect.innerHTML = '<option value="">Select Floor</option>';
-
-    if (!branchId) {
-      floorSelect.disabled = true;
-      return;
-    }
-
     floorSelect.innerHTML = '<option>Loading...</option>';
+    floorSelect.disabled = true;
+
+    if (!branchId) return;
 
     try {
       const res = await fetch(`/offices/branches/${branchId}/floors`);
       const floors = await res.json();
 
-      floorSelect.innerHTML = '<option value="">Select Floor</option>';
-
       if (floors.length === 0) {
         floorSelect.innerHTML = '<option>No Floors Available</option>';
-        floorSelect.disabled = true;
-
         Swal.fire({
           icon: 'info',
           title: 'No Floors Found',
-          text: 'This branch has no floors with offices yet.'
+          text: 'This branch has no floors yet.'
         });
-
-        return;
+      } else {
+        floorSelect.innerHTML = '<option value="">Select Floor</option>';
+        floors.forEach(floor => {
+          floorSelect.innerHTML += `<option value="${floor}">${floor}</option>`;
+        });
+        floorSelect.disabled = false;
       }
-
-      floors.forEach(floor => {
-        const opt = document.createElement('option');
-        opt.value = floor;
-        opt.textContent = floor;
-        floorSelect.appendChild(opt);
-      });
-
-      floorSelect.disabled = false;
-
     } catch (err) {
-      console.error('Error fetching floors:', err);
+      console.error(err);
       floorSelect.innerHTML = '<option>Error loading floors</option>';
-      floorSelect.disabled = true;
-
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Something went wrong while fetching floors.'
+        text: 'Failed to fetch floors.'
       });
     }
   });
 
-  // ✅ Trigger: لو الفرع ثابت — حمّل الفلورز تلقائيًا
-  if (branchSelect.disabled) {
-    branchSelect.dispatchEvent(new Event('change'));
-  }
+  if (branchSelect.disabled) branchSelect.dispatchEvent(new Event('change'));
 
-  // ✅ زرار تحميل المكاتب
-  document.getElementById('loadBtn').addEventListener('click', async function() {
+  loadBtn.addEventListener('click', async () => {
     const branchId = branchSelect.disabled 
       ? '<%= user.branch ? user.branch : "" %>' 
       : branchSelect.value;
 
-    const floor = document.getElementById('floorSelect').value;
+    const floor = floorSelect.value;
 
     if (!branchId || !floor) {
       Swal.fire({
-        icon: 'info',
+        icon: 'warning',
         title: 'Required',
         text: 'Please select both branch and floor.'
       });
       return;
     }
 
-    this.innerHTML = 'Loading...';
+    loadBtn.innerHTML = 'Loading...';
 
     try {
       const res = await fetch(`/offices/manage/list?branch_id=${branchId}&floor=${floor}`);
-      const data = await res.json();
-      renderOffices(data);
+      const offices = await res.json();
+      renderOffices(offices);
 
       Swal.fire({
         toast: true,
         position: 'top-end',
         icon: 'success',
-        title: `${data.length} offices loaded`,
+        title: `${offices.length} offices loaded`,
         showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true
+        timer: 2000
       });
-
     } catch (err) {
       console.error(err);
-
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -143,7 +121,7 @@
       });
     }
 
-    this.innerHTML = '🔎 Show Offices';
+    loadBtn.innerHTML = '🔎 Show Offices';
   });
 
   function renderOffices(data) {
@@ -152,26 +130,27 @@
 
     if (data.length === 0) {
       container.innerHTML = '<p class="text-danger fw-semibold">❌ No offices found for this floor.</p>';
-
       Swal.fire({
         icon: 'info',
         title: 'No Offices',
         text: 'No offices found for this floor.'
       });
-
       return;
     }
 
     data.forEach(office => {
       const col = document.createElement('div');
-      col.className = 'col-md-3 mb-4';
+      col.className = 'col-md-4 col-lg-3 mb-4';
 
       col.innerHTML = `
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="card-title fw-bold text-primary">🏢 ${office.office_number}</h5>
-            <p class="card-text mb-2"><strong>Floor:</strong> ${office.floor}</p>
-            <a href="/offices/${office._id}/edit" class="btn btn-outline-primary w-100 fw-semibold">
+        <div class="office-card shadow-sm">
+          <div class="office-icon">
+            <i class="fas fa-door-open"></i>
+          </div>
+          <h5 class="office-title">Office ${office.office_number}</h5>
+          <p class="office-floor">Floor: ${office.floor}</p>
+          <div class="office-actions">
+            <a href="/offices/${office._id}/edit" class="btn btn-success w-100 fw-semibold">
               ✏️ Edit Office
             </a>
           </div>
@@ -186,17 +165,61 @@
   body {
     background: #f8f9fa;
   }
+
   h1 {
     font-size: 2rem;
   }
+
   select.form-select {
     min-height: 45px;
   }
-  .card {
-    transition: transform 0.2s ease;
+
+  .office-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
   }
-  .card:hover {
+
+  .office-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+
+  .office-icon {
+    font-size: 3rem;
+    color: #0d6efd;
+    margin-bottom: 15px;
+  }
+
+  .office-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+
+  .office-floor {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+  }
+
+  .office-actions .btn {
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+  }
+
+  .btn-success {
+    background-color: #198754;
+    border: none;
+    color: #fff;
+  }
+
+  .btn-success:hover {
+    background-color: #157347;
   }
 </style>
 

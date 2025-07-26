@@ -461,35 +461,64 @@ const grandTotal = downPayment + chequeTotal;
     <!-- Details Section -->
     <div class="section-header">تفاصيل العقد/details</div>
     <table class="details-table">
-        <tr>
-            <td>Unit number / رقم المكتب :</td>
-            <td><%= unit_number %> </td>
-        </tr>
-        <tr>
-            <td>Ejari inscription/ تسجيل الإيجاري :</td>
-            <td><%= registration_fee %> AED</td>
-        </tr>
-        <tr>
-            <td>VAT %/ الضريبة :</td>
-            <td><%= vat %> AED</td>
-        </tr>
-        <tr>
-            <td>Commission/ عمولة :</td>
-            <td><%= commission %> AED</td>
-        </tr>
-        <tr>
-            <td>Office Rent / قيمة الإيجار :</td>
-            <td><%= office_rent %> AED</td>
-        </tr>
-        <tr>
-            <td>TOTAL / المجموع</td>
-            <td><%= total_price %> AED</td>
-        </tr>
-        <tr>
-            <td class="details-dates">Start Date :  <%= start_date %></td>
-            <td class="details-dates">End Date :<%= end_date %> </td>
-        </tr>
-    </table>
+  <tr>
+    <td>Unit number / رقم المكتب :</td>
+    <td><%= unit_number %></td>
+  </tr>
+
+  <% if (Number(registration_fee) > 0) { %>
+    <tr>
+      <td>Ejari inscription / تسجيل الإيجاري :</td>
+      <td><%= Number(registration_fee).toFixed(2) %> AED</td>
+    </tr>
+  <% } %>
+
+  <% if (Number(vat) > 0) { %>
+    <tr>
+      <td>VAT % / الضريبة :</td>
+      <td><%= Number(vat).toFixed(2) %> AED</td>
+    </tr>
+  <% } %>
+
+  <% if (Number(commission) > 0) { %>
+    <tr>
+      <td>Commission / عمولة :</td>
+      <td><%= Number(commission).toFixed(2) %> AED</td>
+    </tr>
+  <% } %>
+
+  <% if (Number(office_rent) > 0) { %>
+    <tr>
+      <td>Office Rent / قيمة الإيجار :</td>
+      <td><%= Number(office_rent).toFixed(2) %> AED</td>
+    </tr>
+  <% } %>
+
+  <% if (Number(security_deposit) > 0) { %>
+    <tr>
+      <td>Security Deposit / التأمين :</td>
+      <td><%= Number(security_deposit).toFixed(2) %> AED</td>
+    </tr>
+  <% } %>
+
+  <% if (Number(admin_fee) > 0) { %>
+    <tr>
+      <td>Admin Fee / رسوم إدارية :</td>
+      <td><%= Number(admin_fee).toFixed(2) %> AED</td>
+    </tr>
+  <% } %>
+
+  <tr>
+    <td>TOTAL / المجموع</td>
+    <td><%= Number(total_price).toFixed(2) %> AED</td>
+  </tr>
+
+  <tr>
+    <td class="details-dates">Start Date : <%= start_date %></td>
+    <td class="details-dates">End Date : <%= end_date %></td>
+  </tr>
+</table>
+
 
     <!-- Terms -->
     <div style="line-height: 18px;" class="terms">

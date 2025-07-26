@@ -22,6 +22,7 @@ app.set("views", path.join(__dirname, "src", "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "src", "public", "uploads")));
 
+
 // ✅ MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
@@ -80,6 +81,7 @@ const invoiceRoutes = require("./src/routes/invoice");
 const adminBranchRoutes = require('./src/routes/adminBranch');
 const callReports = require("./src/routes/callReports");
 const adminReportsRoutes = require('./src/routes/admin/reports');
+const documentsRouter  = require('./src/routes/document');
 
 
 
@@ -111,6 +113,8 @@ app.use("/", invoiceRoutes);
 app.use(adminBranchRoutes);
 app.use("/call-reports", callReports);
 app.use('/admin/reports', adminReportsRoutes);
+app.use('/', documentsRouter);
+
 
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;

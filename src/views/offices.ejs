@@ -1,36 +1,137 @@
 <%- include('partials/header') %>
+<!-- ✅ التنسيق -->
+<style>
+  .office-box {
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #f0f0f0;
+  }
 
-<h1 class="mb-4 text-primary">🏢 All Offices</h1>
+  .office-box:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    transform: translateY(-3px);
+  }
 
-<!-- ✅ هنا رسالة النجاح لو فيه success -->
-<% if (query.success) { %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= query.success %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% } %>
+  .badge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
 
+  .form-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
 
-<div class="row g-4">
-  <% offices.forEach(office => { %>
-    <% const isBooked = bookedOfficeIds.includes(office._id.toString()); %>
+  .transition {
+    transition: all 0.2s ease-in-out;
+  }
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-      <a href="/client/<%= office._id %>" class="text-decoration-none text-dark">
-        <div class="office-box p-3 shadow-sm rounded <%= isBooked ? 'office-booked' : 'office-available' %> hover-shadow transition">
-          <div class="d-flex justify-content-end mb-2">
-            <span class="badge <%= isBooked ? 'bg-danger' : 'bg-success' %>">
-              <%= isBooked ? '🔴 Rented' : '🟢 Available' %>
-            </span>
-          </div>
+  .sticky-top {
+    z-index: 1;
+  }
+</style>
 
-          <h5 class="fw-bold mb-2">Office <%= office.office_number %></h5>
-          <p class="mb-1">🏢 Branch: <%= office.branch_id?.name %></p>
-          <p class="mb-1">Floor: <%= office.floor || 'N/A' %></p>
-        </div>
-      </a>
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- ✅ الشريط الجانبي للفروع -->
+    <div class="col-md-3 mb-4">
+      <div class="bg-white border rounded-4 shadow-sm p-3 sticky-top" style="top: 80px;">
+        <h5 class="fw-bold mb-3">🏢 Branches</h5>
+        <ul class="list-unstyled">
+          <li><a href="?branch=all" class="text-decoration-none d-block py-1 <%= !selectedBranch || selectedBranch === 'all' ? 'fw-bold text-primary' : '' %>">All Branches</a></li>
+          <% branches.forEach(branch => { %>
+            <li>
+              <a href="?branch=<%= branch._id %>" class="text-decoration-none d-block py-1 <%= selectedBranch === branch._id.toString() ? 'fw-bold text-primary' : '' %>">
+                <%= branch.name %>
+              </a>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
     </div>
-  <% }); %>
+
+    <!-- ✅ المحتوى الرئيسي -->
+    <div class="col-md-9">
+
+      <!-- ✅ فلتر بالأعلى -->
+      <form class="row g-3 align-items-end mb-4" method="GET">
+        <div class="col-md-5">
+          <label class="form-label">Select Branch</label>
+          <select name="branch" class="form-select">
+            <option value="all">All Branches</option>
+            <% branches.forEach(branch => { %>
+              <option value="<%= branch._id %>" <%= selectedBranch === branch._id.toString() ? 'selected' : '' %>>
+                <%= branch.name %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Office Status</label>
+          <select name="status" class="form-select">
+            <option value="">All</option>
+            <option value="available" <%= selectedStatus === 'available' ? 'selected' : '' %>>Available</option>
+            <option value="rented" <%= selectedStatus === 'rented' ? 'selected' : '' %>>Rented</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+      </form>
+
+      <!-- ✅ عداد -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4">
+          <div class="bg-success-subtle text-success text-center rounded-3 p-3">
+            <div class="fw-bold fs-4"><%= availableCount %></div>
+            <div class="small">Available Offices</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="bg-danger-subtle text-danger text-center rounded-3 p-3">
+            <div class="fw-bold fs-4"><%= rentedCount %></div>
+            <div class="small">Rented Offices</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="bg-secondary-subtle text-dark text-center rounded-3 p-3">
+            <div class="fw-bold fs-4"><%= offices.length %></div>
+            <div class="small">Total Offices Listed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ جدول المكاتب -->
+      <div class="row g-4">
+        <% offices.forEach(office => { %>
+          <% const isBooked = bookedOfficeIds.includes(office._id.toString()); %>
+
+          <div class="col-6 col-md-4 col-lg-3">
+            <a href="/client/<%= office._id %>" class="text-decoration-none">
+              <div class="border rounded-4 p-3 h-100 bg-white shadow-sm office-box transition">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge <%= isBooked ? 'bg-danger' : 'bg-success' %> small rounded-pill">
+                    <%= isBooked ? 'Rented' : 'Available' %>
+                  </span>
+                  <small class="text-muted">#<%= office.office_number %></small>
+                </div>
+                <div>
+                  <div class="fw-semibold text-dark mb-1">Office <%= office.office_number %></div>
+                  <div class="text-muted small mb-1">🏢 Branch: <%= office.branch_id?.name || '-' %></div>
+                  <div class="text-muted small">📍 Floor: <%= office.floor || '-' %></div>
+                </div>
+              </div>
+            </a>
+          </div>
+        <% }); %>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <%- include('partials/footer') %>
+

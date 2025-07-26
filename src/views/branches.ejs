@@ -1,63 +1,76 @@
 <%- include('partials/header') %>
-<div class="container " >
-    
-<h1 class="mb-4 text-primary">🏢 Branches List</h1>
 
-<!-- <a href="/branches/new" class="btn btn-success mb-4">+ Add New Branch</a> -->
-<% if (user && user.permissions.includes('branches.create')) { %>
-  <a href="/branches/new" class="btn btn-success mb-4">+ Add New Branch</a>
-<% } %>
+<div class="container">
+  <h1 class="mb-4 fw-bold text-primary">🏢 Branches List</h1>
 
-<% if (branches.length === 0) { %>
+  <% if (user && user.permissions.includes('branches.create')) { %>
+    <a href="/branches/new" class="btn btn-success mb-4">➕ Add New Branch</a>
+  <% } %>
+
+  <% if (branches.length === 0) { %>
     <div class="alert alert-info">No branches found.</div>
-<% } else { %>
+  <% } else { %>
     <div class="row g-4">
-        <% branches.forEach(branch => { %>
-            <div class="col-6 col-md-4 col-lg-3">
-                <!-- ✅ نخلي الكارت يروح على صفحة المكاتب الخاصة بالفرع -->
-                <a href="/bookings/branch/<%= branch._id %>" class="text-decoration-none">
-                    <div class="card shadow-sm branch-card h-100 d-flex align-items-center justify-content-center text-center">
-                        <div>
-                            <div style="font-size: 48px;">🏢</div>
-                            <h4 class="card-title mt-3 text-primary fw-bold"><%= branch.name %></h4>
-                            <p class="card-text text-muted mt-2">📍 <%= branch.location %></p>
-                        </div>
-                    </div>
-                </a>
+      <% branches.forEach(branch => { 
+        const available = branch.available_offices ? parseInt(branch.available_offices) : 0;
+        const total = branch.total_offices ? parseInt(branch.total_offices) : 0;
+        const occupied = total - available > 0 ? total - available : 0;
+        const percent = total > 0 ? Math.round((occupied / total) * 100) : 0;
+      %>
+
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+          <a href="/bookings/branch/<%= branch._id %>" class="text-decoration-none">
+            <div class="card branch-card shadow-sm h-100 d-flex flex-column align-items-center justify-content-center text-center p-4">
+              <div class="icon mb-3">🏢</div>
+              <h5 class="card-title fw-bold text-primary mb-2"><%= branch.name %></h5>
+              <p class="card-text text-muted mb-3">📍 <%= branch.location %></p>
+              <span class="badge capacity-badge">
+                👥 Occupied: <%= occupied %> / <%= total %> (<%= percent %>%)
+              </span>
             </div>
-        <% }); %>
+          </a>
+        </div>
+      <% }); %>
     </div>
-<% } %>
-
+  <% } %>
 </div>
-<!-- Styling -->
+
 <style>
-    .branch-card {
-        transition: all 0.3s ease;
-        border: 2px solid #e0e0e0;
-        background-color: #fff;
-        cursor: pointer;
-        border-radius: 16px;
-        padding: 20px;
-    }
+  .branch-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
 
-    .branch-card:hover {
-        border-color: #0d6efd;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        transform: translateY(-5px);
-    }
-</style>
+  .branch-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
+  }
 
-<!-- Page Fade In -->
-<style>
-    body {
-        animation: fadeIn 0.5s ease-in;
-    }
+  .branch-card .icon {
+    font-size: 52px;
+  }
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
+  .capacity-badge {
+    background: #f8f9fa;
+    color: #212529;
+    border: 1px solid #ced4da;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  body {
+    animation: fadeIn 0.4s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 </style>
 
 <%- include('partials/footer') %>

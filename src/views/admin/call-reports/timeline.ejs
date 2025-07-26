@@ -1,0 +1,156 @@
+<%- include('../../partials/header') %>
+
+<div class="container py-5">
+
+  <h2 class="text-center text-primary mb-5 display-6 fw-bold">
+    📞 Call Timeline for <%= call.phone_number %>
+  </h2>
+
+  <!-- ✅ بيانات أساسية -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <strong>👤 Employee:</strong>
+          <p><%= call.employee_id?.name || 'N/A' %></p>
+        </div>
+        <div class="col-md-4">
+          <strong>🧑‍💼 Client:</strong>
+          <p><%= call.client_name || '-' %></p>
+        </div>
+        <div class="col-md-4">
+          <strong>🌐 Source:</strong>
+          <p>
+            <span class="badge 
+              <% if (call.source === 'dubizzle') { %> bg-danger <% } 
+                 else if (call.source === 'bayut') { %> bg-success <% }
+                 else if (call.source === 'meta') { %> bg-primary <% }
+                 else if (call.source === 'PropertyFinder') { %> bg-warning text-dark <% }
+                 else { %> bg-secondary <% } %>">
+              <%= call.source %>
+            </span>
+          </p>
+        </div>
+        <div class="col-md-4">
+          <strong>📅 Call Date:</strong>
+          <p><%= new Date(call.call_date).toLocaleDateString() %></p>
+        </div>
+        <div class="col-md-4">
+          <strong>📣 Answered:</strong>
+          <p><span class="badge <%= call.answered ? 'bg-success' : 'bg-danger' %>">
+            <%= call.answered ? '✅ Yes' : '❌ No' %></span></p>
+        </div>
+        <div class="col-md-12">
+          <strong>⚡ Action:</strong>
+          <p><%= call.action %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ عدد الأيام منذ آخر Follow-Up -->
+  <% 
+    let daysSince = 0;
+    if (call.last_follow_up) {
+      daysSince = Math.floor((new Date() - new Date(call.last_follow_up)) / (1000 * 60 * 60 * 24));
+    } else {
+      daysSince = Math.floor((new Date() - new Date(call.call_date)) / (1000 * 60 * 60 * 24));
+    }
+
+    let badgeClass = 'bg-primary'; // blue default
+    if (daysSince >= 4 && daysSince <= 7) {
+      badgeClass = 'bg-warning text-dark';
+    } else if (daysSince > 7) {
+      badgeClass = 'bg-danger';
+    }
+
+    let daysLabel = '';
+    if (daysSince === 0) {
+      daysLabel = 'Today';
+    } else {
+      daysLabel = `${daysSince} day${daysSince !== 1 ? 's' : ''} ago`;
+    }
+  %>
+  
+
+  <!-- ✅ التايملاين -->
+  <h4 class="fw-bold mb-4 text-primary">🔁 Follow-Up Timeline</h4>
+  <% if (call.follow_up_logs && call.follow_up_logs.length > 0) { %>
+    <ul class="timeline">
+      <% call.follow_up_logs.forEach(log => { 
+        const logDaysAgo = Math.floor((new Date() - new Date(log.date)) / (1000 * 60 * 60 * 24));
+        let logBadge = 'bg-primary';
+        if (logDaysAgo >= 4 && logDaysAgo <= 7) {
+          logBadge = 'bg-warning text-dark';
+        } else if (logDaysAgo > 7) {
+          logBadge = 'bg-danger';
+        }
+        let logLabel = '';
+        if (logDaysAgo === 0) {
+          logLabel = 'Today';
+        } else {
+          logLabel = `${logDaysAgo} day${logDaysAgo !== 1 ? 's' : ''} ago`;
+        }
+      %>
+        <li class="timeline-item mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="fw-bold mb-1">
+                🗓️ <%= new Date(log.date).toLocaleDateString() %>
+                <span class="badge <%= logBadge %>">
+                  <%= logLabel %>
+                </span>
+              </h6>
+              <p class="mb-0">📝 <%= log.note %></p>
+            </div>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="alert alert-info fw-semibold">
+      ℹ️ No follow-ups recorded for this call yet.
+    </div>
+  <% } %>
+
+  <!-- ✅ زر رجوع -->
+  <div class="mt-4">
+    <a href="/call-reports/pending" class="btn btn-secondary rounded-pill">
+      🔙 Back to Pending Calls
+    </a>
+  </div>
+
+</div>
+
+<!-- ✅ Timeline Styles -->
+<style>
+  .timeline {
+    list-style: none;
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline:before {
+    content: '';
+    background: #d4d9df;
+    position: absolute;
+    left: 20px;
+    width: 4px;
+    height: 100%;
+    border-radius: 1rem;
+  }
+  .timeline-item {
+    position: relative;
+  }
+  .timeline-item:before {
+    content: '';
+    background: #0d6efd;
+    border: 3px solid #fff;
+    position: absolute;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+</style>
+
+<%- include('../../partials/footer') %>

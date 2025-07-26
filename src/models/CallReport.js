@@ -1,4 +1,3 @@
-// ✅ src/models/CallReport.js
 const mongoose = require('mongoose');
 
 // ✅ Nested schema for follow-up logs
@@ -31,9 +30,16 @@ const CallReportSchema = new mongoose.Schema({
     required: true
   },
 
+  // ✅ الحقل الجديد لاسم العميل
+  client_name: {
+    type: String,
+    required: false,
+    trim: true
+  },
+
   source: {
     type: String,
-    enum: ['dubizzle', 'bayut', 'meta','PropertyFinder'],
+    enum: ['dubizzle', 'bayut', 'meta', 'PropertyFinder'],
     required: true
   },
 
@@ -52,20 +58,24 @@ const CallReportSchema = new mongoose.Schema({
     default: false
   },
 
-  // ✅ لو فاتت فترة المتابعة القصوى (من تاني يوم)
+  // ✅ لو فاتت فترة المتابعة القصوى
   overdue: {
     type: Boolean,
     default: false
   },
-   marked_done: { type: Boolean, default: false },
 
-  // ✅ تاريخ آخر follow-up (لو هتستخدمه)
+  marked_done: {
+    type: Boolean,
+    default: false
+  },
+
+  // ✅ تاريخ آخر متابعة
   last_follow_up: {
     type: Date,
     default: null
   },
 
-  // ✅ سجل المتابعات الكاملة
+  // ✅ سجل المتابعات
   follow_up_logs: [FollowUpLogSchema]
 
 }, {

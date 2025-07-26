@@ -19,18 +19,25 @@ router.get("/branches/:branchId/sizes", async (req, res) => {
 	res.render("explore/sizes", { branch });
 });
 
-// ✅ عرض المكاتب داخل تصنيف معين (size_category)
+// ✅ عرض المكاتب داخل تصنيف معين (متاحة وغير متاحة)
 router.get("/branches/:branchId/offices", async (req, res) => {
   try {
     const { branchId } = req.params;
     const { size_category } = req.query;
 
-    // نجيب المكاتب المتاحة فقط بناءً على التصنيف
+    // نجيب كل المكاتب بناءً على التصنيف والفرع
     const offices = await Office.find({
       branch_id: branchId,
-      size_category: size_category,
-      status: "available",
+      size_category,
     });
+
+    const activeBookings = await Booking.find({
+      status: "active",
+      end_date: { $gte: new Date() },
+    });
+
+    // استخراج المكاتب المحجوزة حالياً
+    const bookedOfficeIds = activeBookings.map(b => b.office_id.toString());
 
     const branch = await Branch.findById(branchId);
 
@@ -38,6 +45,7 @@ router.get("/branches/:branchId/offices", async (req, res) => {
       offices,
       branch,
       size_category,
+      bookedOfficeIds,
       sizeLabel: size_category.replace("-", " - ") + " sqft",
     });
   } catch (err) {

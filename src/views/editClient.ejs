@@ -1,23 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Your Own Business Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Own Business Center</title>
 
+  <!-- SEO & Social -->
+  <meta name="description" content="Your Own Business Center | Manage branches, offices, clients, rentals, and more in a professional way.">
+  <meta name="author" content="Your Own Business Center">
+  <meta property="og:title" content="Your Own Business Center">
+  <meta property="og:description" content="Manage your branches, offices, clients and rentals seamlessly with Your Own Business Center.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourownb.com/">
+  <meta property="og:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
+  <meta property="og:site_name" content="Your Own Business Center">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Your Own Business Center">
+  <meta name="twitter:description" content="Manage your branches, offices, clients and rentals seamlessly with Your Own Business Center.">
+  <meta name="twitter:image" content="https://yourownb.com/images/buliding/zalfa.jpg">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="apple-touch-icon" href="/images/logo.png">
 
-<style>
-    
+  <!-- External CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
+
+  <!-- Lightbox & Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Active link highlight -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.nav-link');
+      const path = window.location.pathname;
+      links.forEach(link => {
+        if (link.getAttribute('href') === path) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+
+  <!-- Styles -->
+  <style>
     body {
-        padding-bottom: 50px;
-        background-color: #f9f9fb;
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9f9fb;
+      font-family: "Segoe UI", sans-serif;
+      animation: fadeIn 0.5s ease-in;
     }
 
+    .sidebar {
+      width: 250px;
+      background: #212529;
+      color: #fff;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar .sidebar-header {
+      display: none;
+    }
+
+    .sidebar .brand {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .sidebar .brand img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .sidebar hr {
+      border-top: 1px solid #444;
+      margin: 0 20px;
+    }
+
+    .sidebar .nav-link {
+      color: #fff;
+      padding: 10px 20px;
+      display: block;
+      transition: background 0.2s ease, color 0.2s ease;
+      border-radius: 6px;
+    }
+
+   
+    .sidebar .nav-link.active {
+      background: #13b41b69;
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    
+.sidebar .nav-link:hover{
+      background: #38f3418c;
+      color: #fff !important;
+      font-weight: bold;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .topbar {
+      display: none;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 30px;
+    }
+
+    footer {
+      background: #212529;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .sidebar .sidebar-header {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 20px;
+        border-bottom: 1px solid #444;
+      }
+
+      .topbar {
+        display: flex;
+        background: #212529;
+        color: #fff;
+        padding: 10px 20px;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .logout:hover {
+      background: #e6101073 !important;
+    }
+
+    /* .nav-item{
+      border-bottom: #ffffff3a solid 1px;
+  
+    } */
+  </style>
+
+   
+<style>
+    
+ 
     h1 {
         font-weight: 700;
         font-size: 1.8rem;
@@ -139,24 +302,13 @@
         transform: translateY(-5px);
     }
 
-    body {
-        animation: fadeIn 0.5s ease-in;
-    }
+  
 
     @keyframes fadeIn {
         from { opacity: 0; }
         to   { opacity: 1; }
     }
-html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-}
 
-body > .container {
-    flex: 1;
-}
 .office-box {
     border: 2px solid #e0e0e0;
     border-radius: 12px;
@@ -203,49 +355,82 @@ body > .container {
 </style>
 
 </head>
-<body class="bg-light">
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-            <img src="/images/logo.png" alt="Logo" class="me-2" style="height: 40px;">
-            <span class="fw-bold fs-5">Your Own Business Center</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/branches">🏢 Branches</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="/offices">Offices</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/clients">Clients</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/bookings">📋 Rentals</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/bookings/archive">📦 Archive</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/payments">Payments</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/reports/revenue">Revenue Report</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/reports/timeline">Revenue Timeline</a>
-                </li>
-            </ul>
-        </div>
+<body>
+
+  <!-- Sidebar -->
+  <nav id="sidebar" class="sidebar">
+    <!-- Close button يظهر في الموبايل فقط -->
+    <div class="sidebar-header d-md-none">
+      <button id="closeSidebar" class="btn btn-outline-light">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-</nav>
+
+    <a href="/" class="brand">
+      <img src="/images/logo.png" alt="Logo" />
+      <span class="fw-bold">Your Own Business Center</span>
+    </a>
+    <hr>
+
+    <ul class="nav flex-column mb-auto">
+      <% if (user && user.permissions.includes('branches.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/branches"><i class="fas fa-code-branch me-2"></i> Branches</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('branch_manager')) { %>
+        <li class="nav-item"><a class="nav-link" href="/clients"><i class="fas fa-users me-2"></i> Clients</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('bookings.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/bookings"><i class="fas fa-clipboard-list me-2"></i> Rentals</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bookings/archive"><i class="fas fa-archive me-2"></i> Archive</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('accounting.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/bookings/tax-invoices"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Tax Invoices</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('branch_manager')) { %>
+        <li class="nav-item"><a class="nav-link" href="/call-reports/pending"><i class="fas fa-phone-volume me-2"></i> Calls</a></li>
+        <li class="nav-item"><a class="nav-link" href="/call-reports/daily-reports"><i class="fas fa-calendar-check me-2"></i> Daily Reports</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('ceo')) { %>
+        <li class="nav-item"><a class="nav-link" href="/admin/reports"><i class="fas fa-calendar-check me-2"></i> Reports</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('payments.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/payments"><i class="fas fa-money-check-alt me-2"></i> Payments</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('accounting.view')) { %>
+        <li class="nav-item"><a class="nav-link" href="/reports/monthly-dues"><i class="fas fa-chart-line me-2"></i> Monthly Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="/reports/timeline"><i class="fas fa-clock me-2"></i> Revenue Timeline</a></li>
+      <% } %>
+
+      <% if (user && user.permissions.includes('manage_offices')) { %>
+        <li class="nav-item"><a class="nav-link" href="/offices/manage"><i class="fas fa-door-open me-2"></i> Manage Offices</a></li>
+      <% } %>
+
+      <li class="nav-item">
+        <a class="nav-link logout" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Topbar للموبايل -->
+    <div class="topbar d-md-none">
+      <button id="toggleSidebar" class="btn btn-outline-light">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="fw-bold">Your Own Business Center</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content">
 
 <div class="container">
 
@@ -390,28 +575,29 @@ body > .container {
 </style>
 
 </div> <!-- Close container -->
+</main>
 
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-3 mt-4">
-    <small style="font-size: 0.9rem;">&copy; 2025 Your Own Business Center. All rights reserved.</small>
-</footer>
+    <!-- Footer -->
+    <footer>
+      © 2025 Your Own Business Center. All rights reserved.
+    </footer>
+  </div>
 
+  <!-- Toggle Script -->
+  <script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const closeBtn = document.getElementById('closeSidebar');
+    const sidebar = document.getElementById('sidebar');
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-<script>
-  $(document).ready(function() {
-    $('.js-select2').select2({
-      width: '100%',
-      placeholder: 'اختر الجنسية',
-      allowClear: true
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.add('show');
     });
-  });
-</script>
 
+    closeBtn.addEventListener('click', () => {
+      sidebar.classList.remove('show');
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

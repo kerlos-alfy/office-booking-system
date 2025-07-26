@@ -6,7 +6,6 @@
 <h1 class="mb-4 text-primary">📝 New Rental — Office <%= office.office_number %> (Floor: <%= office.floor || 'N/A' %>)</h1>
 
 <form method="POST" action="/bookings" class="card shadow-lg border-0 p-4">
-
   <input type="hidden" name="office_id" value="<%= office._id %>" />
 
   <!-- 🎯 Client & Booking Period -->
@@ -17,7 +16,9 @@
       <select class="form-select js-select2" name="client_id" id="client_id" required>
         <option value="">Select Client</option>
         <% clients.forEach(client => { %>
-          <option value="<%= client._id %>"><%= client.registered_owner_name_en %> — <%= client.company_en %></option>
+          <option value="<%= client._id %>">
+          <%= client.company_en %> — <%= client.registered_owner_name_en %>
+          </option>
         <% }) %>
       </select>
     </div>
@@ -47,33 +48,34 @@
   <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Rent Amount (AED)</label>
-      <input type="number" name="rent_amount" id="rent_amount" step="1" class="form-control calc-trigger" />
+     <input type="number" name="rent_amount" id="rent_amount" step="0.01" class="form-control calc-trigger" />
+
     </div>
     <div class="col-md-6">
-      <label class="form-label">Registration Fee (AED)</label>
-      <input type="number" name="registration_fee" id="registration_fee" step="1" class="form-control calc-trigger" />
+<label class="form-label">Ejari Fee (AED)</label>
+      <input type="number" name="registration_fee" id="registration_fee"  step="0.01" class="form-control calc-trigger" />
     </div>
   </div>
 
   <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Admin Fee (AED)</label>
-      <input type="number" name="admin_fee" id="admin_fee" step="1" class="form-control calc-trigger" />
+      <input type="number" name="admin_fee" id="admin_fee" step="0.01" class="form-control calc-trigger" />
     </div>
     <div class="col-md-6">
       <label class="form-label">Security Deposit (AED)</label>
-      <input type="number" name="sec_deposit" id="sec_deposit" step="1" class="form-control calc-trigger" />
+      <input type="number" name="sec_deposit" id="sec_deposit" step="0.01" class="form-control calc-trigger" />
     </div>
   </div>
 
   <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Commission (AED)</label>
-      <input type="number" name="commission" id="commission" step="1" class="form-control calc-trigger" />
+      <input type="number" name="commission" id="commission" step="0.01" class="form-control calc-trigger" />
     </div>
     <div class="col-md-6">
       <label class="form-label">Down Payment (AED)</label>
-      <input type="number" name="down_payment" id="down_payment" step="1" class="form-control" />
+      <input type="number" name="down_payment" id="down_payment" step="0.01" class="form-control" />
     </div>
   </div>
 
@@ -82,7 +84,7 @@
   <div class="row mb-3">
     <div class="col-md-4">
       <label class="form-label">VAT (AED)</label>
-      <input type="number" name="vat" id="vat" step="1" class="form-control calc-trigger" />
+      <input type="number" name="vat" id="vat" step="0.01" class="form-control calc-trigger" />
     </div>
     <div class="col-md-4">
       <label class="form-label">Total Price (Incl. VAT)</label>
@@ -104,15 +106,19 @@
 </form>
 
 <!-- ✅ Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // ✅ Initialize Select2 once
     $(".js-select2").select2({
       width: "100%",
       placeholder: "Select a client",
-      allowClear: true,
+      allowClear: true
     });
 
+    // ✅ Total calculation logic
     const rent = document.getElementById("rent_amount");
     const reg = document.getElementById("registration_fee");
     const admin = document.getElementById("admin_fee");
@@ -127,7 +133,6 @@
     const validateDates = () => {
       const start = new Date(startInput.value);
       const end = new Date(endInput.value);
-
       const warningId = "date-warning-msg";
       let existing = document.getElementById(warningId);
 

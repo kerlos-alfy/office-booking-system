@@ -19,19 +19,21 @@ router.get('/add', authenticateJWT, (req, res) => {
 });
 
 router.post('/add', authenticateJWT, async (req, res) => {
-  const { call_date, phone_number, source, action, answered } = req.body;
+  const { call_date, phone_number, source, action, answered, client_name } = req.body;
+await CallReport.create({
+  employee_id: req.user.id,
+  client_name: req.body.client_name || '', // ✅ هنا
+  call_date,
+  phone_number,
+  source,
+  action,
+  answered: answered === 'on'
+});
 
-  await CallReport.create({
-    employee_id: req.user.id,
-    call_date,
-    phone_number,
-    source,
-    action,
-    answered: answered === 'on'
-  });
 
   res.redirect('/call-reports/pending');
 });
+
 
 // ✅ 📌 عرض الأرقام اللي مردش عليها + Check Overdue
 router.get('/pending', authenticateJWT, async (req, res) => {
@@ -57,7 +59,10 @@ router.get('/pending', authenticateJWT, async (req, res) => {
 
     console.log(`🚨 Marked ${result.modifiedCount} calls as overdue.`);
 
-    const calls = await CallReport.find({ employee_id: userId }).sort({ call_date: -1 });
+   const calls = await CallReport.find({ employee_id: userId })
+  .populate('employee_id', 'name')
+  .sort({ call_date: -1 });
+
 
     res.render('callReports/pending', {
       user: req.user,
@@ -87,14 +92,15 @@ router.post('/add-multiple', authenticateJWT, async (req, res) => {
       return res.status(400).send('Invalid data');
     }
 
-    const docs = calls.map(c => ({
-      employee_id: req.user.id,
-      call_date: new Date(),
-      phone_number: c.phone_number,
-      source: c.source,
-      action: c.action,
-      answered: c.answered === 'on'
-    }));
+   const docs = calls.map(c => ({
+  employee_id: req.user.id,
+   client_name: c.client_name, // ✅ مهمة هنا
+  call_date: new Date(),
+  phone_number: c.phone_number,
+  source: c.source,
+  action: c.action,
+  answered: c.answered === 'on'
+}));
 
     await CallReport.insertMany(docs);
 
@@ -104,6 +110,7 @@ router.post('/add-multiple', authenticateJWT, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 // ✅ 📌 صفحة تعديل المكالمة
 router.get('/:id/edit', authenticateJWT, async (req, res) => {
@@ -122,33 +129,42 @@ router.get('/:id/edit', authenticateJWT, async (req, res) => {
 });
 
 router.put('/:id', authenticateJWT, async (req, res) => {
-  try {
-    const { phone_number, source, action, call_date, answered, followed_up, follow_up_logs } = req.body;
+  const {
+    phone_number,
+    source,
+    action,
+    call_date,
+    answered,
+    followed_up,
+    follow_up_logs // ✅ مهم جدا!
+  } = req.body;
 
-    const updateData = {
-      phone_number,
-      source,
-      action,
-      answered: answered === 'on',
-      followed_up: followed_up === 'on',
-      last_follow_up: new Date()
-    };
+  const updateData = {
+    phone_number,
+    source,
+    action,
+    answered: answered === 'on',
+    followed_up: followed_up === 'on',
+    last_follow_up: new Date() // ✅ يحدّث آخر تاريخ متابعة
+  };
 
-    if (call_date && !isNaN(new Date(call_date).getTime())) {
-      updateData.call_date = new Date(call_date);
-    }
-
-    if (follow_up_logs) {
-      updateData.$push = { follow_up_logs: { $each: Array.isArray(follow_up_logs) ? follow_up_logs : [follow_up_logs] } };
-    }
-
-    await CallReport.findByIdAndUpdate(req.params.id, updateData);
-    res.redirect('/call-reports/pending');
-  } catch (err) {
-    console.error('❌ Error updating call:', err);
-    res.status(500).send('Server Error');
+  if (call_date && !isNaN(new Date(call_date).getTime())) {
+    updateData.call_date = new Date(call_date);
   }
+
+  if (follow_up_logs) {
+    // ✅ يضيف كل اللي جاي جديد مش يستبدل!
+    updateData.$push = {
+      follow_up_logs: {
+        $each: Array.isArray(follow_up_logs) ? follow_up_logs : [follow_up_logs]
+      }
+    };
+  }
+
+  await CallReport.findByIdAndUpdate(req.params.id, updateData);
+  res.redirect('/call-reports/pending');
 });
+
 
 // ✅ 📌 تحديث + إضافة سجل متابعة
 router.post('/:id/update', authenticateJWT, async (req, res) => {
@@ -176,6 +192,7 @@ router.post('/:id/update', authenticateJWT, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 // ✅ 📌 علامة "تم"
 router.post('/:id/mark-done', authenticateJWT, async (req, res) => {
@@ -614,4 +631,81 @@ router.put('/daily-reports/:id', authenticateJWT, async (req, res) => {
   }
 });
 
+// ✅ Route: متابعة
+router.post('/call-reports/:id/follow-up', authenticateJWT, async (req, res) => {
+  try {
+    const { note } = req.body;
+
+    const update = {
+      $set: {
+        followed_up: true,
+        last_follow_up: new Date()
+      },
+      $push: {
+        follow_up_logs: {
+          date: new Date(),
+          note: note || 'No note added'
+        }
+      }
+    };
+
+    await CallReport.findByIdAndUpdate(req.params.id, update);
+
+    res.redirect('/call-reports/pending'); // أو أي صفحة تانية
+  } catch (err) {
+    console.error('❌ Error updating follow-up:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.put('/call-reports/:id', authenticateJWT, async (req, res) => {
+  try {
+    const { follow_up_logs, ...rest } = req.body;
+
+    const updateData = {
+      phone_number: rest.phone_number,
+      source: rest.source,
+      action: rest.action,
+      call_date: isNaN(new Date(rest.call_date).getTime()) ? null : new Date(rest.call_date),
+      answered: rest.answered === 'on',
+      followed_up: rest.followed_up === 'on',
+    };
+
+    if (follow_up_logs) {
+      const logsArray = Array.isArray(follow_up_logs) ? follow_up_logs : [follow_up_logs];
+      if (logsArray.length > 0) {
+        updateData.$push = { follow_up_logs: { $each: [] } };
+        logsArray.forEach(log => {
+          updateData.$push.follow_up_logs.$each.push({
+            date: log.date || new Date(),
+            note: log.note
+          });
+        });
+        updateData.last_follow_up = new Date();
+      }
+    }
+
+    await CallReport.findByIdAndUpdate(req.params.id, updateData);
+    res.redirect('/call-reports/pending');
+  } catch (err) {
+    console.error('❌ Error updating Call Report:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+
+router.get('/:id/timeline', authenticateJWT, async (req, res) => {
+  try {
+    const call = await CallReport.findById(req.params.id).populate('employee_id', 'name');
+    if (!call) return res.status(404).send('Call Report not found');
+
+    res.render('admin/call-reports/timeline', {
+      user: req.user,
+      call
+    });
+  } catch (err) {
+    console.error('❌ Error fetching call timeline:', err);
+    res.status(500).send('Server Error');
+  }
+});
 module.exports = router;
