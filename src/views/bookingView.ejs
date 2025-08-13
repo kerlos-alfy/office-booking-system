@@ -119,19 +119,27 @@
               </tr>
             </thead>
             <tbody>
-              <% booking.cheques.forEach((cheque, index) => {
-                const due = new Date(cheque.due_date);
-                let rowClass = "";
-                if (cheque.collected) {
-                  rowClass = "table-success";
-                } else if (due < now) {
-                  rowClass = "table-danger";
-                } else if (due.getMonth() === now.getMonth() && due.getFullYear() === now.getFullYear()) {
-                  rowClass = "table-warning";
-                }
-                const totalPaid = (cheque.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
-                const remaining = cheque.amount - totalPaid;
-              %>
+             <% booking.cheques.forEach((cheque, index) => {
+  const normalizeDate = date => new Date(date).toISOString().split("T")[0];
+  const isDownPaymentCheque =
+    parseFloat(cheque.amount) === parseFloat(booking.initial_payment) &&
+    normalizeDate(cheque.due_date) === normalizeDate(booking.down_payment_date || booking.start_date);
+
+  if (isDownPaymentCheque) return;
+
+  const due = new Date(cheque.due_date);
+  let rowClass = "";
+  if (cheque.collected) {
+    rowClass = "table-success";
+  } else if (due < now) {
+    rowClass = "table-danger";
+  } else if (due.getMonth() === now.getMonth() && due.getFullYear() === now.getFullYear()) {
+    rowClass = "table-warning";
+  }
+  const totalPaid = (cheque.payments || []).reduce((sum, p) => sum + p.paid_amount, 0);
+  const remaining = cheque.amount - totalPaid;
+%>
+
               <tr class="<%= rowClass %>">
                 <td><%= index + 1 %></td>
                 <td><%= due.toLocaleDateString() %></td>

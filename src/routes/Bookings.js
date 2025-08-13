@@ -131,12 +131,14 @@ router.get("/branch/:branchId",authenticateJWT, async (req, res) => {
 			);
 			inspectionStatusMap[booking._id.toString()] = 2 - doneFreeInspections.length;
 		});
+const branch = await Branch.findById(branchId);
 
 		// 6️⃣ إرسال البيانات للعرض
 		res.render("bookingOffices", {
   user: req.user, 
   offices: filteredOffices,
   branchId,
+   branch, 
   bookedOfficeIds,
   bookings: activeBookings,
   inspectionStatusMap,
@@ -163,6 +165,99 @@ router.get("/new/:officeId",authenticateJWT, async (req, res) => {
 		res.status(500).send("Error loading new booking form");
 	}
 });
+
+// router.post("/", async (req, res) => {
+//   try {
+//     const {
+//       office_id,
+//       client_id,
+//       page_no,
+//       start_date,
+//       end_date,
+//       down_payment,
+//       cheques,
+//       total_price,
+//       vat,
+//       sec_deposit,
+//       admin_fee,
+//       commission,
+//       ejari,
+//       rent_amount,
+//       registration_fee,
+//     } = req.body;
+
+//     // ✅ تحقق من أن Start Date قبل End Date
+//     const start = new Date(start_date);
+//     const end = new Date(end_date);
+//     if (start >= end) {
+//       return res.status(400).send("❌ Start Date must be before End Date");
+//     }
+
+//     // ✅ نظف الأرقام
+//     const totalPriceClean = Number(String(total_price).replace(/,/g, "")) || 0;
+//     const vatClean = Number(vat) || 0;
+//     const secDepositClean = Number(sec_deposit) || 0;
+//     const adminFeeClean = Number(admin_fee) || 0;
+//     const commissionClean = Number(commission) || 0;
+//     const rentAmountClean = Number(rent_amount) || 0;
+//     const regFeeClean = Number(registration_fee) || 0;
+//     const downPaymentClean = Number(down_payment) || 0;
+
+//     // ✅ جهز cheques Array
+//     const chequesArray = cheques ? Object.values(cheques) : [];
+
+//     // ✅ أضف Down Payment كشيك محصل لو > 0
+//     if (downPaymentClean > 0) {
+//       chequesArray.push({
+//         amount: downPaymentClean,
+//         due_date: start,          // نفس تاريخ بداية الحجز
+//         collected: true,
+//         collected_at: start,      // تم تحصيله فورًا
+//         note: "Down Payment"
+//       });
+//     }
+
+//     // ✅ أنشئ الحجز
+//     const booking = new Booking({
+//       office_id,
+//       client_id,
+//       page_no,
+//       start_date: start,
+//       end_date: end,
+//       initial_payment: downPaymentClean,
+//       total_price: totalPriceClean,
+//       vat: vatClean,
+//       sec_deposit: secDepositClean,
+//       admin_fee: adminFeeClean,
+//       commission: commissionClean,
+//       rent_amount: rentAmountClean,
+//       registration_fee: regFeeClean,
+//       ejari_no: ejari,
+//       payments: [
+//         {
+//           amount: downPaymentClean,
+//           payment_date: start,   // مهم: تاريخ التحصيل
+//           payment_type: "initial",
+//         },
+//       ],
+//       cheques: chequesArray,
+//     });
+
+//     await booking.save();
+
+//     // ✅ أنشئ التفتيشات تلقائيًا
+//     await Inspection.insertMany([
+//       { booking_id: booking._id, type: "labor", paid: false },
+//       { booking_id: booking._id, type: "bank", paid: false },
+//     ]);
+
+//     res.redirect("/bookings/success");
+//   } catch (err) {
+//     console.error("❌ Error creating booking:", err);
+//     res.status(500).send("Error creating booking");
+//   }
+// });
+
 
 router.post("/", async (req, res) => {
   try {
@@ -201,19 +296,28 @@ router.post("/", async (req, res) => {
     const regFeeClean = Number(registration_fee) || 0;
     const downPaymentClean = Number(down_payment) || 0;
 
-    // ✅ جهز cheques Array
-    const chequesArray = cheques ? Object.values(cheques) : [];
+    // ✅ جهز cheques Array (من غير ما نضيف الداون بيمنت)
+const chequesArray = cheques
+  ? Object.values(cheques).filter((c) => {
+      const isSameAmount = Number(c.amount) === downPaymentClean;
+      const isSameDate = c.due_date && new Date(c.due_date).toISOString().split("T")[0] === start.toISOString().split("T")[0];
+      const isDuplicateDownPayment = isSameAmount && isSameDate;
 
-    // ✅ أضف Down Payment كشيك محصل لو > 0
-    if (downPaymentClean > 0) {
-      chequesArray.push({
-        amount: downPaymentClean,
-        due_date: start,          // نفس تاريخ بداية الحجز
-        collected: true,
-        collected_at: start,      // تم تحصيله فورًا
-        note: "Down Payment"
-      });
-    }
+      if (isDuplicateDownPayment) {
+        console.warn("⚠️ Duplicate Down Payment detected in cheques — skipping it.");
+        console.table({
+          amount: c.amount,
+          due_date: c.due_date,
+          down_payment: downPaymentClean,
+          start_date: start.toISOString().split("T")[0],
+        });
+      }
+
+      return !isDuplicateDownPayment;
+    })
+  : [];
+
+
 
     // ✅ أنشئ الحجز
     const booking = new Booking({
@@ -231,13 +335,17 @@ router.post("/", async (req, res) => {
       rent_amount: rentAmountClean,
       registration_fee: regFeeClean,
       ejari_no: ejari,
+
+      // ✅ الداون بيمنت بيتسجل هنا فقط
       payments: [
         {
           amount: downPaymentClean,
-          payment_date: start,   // مهم: تاريخ التحصيل
+          payment_date: start,
           payment_type: "initial",
         },
       ],
+
+      // ✅ الشيكات من الفورم (بدون الداون بيمنت)
       cheques: chequesArray,
     });
 
@@ -255,8 +363,6 @@ router.post("/", async (req, res) => {
     res.status(500).send("Error creating booking");
   }
 });
-
-
 
 router.get("/view/:bookingId",authenticateJWT, async (req, res) => {
   try {
@@ -828,6 +934,14 @@ router.get('/:bookingId/tax-invoice/:invoiceNumber/view', async (req, res) => {
 
 
 router.get('/:bookingId/tax-invoice/:invoiceNumber/edit', async (req, res) => {
+  // 🔢 Helper: split VAT @5%
+  function splitVAT(amount, rate = 0.05) {
+    const amt = Number(amount) || 0;
+    const taxable = +(amt / (1 + rate)).toFixed(2);
+    const vat = +(amt - taxable).toFixed(2);
+    return { taxable, vat, total: +amt.toFixed(2) };
+  }
+
   const booking = await Booking.findById(req.params.bookingId)
     .populate("client_id")
     .populate({
@@ -842,8 +956,8 @@ router.get('/:bookingId/tax-invoice/:invoiceNumber/edit', async (req, res) => {
     invoice_number: req.params.invoiceNumber
   });
 
+  // ✅ لو فيه فاتورة محفوظة — استخدمها، لو لأ — جهّز داتا افتراضية
   let data;
-
   if (taxInvoice) {
     data = taxInvoice.data;
   } else {
@@ -875,24 +989,70 @@ router.get('/:bookingId/tax-invoice/:invoiceNumber/edit', async (req, res) => {
       invoice: {
         number: req.params.invoiceNumber,
         date: new Date().toLocaleDateString(),
-        taxable_amount: booking.total_price - booking.vat,
-        vat_amount: booking.vat,
-        total: booking.total_price,
+        taxable_amount: (booking.total_price || 0) - (booking.vat || 0),
+        vat_amount: booking.vat || 0,
+        total: booking.total_price || 0,
         total_in_words: "",
         items: [
           {
             description: "Booking",
             qty: 1,
-            rate: booking.total_price - booking.vat,
-            taxable: booking.total_price - booking.vat,
+            rate: ((booking.total_price || 0) - (booking.vat || 0)),
+            taxable: ((booking.total_price || 0) - (booking.vat || 0)),
             vat_rate: "5%",
-            vat_amount: booking.vat,
-            total: booking.total_price,
+            vat_amount: booking.vat || 0,
+            total: booking.total_price || 0,
           }
         ]
       }
     };
   }
+
+  // 🧾 جهّز عناصر الفاتورة من المدفوعات (داون بيمنت + مدفوعات شيكات)
+  const itemsFromPayments = [];
+
+  // 1) الداون بيمنت (payments.payment_type === "initial")
+  (booking.payments || []).forEach((p, idx) => {
+    if (p && p.amount > 0 && p.payment_type === "initial") {
+      const { taxable, vat, total } = splitVAT(p.amount, 0.05);
+      itemsFromPayments.push({
+        description: "Advance Payment",
+        qty: 1,
+        rate: taxable,
+        taxable,
+        vat_rate: "5%",
+        vat_amount: vat,
+        total,
+        _meta: { paid_date: p.payment_date, kind: "initial", idx }
+      });
+    }
+  });
+
+  // 2) مدفوعات الشيكات الجزئية (cheque.payments[])
+  (booking.cheques || []).forEach((chq, cIdx) => {
+    (chq.payments || []).forEach((pp, pIdx) => {
+      if (pp && pp.paid_amount > 0) {
+        const { taxable, vat, total } = splitVAT(pp.paid_amount, 0.05);
+        itemsFromPayments.push({
+          description: "Monthly Payment Collection",
+          qty: 1,
+          rate: taxable,
+          taxable,
+          vat_rate: "5%",
+          vat_amount: vat,
+          total,
+          _meta: {
+            due_date: chq.due_date,
+            paid_date: pp.paid_date,
+            note: pp.note || "",
+            kind: "cheque_payment",
+            cheque_index: cIdx,
+            payment_index: pIdx
+          }
+        });
+      }
+    });
+  });
 
   res.render("taxInvoiceEditable", {
     bookingId: booking._id,
@@ -901,6 +1061,7 @@ router.get('/:bookingId/tax-invoice/:invoiceNumber/edit', async (req, res) => {
     contract: data.contract,
     office: data.office,
     invoice: data.invoice,
+    paymentsItems: itemsFromPayments // << مهم
   });
 });
 
@@ -991,6 +1152,14 @@ router.get('/client/:clientId/tax-invoices', async (req, res) => {
 // ✅ NEW TAX INVOICE FORM
 // ✅ توليد فاتورة جديدة برقم جديد
 router.get("/:bookingId/tax-invoice/new", async (req, res) => {
+  // 🔢 Helper
+  function splitVAT(amount, rate = 0.05) {
+    const amt = Number(amount) || 0;
+    const taxable = +(amt / (1 + rate)).toFixed(2);
+    const vat = +(amt - taxable).toFixed(2);
+    return { taxable, vat, total: +amt.toFixed(2) };
+  }
+
   const booking = await Booking.findById(req.params.bookingId)
     .populate("client_id")
     .populate({
@@ -1005,10 +1174,54 @@ router.get("/:bookingId/tax-invoice/new", async (req, res) => {
 
   let newInvoiceNumber = "INV-001";
   if (lastInvoice) {
-    const lastNum = parseInt(lastInvoice.invoice_number.split("-")[1]) || 1;
+    const lastNum = parseInt((lastInvoice.invoice_number || "INV-000").split("-")[1]) || 0;
     const next = String(lastNum + 1).padStart(3, "0");
     newInvoiceNumber = `INV-${next}`;
   }
+
+  // 👇 جهّز عناصر من المدفوعات بدلاً من صف واحد
+  const itemsFromPayments = [];
+
+  // Down payment
+  (booking.payments || []).forEach((p) => {
+    if (p && p.amount > 0 && p.payment_type === "initial") {
+      const { taxable, vat, total } = splitVAT(p.amount, 0.05);
+      itemsFromPayments.push({
+        description: "Advance Payment",
+        qty: 1,
+        rate: taxable,
+        taxable,
+        vat_rate: "5%",
+        vat_amount: vat,
+        total
+      });
+    }
+  });
+
+  // Cheque partial payments
+  (booking.cheques || []).forEach((chq) => {
+    (chq.payments || []).forEach((pp) => {
+      if (pp && pp.paid_amount > 0) {
+        const { taxable, vat, total } = splitVAT(pp.paid_amount, 0.05);
+        itemsFromPayments.push({
+          description: "Monthly Payment Collection",
+          qty: 1,
+          rate: taxable,
+          taxable,
+          vat_rate: "5%",
+          vat_amount: vat,
+          total
+        });
+      }
+    });
+  });
+
+  const totals = itemsFromPayments.reduce((acc, it) => {
+    acc.taxable += Number(it.taxable) || 0;
+    acc.vat += Number(it.vat_amount) || 0;
+    acc.total += Number(it.total) || 0;
+    return acc;
+  }, { taxable: 0, vat: 0, total: 0 });
 
   const defaultData = {
     company: {
@@ -1038,19 +1251,19 @@ router.get("/:bookingId/tax-invoice/new", async (req, res) => {
     invoice: {
       number: newInvoiceNumber,
       date: new Date().toLocaleDateString(),
-      taxable_amount: booking.total_price - booking.vat,
-      vat_amount: booking.vat,
-      total: booking.total_price,
+      taxable_amount: +totals.taxable.toFixed(2),
+      vat_amount: +totals.vat.toFixed(2),
+      total: +totals.total.toFixed(2),
       total_in_words: "",
-      items: [
+      items: itemsFromPayments.length ? itemsFromPayments : [
         {
           description: "Booking",
           qty: 1,
-          rate: booking.total_price - booking.vat,
-          taxable: booking.total_price - booking.vat,
+          rate: (booking.total_price || 0) - (booking.vat || 0),
+          taxable: (booking.total_price || 0) - (booking.vat || 0),
           vat_rate: "5%",
-          vat_amount: booking.vat,
-          total: booking.total_price
+          vat_amount: booking.vat || 0,
+          total: booking.total_price || 0
         }
       ]
     },
@@ -1063,8 +1276,10 @@ router.get("/:bookingId/tax-invoice/new", async (req, res) => {
     contract: defaultData.contract,
     office: defaultData.office,
     invoice: defaultData.invoice,
+    paymentsItems: itemsFromPayments // << مهم
   });
 });
+
 
 
 

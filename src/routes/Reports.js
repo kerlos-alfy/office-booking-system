@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 const Booking = require('../models/Booking');
 const Branch = require('../models/Branch');
@@ -339,8 +340,7 @@ router.get("/timeline",  authenticateJWT,
 
 
 // ✅ تقرير المستحقات الشهرية: Down Payment + Cheques
-router.get('/monthly-dues', authenticateJWT,
-  hasPermission('accounting.view'), async (req, res) => {
+router.get('/monthly-dues', authenticateJWT, hasPermission('accounting.view'), async (req, res) => {
   try {
     const selectedMonth = parseInt(req.query.month) || new Date().getMonth();
     const selectedYear = parseInt(req.query.year) || new Date().getFullYear();
@@ -349,24 +349,20 @@ router.get('/monthly-dues', authenticateJWT,
     const startOfMonth = new Date(selectedYear, selectedMonth, 1);
     const endOfMonth = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59);
 
-    // ✅ فلترة الفرع في حالة وجود ID
-    const branchFilter = (selectedBranchId && mongoose.Types.ObjectId.isValid(selectedBranchId))
-      ? { 'office_id.branch_id': new mongoose.Types.ObjectId(selectedBranchId) }
-      : {};
-
-    // ✅ جلب البيانات
-    const bookings = await Booking.find({
-      ...branchFilter,
+    // ✅ جلب جميع الحجوزات
+    const allBookings = await Booking.find({
       $or: [
         { 'cheques.due_date': { $lte: endOfMonth } },
         { start_date: { $gte: startOfMonth, $lte: endOfMonth } }
       ]
     })
-      .populate({
-        path: 'office_id',
-        populate: { path: 'branch_id' }
-      })
+      .populate({ path: 'office_id', populate: { path: 'branch_id' } })
       .populate('client_id');
+
+    // ✅ فلترة بعد الـ populate
+    const bookings = selectedBranchId && mongoose.Types.ObjectId.isValid(selectedBranchId)
+      ? allBookings.filter(b => b.office_id?.branch_id?._id?.toString() === selectedBranchId)
+      : allBookings;
 
     // ✅ الحسابات
     let totalDues = 0;
@@ -393,7 +389,7 @@ router.get('/monthly-dues', authenticateJWT,
         dues.push({
           officeNumber: booking.office_id?.office_number || 'N/A',
           clientName: booking.client_id?.company_name || booking.client_id?.company_en || 'N/A',
-          branchId: branchIdForThis,          // ✅ هنا مهم جداً
+          branchId: branchIdForThis,
           branchName: branchNameForThis,
           amount: booking.initial_payment,
           paid: booking.initial_payment,
@@ -414,7 +410,15 @@ router.get('/monthly-dues', authenticateJWT,
           ? cheque.payments[cheque.payments.length - 1].paid_date
           : null;
 
-        if (cheque.due_date >= startOfMonth && cheque.due_date <= endOfMonth) {
+        const isDownPaymentDuplicate =
+          cheque.amount === booking.initial_payment &&
+          cheque.due_date &&
+          booking.start_date &&
+          new Date(cheque.due_date).toISOString().split("T")[0] ===
+            new Date(booking.start_date).toISOString().split("T")[0];
+
+        // ✅ شيكات الشهر الحالي
+        if (!isDownPaymentDuplicate && cheque.due_date >= startOfMonth && cheque.due_date <= endOfMonth) {
           totalDues += cheque.amount;
           totalPaid += paid;
           totalCheques += cheque.amount;
@@ -422,7 +426,7 @@ router.get('/monthly-dues', authenticateJWT,
           dues.push({
             officeNumber: booking.office_id?.office_number || 'N/A',
             clientName: booking.client_id?.company_name || booking.client_id?.company_en || 'N/A',
-            branchId: branchIdForThis,         // ✅ مهم جداً هنا كمان
+            branchId: branchIdForThis,
             branchName: branchNameForThis,
             amount: cheque.amount,
             paid: paid,
@@ -432,14 +436,17 @@ router.get('/monthly-dues', authenticateJWT,
             canceled: false,
             cancelDate: null
           });
-        } else if (cheque.due_date < startOfMonth && paid < cheque.amount) {
+        }
+
+        // ✅ شيكات متأخرة
+        if (!isDownPaymentDuplicate && cheque.due_date < startOfMonth && paid < cheque.amount) {
           totalOverdue += cheque.amount;
           overdueCollected += paid;
 
           overdueDues.push({
             officeNumber: booking.office_id?.office_number || 'N/A',
             clientName: booking.client_id?.company_name || booking.client_id?.company_en || 'N/A',
-            branchId: branchIdForThis,         // ✅ حتى هنا للمتأخرين
+            branchId: branchIdForThis,
             branchName: branchNameForThis,
             amount: cheque.amount,
             paid: paid,
@@ -453,13 +460,14 @@ router.get('/monthly-dues', authenticateJWT,
       });
     });
 
-    // ✅ كل الفروع للفلتر Frontend
+    // ✅ تحميل قائمة الفروع للفلتر
     const branches = await Branch.find();
     const branchName = selectedBranchId
       ? branches.find(bb => bb._id.toString() === selectedBranchId)?.name || ''
       : '';
 
-    res.render('monthlyDues', { user: req.user, 
+    res.render('monthlyDues', {
+      user: req.user,
       currentMonthName: startOfMonth.toLocaleString('default', { month: 'long' }),
       selectedMonth,
       selectedYear,
@@ -477,11 +485,10 @@ router.get('/monthly-dues', authenticateJWT,
     });
 
   } catch (err) {
-    console.error('❌ Server Error:', err);
+    console.error('❌ Server Error:', err.message, err.stack);
     res.status(500).send('Server Error');
   }
 });
-
 
 
 router.post('/add-multiple', async (req, res) => {

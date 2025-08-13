@@ -1,0 +1,1522 @@
+[
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "103-02",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 19800
+      },
+      {
+        "type": "two-installments",
+        "total_price": 21800
+      },
+      {
+        "type": "cheques",
+        "total_price": 23800,
+        "down_payment": 8330,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "103-03",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "103-04",
+    "floor": "01",
+    "size_category": "200-250",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 30000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 32000
+      },
+      {
+        "type": "cheques",
+        "total_price": 34000,
+        "down_payment": 11900,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "103-05",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 15000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 17000
+      },
+      {
+        "type": "cheques",
+        "total_price": 19000,
+        "down_payment": 6650,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "103-06",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "103-07",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-01",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-02",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 15000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 17000
+      },
+      {
+        "type": "cheques",
+        "total_price": 19000,
+        "down_payment": 6650,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-03",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-04",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 15000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 17000
+      },
+      {
+        "type": "cheques",
+        "total_price": 19000,
+        "down_payment": 6650,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-05",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-06",
+    "floor": "01",
+    "size_category": "200-250",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 30000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 32000
+      },
+      {
+        "type": "cheques",
+        "total_price": 34000,
+        "down_payment": 11900,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-07",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-08",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-09/10",
+    "floor": "01",
+    "size_category": "150-200",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-11",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-12",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-13",
+    "floor": "01",
+    "size_category": "200-250",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 30000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 32000
+      },
+      {
+        "type": "cheques",
+        "total_price": 34000,
+        "down_payment": 11900,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-14",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-15",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-16",
+    "floor": "01",
+    "size_category": "200-250",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 30000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 32000
+      },
+      {
+        "type": "cheques",
+        "total_price": 34000,
+        "down_payment": 11900,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-20",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-21",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-22",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-23",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-24",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-25",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-26",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-27",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-28",
+    "floor": "01",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 20000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 22000
+      },
+      {
+        "type": "cheques",
+        "total_price": 24000,
+        "down_payment": 8400,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-29",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "101-30",
+    "floor": "01",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-01",
+    "floor": "02",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-02",
+    "floor": "02",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-04",
+    "floor": "02",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-05",
+    "floor": "02",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 25000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 27000
+      },
+      {
+        "type": "cheques",
+        "total_price": 29000,
+        "down_payment": 10150,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-06",
+    "floor": "02",
+    "size_category": "120-150",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 16000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 18000
+      },
+      {
+        "type": "cheques",
+        "total_price": 20000,
+        "down_payment": 7000,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-08/09",
+    "floor": "02",
+    "size_category": "200-250",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 35000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 37000
+      },
+      {
+        "type": "cheques",
+        "total_price": 39000,
+        "down_payment": 13650,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-16",
+    "floor": "02",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 15000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 17000
+      },
+      {
+        "type": "cheques",
+        "total_price": 19000,
+        "down_payment": 6650,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  },
+  {
+    "branch_id": {
+      "$oid": "68553e016131c797d5334507"
+    },
+    "office_number": "201-17",
+    "floor": "02",
+    "size_category": "100-120",
+    "status": "available",
+    "currentBooking": null,
+    "main_image": "uploads/offices/office_103-01_20250729T072/1753774105621-Screenshot-2025-07-16-161050-copy.jpg",
+    "gallery": [
+      "uploads/offices/office_103-01_20250729T072/1753774105624-Logo.jpg"
+    ],
+    "image_folder": "uploads/offices/office_103-01_20250729T072",
+    "payment_plans": [
+      {
+        "type": "single",
+        "total_price": 15000
+      },
+      {
+        "type": "two-installments",
+        "total_price": 17000
+      },
+      {
+        "type": "cheques",
+        "total_price": 19000,
+        "down_payment": 6650,
+        "number_of_cheques": 10
+      }
+    ],
+    "createdAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-29T09:14:09.114462Z"
+    },
+    "__v": 0
+  }
+]

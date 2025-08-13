@@ -1,19 +1,49 @@
 <%- include('partials/header') %>
+<style>
+  input::placeholder {
+    font-weight: 500;
+    color: #888;
+  }
+
+  #searchInput:focus,
+  #unifiedSearchInput:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+</style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="text-primary fw-bold">🗂️ Offices in Branch</h1>
+  <h1 class="text-primary fw-bold">🗂️ Offices in <span style="color:rgb(25 135 84) !important"><%= branch?.name || 'Branch' %></span></h1>
   <a href="/offices/new?branch_id=<%= branchId %>" class="btn btn-success fw-semibold shadow">
     ➕ Add New Office
   </a>
 </div>
 
-<!-- 🔍 Live Search -->
-<div class="mb-4">
-  <input id="searchInput" type="text" placeholder="🔍 Search office number, floor, status, or company..." class="form-control form-control-lg shadow-sm rounded-pill">
+
+<!-- 🔍 Smart Search Box -->
+<div class="card shadow-sm p-4 mb-4 rounded-4">
+  <h5 class="fw-bold mb-3 text-primary">🔎 Search Offices</h5>
+  <div class="row g-3">
+    <!-- Office Fields Search -->
+    <div class="col-md-6">
+      <input id="searchInput" type="text"
+             class="form-control form-control-lg rounded-pill shadow-sm"
+             placeholder="🔍 Search by office number, floor, status, or company">
+    </div>
+
+    <!-- Page No Search -->
+    <div class="col-md-6">
+      <input id="unifiedSearchInput" type="text"
+             class="form-control form-control-lg rounded-pill shadow-sm"
+             placeholder="📄 Search by Page No">
+    </div>
+  </div>
 </div>
 
-<!-- Filter -->
-<form method="GET" action="/bookings/branch/<%= branchId %>" class="mb-4">
+
+
+<!-- ✅ Filter Dropdown -->
+<form method="GET" action="/bookings/branch/<%= branchId %>" class="mb-4" id="filterForm">
   <div class="row g-3 align-items-center">
     <div class="col-auto">
       <label class="col-form-label fw-semibold">Filter:</label>
@@ -23,22 +53,24 @@
         <option value="all" <%= filter === 'all' ? 'selected' : '' %>>Show All</option>
         <option value="available" <%= filter === 'available' ? 'selected' : '' %>>Show Only Available</option>
         <option value="booked" <%= filter === 'booked' ? 'selected' : '' %>>Show Only Rented</option>
+        <option value="expiring" <%= filter === 'expiring' ? 'selected' : '' %>>📆 Expiring This Month</option>
       </select>
     </div>
   </div>
 </form>
 
-<!-- Stats -->
+<!-- ✅ Stats Cards with Filter -->
 <div class="row mb-4 g-3">
   <% const statCards = [
-    { label: 'Total Offices', value: totalOffices, color: 'primary' },
-    { label: 'Available Offices', value: totalAvailable, color: 'success' },
-    { label: 'Rented Offices', value: totalBooked, color: 'danger' },
-    { label: 'Expiring This Month', value: expiringThisMonth, color: 'warning', textColor: 'text-dark' },
+    { label: 'Total Offices', value: totalOffices, color: 'primary', filter: 'all' },
+    { label: 'Available Offices', value: totalAvailable, color: 'success', filter: 'available' },
+    { label: 'Rented Offices', value: totalBooked, color: 'danger', filter: 'booked' },
+    { label: 'Expiring This Month', value: expiringThisMonth, color: 'warning', textColor: 'text-dark', filter: 'expiring' },
   ]; %>
   <% statCards.forEach(stat => { %>
     <div class="col-sm-6 col-md-3">
-      <div class="card text-center bg-<%= stat.color %> text-white shadow-sm stat-card">
+      <div class="card text-center bg-<%= stat.color %> text-white shadow-sm stat-card clickable-card"
+           data-filter="<%= stat.filter %>">
         <div class="card-body">
           <h6 class="card-title"><%= stat.label %></h6>
           <h2 class="<%= stat.textColor || '' %>"><%= stat.value %></h2>
@@ -48,7 +80,7 @@
   <% }); %>
 </div>
 
-<!-- Chart -->
+<!-- 📊 Chart -->
 <div class="text-center mb-4">
   <h5 class="fw-bold">📊 Office Occupancy</h5>
   <div style="max-width: 320px; margin: 0 auto;">
@@ -78,21 +110,29 @@
   const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 %>
 
-<!-- Office Grid -->
+<!-- 🏢 Office Grid -->
+<!-- 🏢 Office Grid -->
 <div class="row g-3" id="officeGrid">
   <% offices.forEach(office => {
     const booking = bookings.find(b => b.office_id?.toString() === office._id.toString());
     const isBooked = !!booking;
     const isExpiringSoon = isBooked && new Date(booking.end_date) >= today && new Date(booking.end_date) <= endOfMonth;
 
-    if (filter === 'all' || (filter === 'available' && !isBooked) || (filter === 'booked' && isBooked)) { %>
+    if (
+      filter === 'all' ||
+      (filter === 'available' && !isBooked) ||
+      (filter === 'booked' && isBooked) ||
+      (filter === 'expiring' && isExpiringSoon)
+    ) { %>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2 office-card"
-         data-number="<%= office.office_number %>"
-         data-floor="<%= office.floor %>"
-         data-status="<%= isBooked ? 'booked' : 'available' %>"
-         data-company="<%= booking?.client_id?.company_en || booking?.client_id?.name || '' %>">
-         
+    <!-- ✅ كارت المكتب مع data-page-no -->
+  <div class="col-6 col-sm-4 col-md-3 col-lg-2 office-card"
+     data-number="<%= office.office_number %>"
+     data-floor="<%= office.floor %>"
+     data-status="<%= isBooked ? 'booked' : 'available' %>"
+     data-company="<%= booking?.client_id?.company_en || booking?.client_id?.name || '' %>"
+     data-page-no="<%= booking?.page_no || '' %>">
+
       <div class="office-box <%= isBooked ? 'office-booked' : 'office-available' %>">
         <% if (isBooked) { %>
           <a href="/bookings/view/<%= booking._id %>" class="stretched-link"></a>
@@ -108,6 +148,12 @@
           <div>
             <h6 class="fw-bold">Office <%= office.office_number %></h6>
             <p class="mb-1">🏢 Floor: <%= office.floor || 'N/A' %></p>
+
+            <% if (booking?.page_no) { %>
+              <span class="badge bg-info text-dark mb-2 d-inline-block">
+                📄 Page No: <%= booking.page_no %>
+              </span>
+            <% } %>
 
             <% if (isExpiringSoon) { %>
               <span class="badge bg-warning text-dark mb-2">⚠️ Expires This Month</span>
@@ -141,26 +187,60 @@
   <% } }); %>
 </div>
 
-<!-- 🔍 Live Search Script -->
+
+<!-- 🔍 Live Search -->
 <script>
   const searchInput = document.getElementById('searchInput');
+ const pageNoSearchInput = document.getElementById('unifiedSearchInput');
+
   const officeCards = document.querySelectorAll('.office-card');
 
-  searchInput.addEventListener('input', function () {
-    const query = this.value.toLowerCase();
+  function performSearch() {
+    const officeQuery = searchInput.value.trim().toLowerCase();
+    const pageQuery = pageNoSearchInput.value.trim().toLowerCase();
 
     officeCards.forEach(card => {
       const number = card.dataset.number?.toLowerCase() || '';
       const floor = card.dataset.floor?.toLowerCase() || '';
       const status = card.dataset.status?.toLowerCase() || '';
       const company = card.dataset.company?.toLowerCase() || '';
+      const pageNo = card.dataset.pageNo?.toLowerCase() || '';
 
-      const match = number.includes(query) || floor.includes(query) || status.includes(query) || company.includes(query);
-      card.style.display = match ? 'block' : 'none';
+      const matchesOfficeFields = officeQuery && (
+        number.includes(officeQuery) ||
+        floor.includes(officeQuery) ||
+        status.includes(officeQuery) ||
+        company.includes(officeQuery)
+      );
+
+      const matchesPage = pageQuery && pageNo.includes(pageQuery);
+
+      const show = (!officeQuery && !pageQuery) || matchesOfficeFields || matchesPage;
+
+      card.style.display = show ? 'block' : 'none';
+    });
+  }
+
+  searchInput.addEventListener('input', performSearch);
+  pageNoSearchInput.addEventListener('input', performSearch);
+</script>
+
+
+<!-- 🖱️ Card Click Filter -->
+<script>
+  document.querySelectorAll('.clickable-card').forEach(card => {
+    card.addEventListener('click', function () {
+      const filterValue = this.dataset.filter;
+      const select = document.querySelector('select[name="filter"]');
+      if (select) {
+        select.value = filterValue;
+        select.form.submit();
+      }
     });
   });
 </script>
 
+<!-- 💅 Style -->
 <style>
   .office-box {
     position: relative;
@@ -226,6 +306,10 @@
   .stat-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .clickable-card {
+    cursor: pointer;
   }
 </style>
 

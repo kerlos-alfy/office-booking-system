@@ -3,13 +3,13 @@
 <div class="container py-5">
 
   <!-- ✅ العنوان -->
-  <h1 class="mb-4 fw-bold text-center text-primary display-5">
-    📆 Monthly Dues - <%= currentMonthName %> <%= selectedYear %>
-    <% if (branchName) { %>
-      <br>🏢 Branch: <%= branchName %>
-    <% } %>
-    
-  </h1>
+ <h1 class="mb-4 fw-bold text-center text-primary display-5">
+  📆 Monthly Dues - <%= currentMonthName %> <%= selectedYear %>
+  <% if (branchName) { %>
+    <br>🏢 Branch: <%= branchName %>
+  <% } %>
+</h1>
+
 
   <!-- ✅ Dashboard صغيرة -->
   <div class="row mb-5">
@@ -39,7 +39,7 @@
     </div>
   </div>
 
- <!-- ✅ فلتر الشهر والسنة -->
+<!-- ✅ فلتر الشهر والسنة + الفرع -->
 <div class="card shadow-sm rounded-4 mb-5 border-0">
   <div class="card-body">
     <h5 class="fw-bold mb-4 text-primary">
@@ -55,7 +55,7 @@
       %>
 
       <!-- ✅ Month -->
-      <div class="col-md-5">
+      <div class="col-md-3">
         <label class="form-label fw-semibold text-secondary">📆 Month</label>
         <select name="month" class="form-select rounded-pill shadow-sm px-3 py-2">
           <% for (let i = 0; i < months.length; i++) { %>
@@ -65,7 +65,7 @@
       </div>
 
       <!-- ✅ Year -->
-      <div class="col-md-5">
+      <div class="col-md-3">
         <label class="form-label fw-semibold text-secondary">📅 Year</label>
         <select name="year" class="form-select rounded-pill shadow-sm px-3 py-2">
           <% for (let y = currentYear - 1; y <= currentYear + 1; y++) { %>
@@ -74,18 +74,38 @@
         </select>
       </div>
 
+      <!-- ✅ Branch -->
+   <!-- ✅ Branch -->
+<div class="col-md-4">
+  <label class="form-label fw-semibold text-secondary">🏢 Branch</label>
+  <select name="branch_id" class="form-select rounded-pill shadow-sm px-3 py-2">
+    <option value="">-- All Branches --</option>
+    <% branches.forEach(branch => { %>
+      <option value="<%= branch._id %>" <%= selectedBranchId === branch._id.toString() ? 'selected' : '' %>>
+        <%= branch.name %>
+      </option>
+    <% }); %>
+  </select>
+</div>
+
+
       <!-- ✅ Submit Button -->
       <div class="col-md-2 text-end">
         <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 shadow fw-bold">
           🔍 Apply Filter
         </button>
+        
       </div>
+      
     </form>
+    
   </div>
+  
 </div>
 
+
 <!-- ✅ فلتر الفرع Frontend -->
-<div class="row mb-4">
+<!-- <div class="row mb-4">
   <div class="col-md-4">
     <label class="form-label fw-semibold text-secondary">🏢 Branch (Frontend)</label>
     <select id="branchFilter" class="form-select rounded-pill shadow-sm px-3 py-2">
@@ -95,7 +115,7 @@
       <% }); %>
     </select>
   </div>
-</div>
+</div> -->
 
   <!-- ✅ جدول المستحقات الشهرية -->
   <% if (dues.length === 0) { %>
